@@ -62,6 +62,19 @@ docs/superseded/
 # actually \includegraphics
 docs/images.png
 
+# side documents, not part of the report itself
+docs/bibliography_notes.tex
+docs/bibliography_notes.pdf
+docs/defense_qa.tex
+docs/defense_qa.pdf
+
+# A stale copy of the thesis sat at the repository ROOT as well as in docs/,
+# so GitHub showed it twice. Identical content, CRLF line endings. The leading
+# slash matters: without it these patterns would also match docs/, which is
+# where the real copy lives next to its appendix and logo.
+/thesis_en_v2.tex
+/thesis_en_v2.pdf
+
 # ------------------------------------------------------------- node -------
 # only needed to regenerate the slide deck with docs/build_deck.js
 node_modules/
