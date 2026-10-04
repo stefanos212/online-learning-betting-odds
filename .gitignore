@@ -44,6 +44,24 @@ docs/Tsampouras_*.pdf
 # personal email, and has no business in a public repository
 docs/DiplomatikiErgasia-AitisiAnathesis_*.pdf
 
+# ------------------------------------------------- superseded write-ups ---
+# The repository carries ONE edition of the thesis: docs/thesis_en_v2.tex (plus
+# its generated appendix docs/appendix_tables_en.tex). Everything below is an
+# earlier or parallel edition of the same work and is kept locally only, so the
+# repo never shows two copies of the thesis.
+docs/thesis.tex
+docs/thesis.pdf
+docs/appendix_tables.tex
+docs/thesis_en.tex
+docs/thesis_en.pdf
+docs/status_report.tex
+docs/status_report.pdf
+docs/superseded/
+
+# byte-identical duplicate of docs/tuc_logo.png, which is the one the thesis
+# actually \includegraphics
+docs/images.png
+
 # ------------------------------------------------------------- misc -------
 scripts/texput.log
 .DS_Store
