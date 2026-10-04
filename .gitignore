@@ -62,7 +62,13 @@ docs/superseded/
 # actually \includegraphics
 docs/images.png
 
+# ------------------------------------------------------------- node -------
+# only needed to regenerate the slide deck with docs/build_deck.js
+node_modules/
+
 # ------------------------------------------------------------- misc -------
+# LibreOffice leaves these behind while a file is open
+docs/.~lock.*#
 scripts/texput.log
 .DS_Store
 Thumbs.db
