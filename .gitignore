@@ -75,6 +75,10 @@ docs/defense_qa.pdf
 /thesis_en_v2.tex
 /thesis_en_v2.pdf
 
+# --------------------------------------------------------- local state ----
+# Claude Code's per-machine settings and lock files
+.claude/
+
 # ------------------------------------------------------------- node -------
 # only needed to regenerate the slide deck with docs/build_deck.js
 node_modules/
