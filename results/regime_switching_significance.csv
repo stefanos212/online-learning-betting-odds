@@ -1,0 +1,2 @@
+series,vs,n,verdict,block_length,mean_diff,ci_low,ci_high,p_value,significant_95
+"Regime-OGD (K=3, β=30, γ=0, τ=0)",OGD,76584,ισοπαλία,42,-1.6343792275024804e-05,-4.0708075248350035e-05,8.44053430471865e-06,0.211,False

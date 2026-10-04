@@ -1,0 +1,8 @@
+# The pipeline uses nothing beyond these three.
+numpy
+pandas
+matplotlib
+
+# Only needed to render a compiled PDF to PNG for visual review, never by the
+# pipeline itself:
+# pymupdf

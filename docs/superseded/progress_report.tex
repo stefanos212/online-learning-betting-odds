@@ -1,0 +1,194 @@
+% !TeX program = xelatex
+% Απαιτεί XeLaTeX (λόγω fontspec/polyglossia) -- ΔΕΝ μεταγλωττίζεται με pdflatex.
+\documentclass[11pt,a4paper]{article}
+
+\usepackage{fontspec}
+\usepackage{polyglossia}
+\setmainlanguage{greek}
+\setotherlanguage{english}
+\setmainfont{Linux Libertine O}
+\setsansfont{Linux Biolinum O}
+\setmonofont{DejaVu Sans Mono}[Scale=0.9]
+
+\usepackage[a4paper,margin=2.6cm]{geometry}
+\usepackage{parskip}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{graphicx}
+\graphicspath{{../results/}}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage[hidelinks,colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\usepackage{xcolor}
+
+\newcommand{\file}[1]{\texttt{#1}}
+
+\let\oldunderscore\_
+\renewcommand{\_}{\oldunderscore\allowbreak}
+\setlength{\emergencystretch}{3em}
+
+\setlist[itemize]{topsep=2pt,itemsep=2pt}
+\setlist[enumerate]{topsep=2pt,itemsep=2pt}
+
+\title{\textbf{Online Convex Optimization based tuning of\\ Mixture of Experts for Sports Outcome Prediction}\\[6pt]
+\large Σύντομη αναφορά προόδου}
+\author{[Ονοματεπώνυμο φοιτητή]}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+% =====================================================================
+\section{Τι κάνει η εργασία}
+% =====================================================================
+
+Κάθε στοιχηματική εταιρεία δίνει τις δικές της πιθανότητες $(p_H, p_D, p_A)$ για το
+αποτέλεσμα ενός ποδοσφαιρικού αγώνα (Νίκη Γηπεδούχου / Ισοπαλία / Νίκη Φιλοξενούμενου).
+Αντιμετωπίζουμε κάθε bookmaker ως έναν \emph{expert}, και μαθαίνουμε \emph{online}
+(αγώνα προς αγώνα, χωρίς να ξαναδούμε το παρελθόν) πώς να τους συνδυάζουμε σε ένα ενιαίο
+μείγμα που να τους ξεπερνά όλους μαζί. Χρησιμοποιούμε τρεις κλασικούς αλγορίθμους Online
+Convex Optimization (Hedge, OGD, FTRL), γενικευμένους ώστε να δουλεύουν και όταν κάποιοι
+bookmakers δεν δίνουν απόδοση σε κάθε αγώνα (μερική κάλυψη).
+
+% =====================================================================
+\section{Δεδομένα}
+% =====================================================================
+
+Πηγή: football-data.co.uk, ενότητα "Main Leagues". \textbf{22 διοργανώσεις}
+(Αγγλία $\times$5, Σκωτία $\times$4, Γερμανία/Ιταλία/Ισπανία/Γαλλία $\times$2,
+Ολλανδία/Βέλγιο/Πορτογαλία/Τουρκία/Ελλάδα $\times$1), \textbf{10 σεζόν} (2016/17--2025/26),
+\textbf{76.639 αγώνες}, εκ των οποίων 76.584 έχουν τουλάχιστον μία χρήσιμη απόδοση.
+Μετά την αφαίρεση μη-ανεξάρτητων/aggregate στηλών (π.χ.\ Max/Avg) και τη συγχώνευση ενός
+γνωστού rebrand (VC Bet $\to$ BetVictor), μένουν \textbf{26 ανεξάρτητοι bookmakers}.
+
+% =====================================================================
+\section{Μεθοδολογία, σε συντομία}
+% =====================================================================
+
+\begin{itemize}
+  \item \textbf{De-vig}: οι raw αποδόσεις μετατρέπονται σε καθαρές πιθανότητες
+        (proportional normalization) αφαιρώντας το περιθώριο κέρδους (overround) του
+        κάθε bookmaker.
+  \item \textbf{Sleeping Experts / Specialists reduction}: επιτρέπει στο Hedge/OGD/FTRL να
+        δουλεύουν σωστά ακόμη κι όταν ένας bookmaker "κοιμάται" (δεν δίνει απόδοση) σε
+        κάποιους αγώνες -- επανακανονικοποίηση μόνο πάνω στους ενεργούς κάθε γύρο, με το
+        state των κοιμισμένων παγωμένο.
+  \item \textbf{Βαθμονόμηση (calibration)}: δεύτερο στάδιο OCO (online temperature scaling)
+        πάνω στο μείγμα, για διόρθωση του γνωστού \emph{favorite-longshot bias} (οι αγορές
+        στοιχημάτων τείνουν να υπερτιμούν τα "μεγάλα" σενάρια και να υποτιμούν τα φαβορί).
+  \item \textbf{Στατιστική σημαντικότητα}: moving block bootstrap (όχι απλό t-test) --
+        λαμβάνει υπόψη ότι οι διαδοχικές ζημίες ανά αγώνα δεν είναι ανεξάρτητες.
+  \item \textbf{Οικονομικός έλεγχος}: προσομοίωση στοιχηματισμού Kelly, leave-one-
+        bookmaker-out (ο bookmaker εναντίον του οποίου στοιχηματίζουμε αποκλείεται πρώτα
+        από το μείγμα, ώστε να μην είναι κυκλικό).
+\end{itemize}
+
+Καμία θεωρητική απόδειξη δεν παρατίθεται εδώ -- υπάρχουν αναλυτικά στο πλήρες κείμενο
+(\file{thesis\_report.tex}).
+
+% =====================================================================
+\section{Κύρια ευρήματα}
+% =====================================================================
+
+\subsection{Πυρήνας: Hedge / OGD / FTRL έναντι bookmakers}
+
+\begin{table}[h]
+\centering
+\begin{tabular}{@{}lrr@{}}
+\toprule
+\textbf{Μέθοδος} & \textbf{Raw log-loss} & \textbf{Βαθμονομημένο log-loss} \\
+\midrule
+PSC (Pinnacle, closing) & 0,9971 & \textbf{0,9968} \\
+OGD (καλύτερος αλγόριθμος) & 0,9983 & 0,9976 \\
+Hedge & 0,9985 & 0,9978 \\
+FTRL & 0,9985 & 0,9978 \\
+Uniform average & 0,9989 & 0,9981 \\
+\bottomrule
+\end{tabular}
+\caption{Tier-A κατάταξη (κάλυψη $\geq$70\%), ταξινομημένη κατά βαθμονομημένο log-loss.
+Χαμηλότερο = καλύτερο.}
+\end{table}
+
+\begin{itemize}
+  \item Το \textbf{OGD} είναι ο καλύτερος από τους τρεις αλγορίθμους, και μαζί με το Hedge
+        και το FTRL ξεπερνούν σημαντικά το naive uniform average.
+  \item Ο \textbf{PSC} (Pinnacle, closing odds) έχει στατιστικά σημαντικό προβάδισμα έναντι
+        του OGD -- κανένας μεμονωμένος αλγόριθμος δεν ξεπερνά τον καλύτερο "sharp"
+        bookmaker, μόνο τους υπόλοιπους.
+  \item Η \textbf{βαθμονόμηση βοηθάει σημαντικά}, με συνέπεια, σε όλους τους αλγορίθμους
+        και bookmakers.
+  \item Οι \textbf{αποδόσεις κλεισίματος} (closing) δίνουν σημαντικά καλύτερο μείγμα από
+        τις αποδόσεις ανοίγματος (opening) -- αναμενόμενο, αφού η αγορά έχει απορροφήσει
+        περισσότερη πληροφορία μέχρι το κλείσιμο.
+\end{itemize}
+
+\subsection{Επεκτάσεις (μία γραμμή η καθεμία)}
+
+\begin{itemize}
+  \item \textbf{Fixed-Share}: διορθώνει bookmakers με τεχνητά διογκωμένο τελικό βάρος
+        (π.χ.\ ενεργοί σε μία μόνο σεζόν), με μικρό κόστος στο συνολικό log-loss.
+  \item \textbf{Contextual experts (ανά λίγκα)}: \emph{δεν} βοηθάει -- το ενιαίο μείγμα
+        ξεπερνά τα specialists ανά λίγκα (πλην Σκωτίας, οριακά).
+  \item \textbf{Value betting}: καμία σημαντική άκρη έναντι σκληρού bookmaker (B365C)·
+        μεγάλη, σημαντική άκρη έναντι πιο αδύναμου (BW) -- με την επιφύλαξη ότι
+        πραγματικά όρια λογαριασμού δεν προσομοιώνονται.
+  \item \textbf{Ακρίβεια ανά κατηγορία}: οι ισοπαλίες είναι ουσιαστικά απρόβλεπτες ως
+        \emph{argmax} πρόβλεψη ($<$0,7\% ακρίβεια), παρότι $\sim$26\% των αγώνων.
+  \item \textbf{Χρονικές τάσεις (10 σεζόν)}: καμία σημαντική τάση στο log-loss/ECE, αλλά
+        το overround \emph{αυξάνεται} σημαντικά ($\sim$4,4\%$\to$6,0\%).
+  \item \textbf{Per-season βαθμονόμηση / warm-start}: σημαντικά καλύτερα από raw, αλλά
+        στατιστικά αδιάκριτα από το ενιαίο global calibration.
+\end{itemize}
+
+% =====================================================================
+\section{Πρόσφατη δουλειά: εναλλακτική μέθοδος de-vig (Shin)}
+% =====================================================================
+
+Ελέγξαμε αν τα παραπάνω ευρήματα είναι artifact της επιλογής μεθόδου de-vig
+(proportional normalization), δοκιμάζοντας τη μέθοδο του \textbf{Shin (1992)} --
+μοντελοποιεί μια αναλογία "insider" στοιχηματιστών και ανακατανέμει το περιθώριο του
+bookmaker υπέρ του φαβορί, αντί να το μοιράζει ομοιόμορφα.
+
+\begin{itemize}
+  \item Η \textbf{κατάταξη δεν αλλάζει}: ο PSC παραμένει πρώτος, με την ίδια σειρά
+        αλγορίθμων/bookmakers, είτε με proportional είτε με Shin de-vig.
+  \item Στο \textbf{raw} στάδιο, το Shin είναι στατιστικά σημαντικά καλύτερο
+        (log-loss \emph{και} Brier) σε όλες τις 11 οντότητες (4 αλγόριθμοι + 7 Tier-A
+        bookmakers), $p<0{,}0001$ παντού.
+  \item Η \textbf{ποιότητα βαθμονόμησης} (Expected Calibration Error) βελτιώνεται
+        δραματικά με Shin -- μειώνεται κατά $\sim$35--57\% σε κάθε σειρά (π.χ.\ OGD:
+        0,0091 $\to$ 0,0043).
+  \item Μετά όμως τη βαθμονόμηση, το πλεονέκτημα του Shin \textbf{συρρικνώνεται ή
+        εξαφανίζεται} -- και, αντίστροφα, το ίδιο το calibration παύει να είναι
+        στατιστικά σημαντικό για τα περισσότερα series \emph{μέσα} στο Shin (ενώ είναι
+        σημαντικό παντού μέσα στο proportional normalization). Ερμηνεία: οι δύο μέθοδοι
+        διορθώνουν το \emph{ίδιο} favorite-longshot bias, με διαφορετικό μηχανισμό --
+        μόλις γίνει η μία διόρθωση, η άλλη γίνεται σε μεγάλο βαθμό περιττή.
+  \item Το ίδιο μοτίβο επιβεβαιώνεται και στην οικονομική προσομοίωση (value betting).
+\end{itemize}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=0.95\textwidth]{shin_vs_basic_calibration_reliability.png}
+\caption{Calibration gap (πραγματική $-$ προβλεπόμενη συχνότητα): proportional
+normalization (αριστερά) έναντι Shin (δεξιά). Το εύρος συρρικνώνεται δραματικά --
+οπτική επιβεβαίωση της διόρθωσης του favorite-longshot bias.}
+\end{figure}
+
+\textbf{Συμπέρασμα}: το βασικό εύρημα της εργασίας (μείγμα $>$ κάθε μεμονωμένος
+bookmaker εκτός του καλύτερου sharp bookmaker· βαθμονόμηση βοηθάει) \textbf{δεν είναι
+artifact} της επιλογής de-vig -- επιβεβαιώνεται με δύο ανεξάρτητες μεθόδους.
+
+% =====================================================================
+\section{Τρέχουσα κατάσταση \& επόμενα βήματα}
+% =====================================================================
+
+Το πλήρες pipeline (download $\to$ επεξεργασία $\to$ πυρήνας αλγορίθμων $\to$
+βαθμονόμηση $\to$ 9 επεκτάσεις $\to$ Shin robustness check) τρέχει καθαρά end-to-end. Το
+πλήρες κείμενο (θεωρία, υλοποίηση, όλα τα ευρήματα) είναι ήδη σε προχωρημένο στάδιο στο
+\file{thesis\_report.tex}. Το ερώτημα που έχει μείνει ανοιχτό είναι \textbf{scope}: πόσα
+από τα $\sim$10 follow-up ευρήματα αξίζει να μπουν σε κεντρικό κεφάλαιο έναντι
+παραρτήματος, ώστε το κείμενο να έχει καθαρή, εστιασμένη αφήγηση αντί να διασπείρεται.
+
+\end{document}

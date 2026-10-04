@@ -1,0 +1,28 @@
+market,algorithm,metric,comparison,lower_is_better,verdict,n,normalization,block_length,mean_diff,ci_low,ci_high,p_value,significant_95
+opening,Hedge,log_loss,Hedge vs Uniform average,True,Uniform average wins,76557,Basic,42,7.511304210635667e-05,1.4102863728606102e-05,0.00013894400225620418,0.019,True
+opening,Hedge,brier,Hedge vs Uniform average,True,Uniform average wins,76557,Basic,42,5.5923051021549764e-05,1.6556458877485006e-05,9.397858379522435e-05,0.0,True
+opening,Hedge,accuracy,Hedge vs Uniform average,False,tie (not significant),76557,Basic,42,3.918648849876562e-05,-0.00020899460532675,0.00027430541949135937,0.817,False
+opening,OGD,log_loss,OGD vs Uniform average,True,tie (not significant),76557,Basic,42,-4.3410505976798084e-05,-0.00013364103529861425,5.768030906151416e-05,0.433,False
+opening,OGD,brier,OGD vs Uniform average,True,tie (not significant),76557,Basic,42,-4.4014878004528696e-05,-9.559190465884569e-05,1.3198354183576822e-05,0.14,False
+opening,OGD,accuracy,OGD vs Uniform average,False,tie (not significant),76557,Basic,42,-6.531081416460937e-05,-0.00043105137348642186,0.00032655407082304687,0.759,False
+opening,FTRL,log_loss,FTRL vs Uniform average,True,Uniform average wins,76557,Basic,42,7.618237110293982e-05,1.5285603553048712e-05,0.00014004132350936368,0.015,True
+opening,FTRL,brier,FTRL vs Uniform average,True,Uniform average wins,76557,Basic,42,5.6813264747626965e-05,1.84232849808224e-05,9.597800530677422e-05,0.002,True
+opening,FTRL,accuracy,FTRL vs Uniform average,False,tie (not significant),76557,Basic,42,-3.918648849876562e-05,-0.00027430541949135937,0.00019593244249382813,0.782,False
+closing,Hedge,log_loss,Hedge vs Uniform average,True,Uniform average wins,76521,Basic,42,0.0001383473086324709,9.614033919321369e-05,0.00018294059544695664,0.0,True
+closing,Hedge,brier,Hedge vs Uniform average,True,Uniform average wins,76521,Basic,42,9.206624378843728e-05,6.52630349607342e-05,0.00012085532923395749,0.0,True
+closing,Hedge,accuracy,Hedge vs Uniform average,False,tie (not significant),76521,Basic,42,-0.00013068308046157264,-0.00045739078161550426,0.0001829563126462017,0.423,False
+closing,OGD,log_loss,OGD vs Uniform average,True,OGD wins,76521,Basic,42,-0.00026067766930507096,-0.0003616083524664667,-0.00015633387924838824,0.0,True
+closing,OGD,brier,OGD vs Uniform average,True,OGD wins,76521,Basic,42,-0.00014439132717489328,-0.00020808279030802958,-7.850285094549042e-05,0.0,True
+closing,OGD,accuracy,OGD vs Uniform average,False,tie (not significant),76521,Basic,42,-0.000248297852876988,-0.0007056886344924923,0.00022216123678467348,0.297,False
+closing,FTRL,log_loss,FTRL vs Uniform average,True,Uniform average wins,76521,Basic,42,0.0001328047648633879,8.957541049954486e-05,0.00017682518495667568,0.0,True
+closing,FTRL,brier,FTRL vs Uniform average,True,Uniform average wins,76521,Basic,42,8.835638548196806e-05,6.124747913534286e-05,0.00011704005390888794,0.0,True
+closing,FTRL,accuracy,FTRL vs Uniform average,False,tie (not significant),76521,Basic,42,-0.0001437513885077299,-0.0004577174893166576,0.00016988800460004442,0.367,False
+full,Hedge,log_loss,Hedge vs Uniform average,True,Hedge wins,76584,Basic,42,-0.00044195955013234274,-0.0006199559920945439,-0.00025961792394680396,0.0,True
+full,Hedge,brier,Hedge vs Uniform average,True,Hedge wins,76584,Basic,42,-0.00029619744680040787,-0.0004189665881366894,-0.00017328635035510661,0.0,True
+full,Hedge,accuracy,Hedge vs Uniform average,False,tie (not significant),76584,Basic,42,0.0005614749817194191,-0.00014363313485845608,0.0012535255405828893,0.123,False
+full,OGD,log_loss,OGD vs Uniform average,True,OGD wins,76584,Basic,42,-0.0014080696082694319,-0.0016722649205743515,-0.0011503064428725921,0.0,True
+full,OGD,brier,OGD vs Uniform average,True,OGD wins,76584,Basic,42,-0.000907902408851542,-0.001082105941775106,-0.0007373043198284878,0.0,True
+full,OGD,accuracy,OGD vs Uniform average,False,tie (not significant),76584,Basic,42,0.0006920505588634702,-0.00024809359657369687,0.0016194635955290905,0.156,False
+full,FTRL,log_loss,FTRL vs Uniform average,True,FTRL wins,76584,Basic,42,-0.0004277947802690547,-0.0006067591078484905,-0.00024542934766145,0.0,True
+full,FTRL,brier,FTRL vs Uniform average,True,FTRL wins,76584,Basic,42,-0.0002893910164187815,-0.0004136250160409017,-0.00016627492524668615,0.0,True
+full,FTRL,accuracy,FTRL vs Uniform average,False,tie (not significant),76584,Basic,42,0.0006006476548626344,-0.00010446046171524079,0.0013057557714405098,0.108,False

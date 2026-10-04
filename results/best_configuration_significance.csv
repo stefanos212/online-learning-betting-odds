@@ -1,0 +1,19 @@
+config,stage,vs,n,verdict,block_length,mean_diff,ci_low,ci_high,p_value,significant_95
+"baseline (full 26, basic)",raw,PSC alone,71818,PSC alone better,42,0.0006503310948641488,0.0004395268382867099,0.0008579288089366589,0.0,True
+"baseline (full 26, basic)",calibrated,PSC alone,71818,PSC alone better,42,0.00042768686847407953,0.00019721559907198477,0.000642256364994798,0.0,True
+"closing only, basic",raw,PSC alone,71818,PSC alone better,42,0.00018967352117435867,8.603866990182397e-05,0.00028665295797207594,0.0,True
+"closing only, basic",raw,"baseline (full 26, basic)",71818,"closing only, basic better",42,-0.00046065757368979007,-0.0006386415352857403,-0.0002865590242026561,0.0,True
+"closing only, basic",calibrated,PSC alone,71818,tie (not significant),42,8.701908990189665e-05,-2.5797189545207628e-05,0.00019632967432056892,0.143,False
+"closing only, basic",calibrated,"baseline (full 26, basic)",71818,"closing only, basic better",42,-0.00034066777857218297,-0.000526379363951894,-0.0001551188082386925,0.0,True
+"full 26, Shin",raw,PSC alone,71818,PSC alone better,42,0.0003087455722273326,8.026069091367346e-05,0.0005367206475756221,0.011,True
+"full 26, Shin",raw,"baseline (full 26, basic)",71818,"full 26, Shin better",42,-0.0003415855226368162,-0.0004552303129563677,-0.00021871276530693501,0.0,True
+"full 26, Shin",calibrated,PSC alone,71818,PSC alone better,42,0.0004637786929485806,0.0002148224221513361,0.0006940167313895898,0.0,True
+"full 26, Shin",calibrated,"baseline (full 26, basic)",71818,tie (not significant),42,3.609182447450108e-05,-1.5575780254667658e-05,8.913456784673e-05,0.181,False
+A: closing + Shin,raw,PSC alone,71818,tie (not significant),42,-0.00012169971349314295,-0.0002499000962741266,2.995952930968207e-06,0.057,False
+A: closing + Shin,raw,"baseline (full 26, basic)",71818,A: closing + Shin better,42,-0.0007720308083572916,-0.0009984745812956978,-0.0005561936175091732,0.0,True
+A: closing + Shin,calibrated,PSC alone,71818,tie (not significant),42,7.016953330305621e-05,-4.3245049772712905e-05,0.00017938865816740355,0.234,False
+A: closing + Shin,calibrated,"baseline (full 26, basic)",71818,A: closing + Shin better,42,-0.0003575173351710234,-0.0005552662007499012,-0.00016050513906351065,0.0,True
+B: A minus single-season,raw,PSC alone,71818,tie (not significant),42,-0.00011499265305890005,-0.00024203883638407474,9.522057352951742e-06,0.072,False
+B: A minus single-season,raw,"baseline (full 26, basic)",71818,B: A minus single-season better,42,-0.0007653237479230488,-0.0009914406980340213,-0.0005451163984662299,0.0,True
+B: A minus single-season,calibrated,PSC alone,71818,tie (not significant),42,7.693366516443379e-05,-3.450665620944443e-05,0.00018337372799994263,0.181,False
+B: A minus single-season,calibrated,"baseline (full 26, basic)",71818,B: A minus single-season better,42,-0.0003507532033096458,-0.0005502729992821695,-0.00015203314335878148,0.0,True

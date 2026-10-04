@@ -1,0 +1,251 @@
+series,type,season,metric,value,kind
+Hedge,algorithm,1617,log_loss,0.9947671172675379,per-series
+Hedge,algorithm,1617,ece,0.017871674719474675,per-series
+Hedge,algorithm,1718,log_loss,0.9933697420994179,per-series
+Hedge,algorithm,1718,ece,0.010076848937110328,per-series
+Hedge,algorithm,1819,log_loss,0.9991046082986564,per-series
+Hedge,algorithm,1819,ece,0.008554866153345683,per-series
+Hedge,algorithm,1920,log_loss,1.0104557757067538,per-series
+Hedge,algorithm,1920,ece,0.006202941311303451,per-series
+Hedge,algorithm,2021,log_loss,1.0066503765888544,per-series
+Hedge,algorithm,2021,ece,0.008456279425173357,per-series
+Hedge,algorithm,2122,log_loss,0.9959870604750011,per-series
+Hedge,algorithm,2122,ece,0.010105340846340172,per-series
+Hedge,algorithm,2223,log_loss,0.9939613873466612,per-series
+Hedge,algorithm,2223,ece,0.0158258901755283,per-series
+Hedge,algorithm,2324,log_loss,0.9923502170460631,per-series
+Hedge,algorithm,2324,ece,0.007408985094602763,per-series
+Hedge,algorithm,2425,log_loss,0.9983161370192768,per-series
+Hedge,algorithm,2425,ece,0.0062603570837079835,per-series
+Hedge,algorithm,2526,log_loss,1.0008644806340687,per-series
+Hedge,algorithm,2526,ece,0.009824786711063974,per-series
+OGD,algorithm,1617,log_loss,0.9936678491341023,per-series
+OGD,algorithm,1617,ece,0.016800511290781885,per-series
+OGD,algorithm,1718,log_loss,0.991254322170445,per-series
+OGD,algorithm,1718,ece,0.009435785649925482,per-series
+OGD,algorithm,1819,log_loss,0.9975573441909614,per-series
+OGD,algorithm,1819,ece,0.0069732806450052715,per-series
+OGD,algorithm,1920,log_loss,1.01032099610994,per-series
+OGD,algorithm,1920,ece,0.004918076474432602,per-series
+OGD,algorithm,2021,log_loss,1.0069655092511014,per-series
+OGD,algorithm,2021,ece,0.009400870638138423,per-series
+OGD,algorithm,2122,log_loss,0.9957394248636054,per-series
+OGD,algorithm,2122,ece,0.009370792886157428,per-series
+OGD,algorithm,2223,log_loss,0.9927819792504373,per-series
+OGD,algorithm,2223,ece,0.013230841034177135,per-series
+OGD,algorithm,2324,log_loss,0.9913385368848313,per-series
+OGD,algorithm,2324,ece,0.0065503036969075164,per-series
+OGD,algorithm,2425,log_loss,0.9969160030018122,per-series
+OGD,algorithm,2425,ece,0.0054731125946145985,per-series
+OGD,algorithm,2526,log_loss,0.9997246445471248,per-series
+OGD,algorithm,2526,ece,0.008349066423429382,per-series
+FTRL,algorithm,1617,log_loss,0.9947697544545425,per-series
+FTRL,algorithm,1617,ece,0.01785307238154575,per-series
+FTRL,algorithm,1718,log_loss,0.9933721144193813,per-series
+FTRL,algorithm,1718,ece,0.010083152487736958,per-series
+FTRL,algorithm,1819,log_loss,0.9991096610088867,per-series
+FTRL,algorithm,1819,ece,0.008605219633776291,per-series
+FTRL,algorithm,1920,log_loss,1.0104557767223812,per-series
+FTRL,algorithm,1920,ece,0.006202969053884504,per-series
+FTRL,algorithm,2021,log_loss,1.0066499872967265,per-series
+FTRL,algorithm,2021,ece,0.008462835714939339,per-series
+FTRL,algorithm,2122,log_loss,0.9959842732067264,per-series
+FTRL,algorithm,2122,ece,0.010101568937208363,per-series
+FTRL,algorithm,2223,log_loss,0.9939606992081645,per-series
+FTRL,algorithm,2223,ece,0.015670802418169746,per-series
+FTRL,algorithm,2324,log_loss,0.9923426156006456,per-series
+FTRL,algorithm,2324,ece,0.007403173104735911,per-series
+FTRL,algorithm,2425,log_loss,0.9983169787407548,per-series
+FTRL,algorithm,2425,ece,0.006197863830649374,per-series
+FTRL,algorithm,2526,log_loss,1.001007023768232,per-series
+FTRL,algorithm,2526,ece,0.010092036242953972,per-series
+Uniform average,algorithm,1617,log_loss,0.9947685179396377,per-series
+Uniform average,algorithm,1617,ece,0.017854599429630483,per-series
+Uniform average,algorithm,1718,log_loss,0.9933786636082119,per-series
+Uniform average,algorithm,1718,ece,0.010073487512971655,per-series
+Uniform average,algorithm,1819,log_loss,0.999122024348103,per-series
+Uniform average,algorithm,1819,ece,0.008494268731887411,per-series
+Uniform average,algorithm,1920,log_loss,1.0113009819360008,per-series
+Uniform average,algorithm,1920,ece,0.0038501435175311185,per-series
+Uniform average,algorithm,2021,log_loss,1.007751212018078,per-series
+Uniform average,algorithm,2021,ece,0.00970341720284716,per-series
+Uniform average,algorithm,2122,log_loss,0.9971656657553601,per-series
+Uniform average,algorithm,2122,ece,0.01022392354697185,per-series
+Uniform average,algorithm,2223,log_loss,0.9945661679747048,per-series
+Uniform average,algorithm,2223,ece,0.015275103410432716,per-series
+Uniform average,algorithm,2324,log_loss,0.993260204744814,per-series
+Uniform average,algorithm,2324,ece,0.008367934259741064,per-series
+Uniform average,algorithm,2425,log_loss,0.9983140834589087,per-series
+Uniform average,algorithm,2425,ece,0.006596283982388016,per-series
+Uniform average,algorithm,2526,log_loss,1.0006506029634714,per-series
+Uniform average,algorithm,2526,ece,0.0092908725951882,per-series
+B365,bookmaker,1617,log_loss,0.9952672645847994,per-series
+B365,bookmaker,1617,ece,0.014083841259270466,per-series
+B365,bookmaker,1718,log_loss,0.994335562982133,per-series
+B365,bookmaker,1718,ece,0.008295106018734382,per-series
+B365,bookmaker,1819,log_loss,1.0007644255276753,per-series
+B365,bookmaker,1819,ece,0.005099254957188028,per-series
+B365,bookmaker,1920,log_loss,1.0145748949452391,per-series
+B365,bookmaker,1920,ece,0.006539615719318683,per-series
+B365,bookmaker,2021,log_loss,1.0105348859017738,per-series
+B365,bookmaker,2021,ece,0.00514513264903001,per-series
+B365,bookmaker,2122,log_loss,1.0006312744698638,per-series
+B365,bookmaker,2122,ece,0.007072533876927902,per-series
+B365,bookmaker,2223,log_loss,0.9967195017237641,per-series
+B365,bookmaker,2223,ece,0.011680135515497087,per-series
+B365,bookmaker,2324,log_loss,0.9962731018668175,per-series
+B365,bookmaker,2324,ece,0.009742789285516727,per-series
+B365,bookmaker,2425,log_loss,1.001141522782125,per-series
+B365,bookmaker,2425,ece,0.006239848335800785,per-series
+B365,bookmaker,2526,log_loss,1.0028600984424312,per-series
+B365,bookmaker,2526,ece,0.0067859020407760335,per-series
+BW,bookmaker,1617,log_loss,0.9952260473238593,per-series
+BW,bookmaker,1617,ece,0.015927112724807638,per-series
+BW,bookmaker,1718,log_loss,0.9950730282985363,per-series
+BW,bookmaker,1718,ece,0.009484676710725554,per-series
+BW,bookmaker,1819,log_loss,1.0002483544580898,per-series
+BW,bookmaker,1819,ece,0.007895828434678407,per-series
+BW,bookmaker,1920,log_loss,1.0134304244002563,per-series
+BW,bookmaker,1920,ece,0.004154488814060816,per-series
+BW,bookmaker,2021,log_loss,1.01250630757273,per-series
+BW,bookmaker,2021,ece,0.008041591626316557,per-series
+BW,bookmaker,2122,log_loss,1.001883344612572,per-series
+BW,bookmaker,2122,ece,0.009162088691546924,per-series
+BW,bookmaker,2223,log_loss,0.9978952211787829,per-series
+BW,bookmaker,2223,ece,0.013535727913944492,per-series
+BW,bookmaker,2324,log_loss,0.9951117331043555,per-series
+BW,bookmaker,2324,ece,0.010391206552622562,per-series
+BW,bookmaker,2425,log_loss,1.0011397250791325,per-series
+BW,bookmaker,2425,ece,0.010688157314931166,per-series
+BW,bookmaker,2526,log_loss,1.0035268998335782,per-series
+BW,bookmaker,2526,ece,0.00937521633388693,per-series
+PS,bookmaker,1617,log_loss,0.996342663152163,per-series
+PS,bookmaker,1617,ece,0.013283248331764775,per-series
+PS,bookmaker,1718,log_loss,0.9969163142588614,per-series
+PS,bookmaker,1718,ece,0.006599257138530753,per-series
+PS,bookmaker,1819,log_loss,1.0001217783687868,per-series
+PS,bookmaker,1819,ece,0.007026851840160028,per-series
+PS,bookmaker,1920,log_loss,1.013473750949096,per-series
+PS,bookmaker,1920,ece,0.004904773750140502,per-series
+PS,bookmaker,2021,log_loss,1.0099227875232257,per-series
+PS,bookmaker,2021,ece,0.006998717088694566,per-series
+PS,bookmaker,2122,log_loss,0.9992533887008941,per-series
+PS,bookmaker,2122,ece,0.006837506649966469,per-series
+PS,bookmaker,2223,log_loss,0.9960056217613226,per-series
+PS,bookmaker,2223,ece,0.010679350099369126,per-series
+PS,bookmaker,2324,log_loss,0.9950094829683509,per-series
+PS,bookmaker,2324,ece,0.007439557026867264,per-series
+PS,bookmaker,2425,log_loss,1.0001622975069278,per-series
+PS,bookmaker,2425,ece,0.006690700724276932,per-series
+PS,bookmaker,2526,log_loss,1.0058583313893559,per-series
+PS,bookmaker,2526,ece,0.009436925326270296,per-series
+PSC,bookmaker,1617,log_loss,0.9933764796645841,per-series
+PSC,bookmaker,1617,ece,0.015401647589972187,per-series
+PSC,bookmaker,1718,log_loss,0.9910520207867832,per-series
+PSC,bookmaker,1718,ece,0.00637486442979019,per-series
+PSC,bookmaker,1819,log_loss,0.9969051547394661,per-series
+PSC,bookmaker,1819,ece,0.006887013470935584,per-series
+PSC,bookmaker,1920,log_loss,1.0101794021233812,per-series
+PSC,bookmaker,1920,ece,0.005266138766538513,per-series
+PSC,bookmaker,2021,log_loss,1.006441666110026,per-series
+PSC,bookmaker,2021,ece,0.007496296321790544,per-series
+PSC,bookmaker,2122,log_loss,0.9951377761813007,per-series
+PSC,bookmaker,2122,ece,0.008036459502362526,per-series
+PSC,bookmaker,2223,log_loss,0.9922508103094806,per-series
+PSC,bookmaker,2223,ece,0.011293768586458851,per-series
+PSC,bookmaker,2324,log_loss,0.9910515142049422,per-series
+PSC,bookmaker,2324,ece,0.006019429955646544,per-series
+PSC,bookmaker,2425,log_loss,0.996793824637459,per-series
+PSC,bookmaker,2425,ece,0.004894392988025145,per-series
+PSC,bookmaker,2526,log_loss,1.0043109352411979,per-series
+PSC,bookmaker,2526,ece,0.00815603444381453,per-series
+B365,bookmaker,1617,overround_pct,5.3661855269218774,per-series
+B365,bookmaker,1718,overround_pct,5.393980215276568,per-series
+B365,bookmaker,1819,overround_pct,5.329244761343283,per-series
+B365,bookmaker,1920,overround_pct,5.903701837387797,per-series
+B365,bookmaker,2021,overround_pct,6.424298846651711,per-series
+B365,bookmaker,2122,overround_pct,6.526550397275063,per-series
+B365,bookmaker,2223,overround_pct,6.320346049542071,per-series
+B365,bookmaker,2324,overround_pct,6.145393392381362,per-series
+B365,bookmaker,2425,overround_pct,6.795107302306907,per-series
+B365,bookmaker,2526,overround_pct,7.656627828987612,per-series
+BW,bookmaker,1617,overround_pct,7.445511251553638,per-series
+BW,bookmaker,1718,overround_pct,6.8903691605183335,per-series
+BW,bookmaker,1819,overround_pct,6.681192116933309,per-series
+BW,bookmaker,1920,overround_pct,6.59066401163532,per-series
+BW,bookmaker,2021,overround_pct,6.360038041640998,per-series
+BW,bookmaker,2122,overround_pct,7.126257771333864,per-series
+BW,bookmaker,2223,overround_pct,7.4587445201529015,per-series
+BW,bookmaker,2324,overround_pct,7.493204219553349,per-series
+BW,bookmaker,2425,overround_pct,7.503465906833832,per-series
+BW,bookmaker,2526,overround_pct,7.554578634741596,per-series
+PS,bookmaker,1617,overround_pct,2.4583068834849024,per-series
+PS,bookmaker,1718,overround_pct,2.6423401864739167,per-series
+PS,bookmaker,1819,overround_pct,3.6960052087798263,per-series
+PS,bookmaker,1920,overround_pct,3.695876821994557,per-series
+PS,bookmaker,2021,overround_pct,3.3852216009832605,per-series
+PS,bookmaker,2122,overround_pct,3.752168508177937,per-series
+PS,bookmaker,2223,overround_pct,3.523931498403375,per-series
+PS,bookmaker,2324,overround_pct,3.785305871433349,per-series
+PS,bookmaker,2425,overround_pct,5.077627785110321,per-series
+PS,bookmaker,2526,overround_pct,4.910958864541745,per-series
+PSC,bookmaker,1617,overround_pct,2.406450971667666,per-series
+PSC,bookmaker,1718,overround_pct,2.629995149738958,per-series
+PSC,bookmaker,1819,overround_pct,3.1838483663728017,per-series
+PSC,bookmaker,1920,overround_pct,3.670560635786477,per-series
+PSC,bookmaker,2021,overround_pct,3.1373059630411557,per-series
+PSC,bookmaker,2122,overround_pct,3.2964455804301416,per-series
+PSC,bookmaker,2223,overround_pct,3.3298640122067598,per-series
+PSC,bookmaker,2324,overround_pct,3.515437595881912,per-series
+PSC,bookmaker,2425,overround_pct,3.935814371791807,per-series
+PSC,bookmaker,2526,overround_pct,3.8670908068869614,per-series
+Bookmaker average,,1617,log_loss,0.9950531136813514,aggregate
+Bookmaker average,,1718,log_loss,0.9943442315815785,aggregate
+Bookmaker average,,1819,log_loss,0.9995099282735045,aggregate
+Bookmaker average,,1920,log_loss,1.0129146181044932,aggregate
+Bookmaker average,,2021,log_loss,1.009851411776939,aggregate
+Bookmaker average,,2122,log_loss,0.9992264459911576,aggregate
+Bookmaker average,,2223,log_loss,0.9957177887433376,aggregate
+Bookmaker average,,2324,log_loss,0.9943614580361166,aggregate
+Bookmaker average,,2425,log_loss,0.9998093425014112,aggregate
+Bookmaker average,,2526,log_loss,1.0041390662266407,aggregate
+Algorithm average,,1617,log_loss,0.9944933096989552,aggregate
+Algorithm average,,1718,log_loss,0.992843710574364,aggregate
+Algorithm average,,1819,log_loss,0.9987234094616518,aggregate
+Algorithm average,,1920,log_loss,1.010633382618769,aggregate
+Algorithm average,,2021,log_loss,1.00700427128869,aggregate
+Algorithm average,,2122,log_loss,0.9962191060751733,aggregate
+Algorithm average,,2223,log_loss,0.993817558444992,aggregate
+Algorithm average,,2324,log_loss,0.9923228935690886,aggregate
+Algorithm average,,2425,log_loss,0.9979658005551881,aggregate
+Algorithm average,,2526,log_loss,1.0005616879782242,aggregate
+Bookmaker average,,1617,ece,0.014673962476453766,aggregate
+Bookmaker average,,1718,ece,0.0076884760744452205,aggregate
+Bookmaker average,,1819,ece,0.006727237175740511,aggregate
+Bookmaker average,,1920,ece,0.005216254262514629,aggregate
+Bookmaker average,,2021,ece,0.006920434421457919,aggregate
+Bookmaker average,,2122,ece,0.007777147180200956,aggregate
+Bookmaker average,,2223,ece,0.011797245528817389,aggregate
+Bookmaker average,,2324,ece,0.008398245705163274,aggregate
+Bookmaker average,,2425,ece,0.007128274840758507,aggregate
+Bookmaker average,,2526,ece,0.008438519536186948,aggregate
+Algorithm average,,1617,ece,0.0175949644553582,aggregate
+Algorithm average,,1718,ece,0.009917318646936107,aggregate
+Algorithm average,,1819,ece,0.008156908791003665,aggregate
+Algorithm average,,1920,ece,0.005293532589287919,aggregate
+Algorithm average,,2021,ece,0.00900585074527457,aggregate
+Algorithm average,,2122,ece,0.009950406554169454,aggregate
+Algorithm average,,2223,ece,0.015000659259576974,aggregate
+Algorithm average,,2324,ece,0.007432599038996814,aggregate
+Algorithm average,,2425,ece,0.006131904372839993,aggregate
+Algorithm average,,2526,ece,0.009389190493158882,aggregate
+Bookmaker average,,1617,overround_pct,4.419113658407021,aggregate
+Bookmaker average,,1718,overround_pct,4.389171178001944,aggregate
+Bookmaker average,,1819,overround_pct,4.722572613357305,aggregate
+Bookmaker average,,1920,overround_pct,4.965200826701038,aggregate
+Bookmaker average,,2021,overround_pct,4.82671611307928,aggregate
+Bookmaker average,,2122,overround_pct,5.175355564304252,aggregate
+Bookmaker average,,2223,overround_pct,5.158221520076276,aggregate
+Bookmaker average,,2324,overround_pct,5.234835269812494,aggregate
+Bookmaker average,,2425,overround_pct,5.828003841510717,aggregate
+Bookmaker average,,2526,overround_pct,5.997314033789478,aggregate

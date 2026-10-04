@@ -1,0 +1,50 @@
+# ---------------------------------------------------------------- data ----
+# odds_long.csv and odds_long_shin.csv are 118 MB and 134 MB. GitHub rejects
+# any file over 100 MB outright, so these cannot be committed even if we wanted
+# them to be. They are rebuilt from data/raw by scripts/data_processer.py.
+data/processed/
+
+# memoised panel tensors, keyed on the source CSV's mtime; pure derived state
+data/cache/
+
+# the raw football-data.co.uk downloads. Regenerable with
+# scripts/download_data.ps1, and third-party data is better linked than
+# redistributed.
+data/raw/
+
+# ------------------------------------------------------- local snapshots ---
+# baselines taken before a refactor, for check_results.py to compare against
+results_backup_*/
+results_baseline_*/
+
+# ------------------------------------------------------------- python -----
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# -------------------------------------------------------------- latex -----
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+
+# --------------------------------------------------------- not ours -------
+# other students' theses, kept locally as formatting references only
+docs/Kapourani_*.pdf
+docs/Skoulas_*.pdf
+docs/Tsampouras_*.pdf
+
+# the signed assignment form: carries a phone number, student number and
+# personal email, and has no business in a public repository
+docs/DiplomatikiErgasia-AitisiAnathesis_*.pdf
+
+# ------------------------------------------------------------- misc -------
+scripts/texput.log
+.DS_Store
+Thumbs.db
