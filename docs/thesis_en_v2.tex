@@ -351,8 +351,14 @@ market is rarer and usually less rigorous.
 
 The third, and the most relevant here, uses \emph{the odds themselves as the prediction}. This
 approach recognises that the market price incorporates all available information, including
-items that never appear in public statistics. The present work belongs to this category, with
-the difference that it does not use a single price but learns online how to combine many.
+items that never appear in public statistics. Kaunitz et al.\ (2017) is the clearest empirical
+precedent: rather than building a competing forecast, they treat the consensus of the published
+odds as the probability estimate and bet where an individual bookmaker departs from it, a
+strategy profitable over a decade of simulation and over five months of real-money betting. The
+present work belongs to this category, with two differences. It does not use a fixed consensus
+but learns online how to weight the companies, with a regret guarantee; and the weighting is
+driven by a loss that each company pays on its own quoted matches, so a company covering a
+fraction of the fixtures can still contribute.
 
 \section{Efficiency of betting markets}
 
@@ -410,10 +416,21 @@ puzzle}, is that the simple average often proves more robust than weighted combi
 weights are estimated from data: the gain from better weighting is cancelled by the estimation
 noise in the weights themselves.
 
+The combination of online aggregation with the sleeping-experts reduction is established
+practice outside this domain. Pfitzner et al.\ (2025) apply exactly that pairing to operational
+temperature forecasting, waking experts that are poor on average but good in identifiable
+circumstances, and obtain second-order regret bounds for the result. The reduction this thesis
+relies on is therefore not novel in itself; what is new is the observation that in a betting
+panel the sleeping pattern is not a nuisance to be tolerated but carries information, since
+which companies quote a given fixture is itself a signal, and that the same reduction induces a
+movement of the weight vector that must be controlled for before any gain is read as learning
+(\S\ref{sec:res-bandit}).
+
 That finding bears directly on our results. This thesis shows that learned combination beats
 the simple average when the experts differ substantively in quality, and falls short of it
-when they do not; that is, it identifies empirically the condition under which the puzzle holds
-or fails.
+when they do not. The puzzle is therefore not a general law but a statement about homogeneous
+panels: the condition it depends on is the spread in expert quality, and that condition is
+measurable in advance.
 
 \section{Position of the present work}
 
@@ -422,6 +439,16 @@ offers algorithms with guarantees but is more rarely applied to betting markets 
 partial coverage. The sports prediction literature often uses odds as a benchmark, but less
 often as \emph{a set of experts to be combined}. And the economic literature on markets
 explains why companies differ, but does not exploit those differences algorithmically.
+
+Online convex optimisation has been brought to betting markets, but from the opposite side of
+the counter. Zhu et al.\ (2024) place the \emph{bookmaker} in the role of the learner, updating
+posted odds as bets arrive, and prove $O(\sqrt{T})$ regret for the resulting pricing
+algorithms. Their central result is worth stating here because it is the mirror image of one of
+ours: they show that maximising the operator's profit and eliciting information from bettors
+are fundamentally incompatible objectives. Read from the bettor's side, that is the same
+separation this thesis measures between predictive and economic performance
+(\S\ref{sec:res-value}), and it supplies a reason to expect it rather than merely an
+observation that it occurred.
 
 Our contribution is the systematic synthesis of the three: online algorithms with guarantees,
 applied to the full set of available companies with correct handling of partial coverage, with
@@ -2746,8 +2773,12 @@ Levitt's (2004) observation that betting markets are organised around the bettor
 around the price. The odds, read this way, are not a statement about the match but \textbf{an
 offer, revocable against whoever accepts it too well}. Account restrictions are not measured
 here, since the data are prices and not customer outcomes; what is measured is the concentration
-of the edge at the soft houses and its absence at the sharp one, while the practice of excluding
-winners is a known fact of the industry, imported here rather than demonstrated.
+of the edge at the soft houses and its absence at the sharp one. The revocation itself has been
+documented elsewhere: Kaunitz et al.\ (2017) bet a profitable odds-based strategy with real
+money for five months and report that the response was not a correction of the prices but stake
+limits and account closures directed at them as clients. That is the complement of our
+measurement rather than a repetition of it, and the two together close the argument: the edge
+concentrates where access is controlled, and it is withdrawn when exercised.
 
 \paragraph{No teleology, and the path is not a straight line.} Every regret bound in the thesis
 assumes the opposite: comparison against the best \textbf{fixed} weight vector, which is the same
@@ -2891,6 +2922,10 @@ algorithms for online convex optimization. \emph{Machine Learning}, 69(2--3), 16
 \bibitem{herbster1998} Herbster, M., \& Warmuth, M. K. (1998). Tracking the best expert.
 \emph{Machine Learning}, 32(2), 151--178.
 
+\bibitem{kaunitz2017} Kaunitz, L., Zhong, S., \& Kreiner, J. (2017). Beating the bookies with
+their own numbers -- and how the online sports betting market is rigged.
+\emph{arXiv:1710.02824}.
+
 \bibitem{kelly1956} Kelly, J. L. (1956). A new interpretation of information rate.
 \emph{Bell System Technical Journal}, 35(4), 917--926.
 
@@ -2915,6 +2950,10 @@ Die trinitarische Formel.
 \bibitem{murphy1973} Murphy, A. H. (1973). A new vector partition of the probability score.
 \emph{Journal of Applied Meteorology}, 12(4), 595--600.
 
+\bibitem{pfitzner2025} Pfitzner, L., Wintenberger, O., \& Mestre, O. (2025). Contribution of
+expert aggregation to temperature prediction part II: Second order bounds with sleeping
+experts. \emph{arXiv:2506.15216}.
+
 \bibitem{shin1992} Shin, H. S. (1992). Prices of state contingent claims with insider traders,
 and the favourite-longshot bias. \emph{The Economic Journal}, 102(411), 426--435.
 
@@ -2928,6 +2967,9 @@ for state-contingent claims. \emph{The Economic Journal}, 103(420), 1141--1153.
 betting odds. \emph{International Journal of Forecasting}, 30(4), 934--943.
 
 \bibitem{vovk1990} Vovk, V. G. (1990). Aggregating strategies. \emph{COLT}, 371--386.
+
+\bibitem{zhu2024} Zhu, H., Soen, A., Cheung, Y. K., \& Xie, L. (2024). Online learning in
+betting markets: profit versus prediction. \emph{ICML}.
 
 \bibitem{zinkevich2003} Zinkevich, M. (2003). Online convex programming and generalized
 infinitesimal gradient ascent. \emph{ICML}, 928--936.
