@@ -1760,9 +1760,9 @@ comparison is made on the tail with a moving block bootstrap.}
 The result is negative for two of them and \textbf{positive for one}. For Hedge and OGD the
 constant step loses significantly, by $+0.000089$ and $+0.000299$ respectively. For FTRL, however,
 it wins significantly, by $-0.000096$ ($p=0.001$), and the critical point is that the two
-schemes have an \emph{identical} score on the prefix ($0.99828$ for both): the selection did
-not prefer the constant step in order to flatter the tail, it chose it on a tie and it won out
-of sample. The explanation is the same asymmetry that explains the opposite tuning directions:
+schemes have an \emph{identical} score on the prefix ($0.99828$ for both). With nothing to
+separate the two on the training data, the selection cannot have favoured the constant step in
+order to flatter the tail, and the advantage emerges only out of sample. The explanation is the same asymmetry that explains the opposite tuning directions:
 FTRL's $\eta$ multiplies the entire accumulated loss, not one round's gradient, so it is the
 one of the three for which ``non-decaying'' means something qualitatively different.
 
