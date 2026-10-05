@@ -13,9 +13,13 @@ data/cache/
 data/raw/
 
 # ------------------------------------------------------- local snapshots ---
-# baselines taken before a refactor, for check_results.py to compare against
+# baselines taken before a refactor, for check_results.py to compare against.
+# check_results.py save <NAME> writes the snapshot next to itself, in scripts/,
+# so any such directory there is a snapshot and never source.
 results_backup_*/
 results_baseline_*/
+scripts/PRE*/
+scripts/BASELINE*/
 
 # ------------------------------------------------------------- python -----
 __pycache__/
