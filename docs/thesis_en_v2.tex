@@ -1079,7 +1079,7 @@ v_t = \Pi_{\Delta}(w_t), \qquad \hat{w} = v_t - \eta_t \ell_t, \qquad w_{t+1} = 
 The Fixed-Share of \S\ref{sec:fixed-share} is the special case
 $M = (1-\alpha)I + \tfrac{\alpha}{N}\mathbf{1}\mathbf{1}^{\!\top}$, that is a uniform leak. A
 general $M$ is strictly more expressive, because it can say \emph{where} the lost mass goes:
-e.g. to the opening/closing ``twin'' of the same house, or to peers in the same market phase.
+e.g.\ to the opening/closing ``twin'' of the same house, or to peers in the same market phase.
 Row-stochasticity guarantees conservation of total mass, which is exactly what makes $\alpha=0$
 a genuine no-op rather than an approximate one.
 
@@ -1262,7 +1262,7 @@ $\phi''(s) = \mathrm{Var}_{k\sim \tilde{p}^{(s)}}(a_k) \geq 0$.
 Convexity is what makes $s$ learnable by projected OGD, that is a \emph{second OCO stage} on top
 of the output of the first, which remains fully causal: the temperature at round $t$ depends only
 on outcomes up to round $t-1$. The form of the derivative has a further direct interpretation:
-the step is positive when the realised outcome had a log-probability below the average, i.e. the
+the step is positive when the realised outcome had a log-probability below the average, i.e.\ the
 algorithm sharpens the distribution when it is surprised and softens it when it is not.
 
 \subsection{Statistical significance: the moving block bootstrap}
@@ -1429,8 +1429,8 @@ bets changes completely from round to round.
 \label{sec:mcmc-theory}
 
 Both the closed form and the learned multiplier treat $\hat{p}$ as \emph{known}. It is not: it is
-an estimate, and how uncertain it is varies from match to match, when the awake experts agree,
-the estimate is reliable, when they disagree, it is not. The natural formulation replaces the
+an estimate, and how uncertain it is varies from match to match: when the awake experts agree
+the estimate is reliable, and when they disagree it is not. The natural formulation replaces the
 point maximum with the \emph{posterior expected} one: \[ f^{\mathrm{B}} \;=\; \arg\max_{f} \;
 \mathbb{E}_{\theta \sim \pi(\cdot\mid\mathcal{D})} \big[\, g(f,\theta) \,\big], \] \[
 g(f,\theta) \;=\; \theta_k \log\big(1+f(o_k-1)\big) \;+\; (1-\theta_k)\log(1-f). \]
@@ -1595,7 +1595,7 @@ complexity is not justified.
 \label{sec:protocol}
 
 The framework does not require a train/test split, since every prediction is already
-out-of-sample. It does, however, require care about whatever is \emph{selected} by looking at the
+out of sample. It does, however, require care about whatever is \emph{selected} by looking at the
 data. Two such quantities exist: the step multiplier of each algorithm and the learning rate of
 the calibrator. Both are selected by the same protocol:
 
@@ -1736,7 +1736,7 @@ described.
 $1/\sqrt{t}$ is derived for a \emph{static} comparator, whereas the panel here is not static, so a
 step that never stops moving is the theoretically indicated alternative. It had been tried only
 for Hedge and only over $[0.1, 2]$, while Hedge's decaying schedule passes $\eta \approx 0.033$
-at the first round and $\eta \approx 1.7\cdot10^{-4}$ by the middle of the period, i.e. the
+at the first round and $\eta \approx 1.7\cdot10^{-4}$ by the middle of the period, i.e.\ the
 entire interesting region lay \emph{below} the old grid. The sweep was extended over five
 decades and to all three algorithms, with selection on the prefix and a paired test on the
 tail.
@@ -2050,7 +2050,7 @@ $-0.00315$ (IW) and $p<0.001$ throughout. All of them, however, are opening pric
 On the two \textbf{homogeneous} panels the result changes. On closing, OGD beats three (WHC
 $-0.00088$, IWC $-0.00077$, BWC $-0.00051$) and ties with B365C ($p=0.505$) and VC\_BVC
 ($p=0.284$); it does rank first, but with the plain average second at a distance of $0.00002$,
-i.e. practically indistinguishable. On opening it again beats three, ties with B365 ($p=0.203$),
+i.e.\ practically indistinguishable. On opening it again beats three, ties with B365 ($p=0.203$),
 but \textbf{significantly loses to VC\_BV} ($+0.00030$, $p=0.004$): the only case in the whole
 thesis where a \emph{bookmaker} other than Pinnacle significantly beats us, and there the plain
 average moves ahead of OGD. The statement is deliberately restricted to bookmakers: in the
@@ -2399,7 +2399,7 @@ One-point BGD & $+0.000501$ \;(41.5\%) & $\mathbf{-0.000000}$ \;(0.0\%) \\
 \bottomrule
 \end{tabular}
 \caption{Decomposition of the full-information margin (uniform average $0.998132$ against OGD
-$0.996926$, i.e. $0.001206$) into what the projection gives with no learning at all and what the
+$0.996926$, i.e.\ $0.001206$) into what the projection gives with no learning at all and what the
 bandit feedback adds on top.}
 \label{tab:bandit-decomp}
 \end{table}
@@ -2450,7 +2450,7 @@ on the theoretical argument that the linear problem is harder.
 \label{sec:res-regime}
 
 The Markov chain on the \emph{weight vector} has already been tried and rejected: every
-transition kernel selects $\alpha=0$ on train, i.e. collapses to plain OGD. Here the chain runs
+transition kernel selects $\alpha=0$ on train, i.e.\ collapses to plain OGD. Here the chain runs
 over a different object, over \emph{market states}. We maintain $K$ latent regimes, one weight
 vector per regime under Sleeping Experts, and a belief updated by the forward recursion of a
 hidden Markov model; each regime steps in proportion to its responsibility. $K=1$ reproduces
@@ -2511,7 +2511,7 @@ one bounds the method's scope.
 \paragraph{Per-league specialisation does not help.} A separate model per league loses to the
 single model in \emph{every} one of the six leagues tested. Two plausible causes: each league has
 only 2,231--3,800 matches, far too few for the online algorithm to converge on its own, and the
-specialists end up trusting largely the \emph{same} experts as the unified model, i.e. they do not
+specialists end up trusting largely the \emph{same} experts as the unified model, i.e.\ they do not
 discover anything local.
 
 \paragraph{Fixed-Share does not help.} Every $\alpha > 0$ worsens the log-loss ($0.99842$ at
@@ -2535,12 +2535,12 @@ picks a worse value for OGD, since the grid is nearly flat there and the selecti
 
 \paragraph{Markovian transition kernels offer nothing.} All three kernels of
 \S\ref{sec:markov-theory}(a) (uniform, towards the opening/closing twin, towards the same
-market phase) select $\alpha = 0$ on the chronological prefix, i.e. collapse to plain OGD. The
+market phase) select $\alpha = 0$ on the chronological prefix, i.e.\ collapse to plain OGD. The
 paired tests confirm this with a mean difference of $0.000000$ \emph{exactly} and $p=1.000$,
 not approximately. The finding agrees with Fixed-Share: once the step itself is tuned, no
 post-hoc movement of mass has anything left to correct, because both control the same quantity.
 It is worth noting, however, that at \emph{large} $\alpha$ the structured kernels do measurably
-less damage than the uniform one, i.e. the panel's structure is real and detectable, merely
+less damage than the uniform one, i.e.\ the panel's structure is real and detectable, merely
 redundant.
 
 \paragraph{The Bayesian version of Kelly does not beat the fixed fraction.} The formulation of
@@ -2569,7 +2569,7 @@ At the level of \textbf{method}, the framework works, but less than a first read
 online mixture of published odds, with no data beyond the prices themselves, consistently and
 significantly beats both the uniform average and the overwhelming majority of individual
 companies. That this is achieved with no statistical assumption about the distribution of the
-data, and with predictions that are by construction out-of-sample, is the main methodological
+data, and with predictions that are by construction out of sample, is the main methodological
 gain of the online approach over a classical batch one. The limitation emerged from the
 experiment of \S\ref{sec:res-bandit}: with an explicit zero-step control it turns out that $41\%$
 of the margin over the uniform average is produced by the repeated projection onto the simplex,
@@ -2745,8 +2745,8 @@ decomposition is improved by no method and no amount of capital, and the closing
 opening price systematically. Something resists, and that something is the match, which occurs
 whatever anyone prices it at. The precise statement is therefore not that the odds lack
 objectivity but that \textbf{they are not objective about what they appear to be about}: there is
-no probability of the match waiting to be read off, there is an objective expression of a
-relation, and it is measured, compared and ranked reproducibly. The fetish is not that the number
+no probability of the match waiting to be read off; what there is, is an objective expression
+of a relation, and it is measured, compared and ranked reproducibly. The fetish is not that the number
 is false but that we misattribute what it is a number of. If appearance and essence coincided
 directly, Marx observed, all science would be superfluous; here the distance between them is
 itself a measurement.
