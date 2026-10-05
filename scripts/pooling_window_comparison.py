@@ -40,7 +40,7 @@ from sleeping_experts import (
 from final_ranking import calibrate_full_history
 from significance_test import moving_block_bootstrap_test, full_length_raw_logloss, full_length_calibrated_logloss, paired_diff
 
-COVERAGE_THRESHOLD = 70.0
+COVERAGE_THRESHOLD = 60.0  # keep in step with final_ranking.COVERAGE_THRESHOLD
 WINDOWS = {
     "5yr": {"2122", "2223", "2324", "2425", "2526"},
     "10yr": None,  # None = every season

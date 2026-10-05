@@ -32,7 +32,7 @@ from sleeping_experts import (
     run_hedge_sleeping, run_ogd_sleeping, run_ftrl_sleeping,
 )
 
-COVERAGE_THRESHOLD = 70.0
+COVERAGE_THRESHOLD = 60.0  # keep in step with final_ranking.COVERAGE_THRESHOLD
 OUTCOME_LABELS = {0: "1 (Home win)", 1: "X (Draw)", 2: "2 (Away win)"}
 TYPE_COLORS = {"algorithm": "#2a78d6", "bookmaker": "#eb6834"}
 

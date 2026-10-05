@@ -1801,6 +1801,8 @@ OGD            & algorithm & ---     & 0.99745 / 0.99693 & 0.59612 / 0.59586 \\
 Hedge          & algorithm & ---     & 0.99842 / 0.99773 & 0.59674 / 0.59637 \\
 FTRL           & algorithm & ---     & 0.99843 / 0.99774 & 0.59674 / 0.59638 \\
 Uniform        & baseline  & ---     & 0.99886 / 0.99813 & 0.59703 / 0.59665 \\
+B365C          & bookmaker & closing & 0.99953 / 0.99910 & 0.59732 / 0.59711 \\
+BWC            & bookmaker & closing & 0.99998 / 0.99919 & 0.59769 / 0.59728 \\
 VC\_BV         & bookmaker & opening & 1.00075 / 1.00026 & 0.59833 / 0.59806 \\
 WH             & bookmaker & opening & 1.00119 / 1.00048 & 0.59860 / 0.59818 \\
 PS (Pinnacle)  & bookmaker & opening & 1.00083 / 1.00055 & 0.59838 / 0.59824 \\
@@ -1809,7 +1811,7 @@ BW             & bookmaker & opening & 1.00140 / 1.00065 & 0.59873 / 0.59833 \\
 B365           & bookmaker & opening & 1.00113 / 1.00073 & 0.59852 / 0.59832 \\
 \bottomrule
 \end{tabular}
-\caption{Ranking by calibrated log-loss, bookmakers with coverage $\geq$70\%.}
+\caption{Ranking by calibrated log-loss, bookmakers with coverage $\geq$60\%.}
 \label{tab:ranking}
 \end{table}
 
@@ -1831,11 +1833,19 @@ Figure~\ref{fig:ranking} plots the same ranking. The paired tests give:
         $p<0.001$, over the 71,818 common matches.
 \end{itemize}
 
-\paragraph{A necessary caveat.} The 70\% coverage threshold leaves in only one closing bookmaker,
-PSC, because the remaining closing columns start around 2019/20 and B365C narrowly misses at
-69.6\%. The statement ``we beat everyone except PSC'' therefore means, \emph{here}, that we beat
-six opening prices. The substantive comparison against closing prices is made in
-\S\ref{sec:res-recent} and \S\ref{sec:res-deploy}.
+\paragraph{A necessary caveat.} Three of the twelve closing columns clear the 60\% coverage
+floor (PSC at 93.8\%, B365C at 69.6\%, BWC at 65.0\%); the rest start around 2019/20 and do not
+reach it over the decade. The ranking therefore compares the mixture against three closing
+prices and six opening ones, which is enough for the comparison that matters but not the whole
+closing market. The fuller treatment is in \S\ref{sec:res-recent} and \S\ref{sec:res-deploy},
+where the window is short enough for most closing columns to qualify.
+
+A second caveat applies to the table as a whole and is more serious. Each series is scored over
+the rounds it actually quotes, and those differ: 76,584 for the algorithms, 71,818 for PSC,
+53,267 for B365C, 49,755 for BWC. The columns are therefore not strictly comparable with one
+another, which is why every claim below rests on a \emph{paired} test over the rounds the two
+compared series share, never on the difference of two table entries
+(\S\ref{sec:common-rounds}).
 
 Note that Interwetten occupies the \emph{last} place in the raw log-loss ranking ($1.00186$)
 despite having the seventh best coverage. Its addition therefore makes the statement ``we beat

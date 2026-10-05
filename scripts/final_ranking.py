@@ -33,7 +33,7 @@ from sleeping_experts import (
 )
 from calibration_correction import temperature_calibrate, select_lr_on_train, TRAIN_FRACTION, LR_GRID
 
-COVERAGE_THRESHOLD = 70.0  # Tier A cutoff, % of matches covered
+COVERAGE_THRESHOLD = 60.0  # Tier A cutoff, % of matches covered
 
 RANK_COLORS = {"algorithm": "#2a78d6", "bookmaker": "#eb6834"}
 
