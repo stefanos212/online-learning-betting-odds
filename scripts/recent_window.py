@@ -3,15 +3,21 @@ EVERY FORECASTING EXPERIMENT IN THE PROJECT, RERUN ON THE LAST FIVE SEASONS.
 
 The headline numbers of this project are pooled over 10 seasons. That has one
 concrete cost that only shows up when you look at WHICH bookmakers survive the
->=70% coverage floor: over 10 seasons exactly ONE closing column does (PSC, at
-93.8%), because every other closing column only starts around 2019/20 -- B365C
-misses at 69.6%. So "the mixture beats every bookmaker but PSC", measured over
-10 seasons, is mostly a statement about OPENING prices, which the project
-itself shows are systematically worse.
+>=60% coverage floor: over 10 seasons only THREE closing columns do (PSC at
+93.8%, B365C at 69.6%, BWC at 65.0%), because every other closing column only
+starts around 2019/20. So the decade ranking still leans mostly on OPENING
+prices, which the project itself shows are systematically worse.
 
-Restrict to the last five seasons (2021/22-2025/26) and B365C, BWC, VC_BVC and
-WHC all clear the floor. The comparison everyone actually cares about -- our
-mixture against several genuine closing prices -- becomes possible.
+Restrict to the last five seasons (2021/22-2025/26) and VC_BVC and WHC clear
+the floor as well, giving five closing prices against five opening ones. The
+comparison everyone actually cares about -- our mixture against the closing
+market rather than a single column of it -- becomes possible.
+
+The floor is deliberately the same number as final_ranking's, but note it is
+not the same filter: inside a five-season window the series sit at either end
+(a column starting in 2019/20 is near 100% here and near 0% over the decade),
+so anything from 51% to 70% selects the identical panel. The results of this
+file are not sensitive to the choice.
 
 This file reruns, on that window and from scratch (fresh uniform-weight start,
 not a slice of a 10-year run):
@@ -59,7 +65,7 @@ from significance_test import moving_block_bootstrap_test, paired_diff, full_len
 
 RECENT_SEASONS = 5
 TRAIN_FRACTION = 0.75
-COVERAGE_FLOOR = 70.0
+COVERAGE_FLOOR = 60.0
 CHALLENGER = "OGD"
 DROPPED = ["PS", "PSC"]
 
