@@ -84,8 +84,14 @@ docs/defense_qa.pdf
 .claude/
 
 # ------------------------------------------------------------- node -------
-# only needed to regenerate the slide deck with docs/build_deck.js
+# The defence deck ships as the finished docs/defense_presentation.pptx. The
+# Node toolchain that generated it is kept locally only: this is a Python and
+# LaTeX repository and has no reason to carry a JavaScript dependency tree.
 node_modules/
+package.json
+package-lock.json
+deck_data.json
+docs/build_deck.js
 
 # ------------------------------------------------------------- misc -------
 # LibreOffice leaves these behind while a file is open
