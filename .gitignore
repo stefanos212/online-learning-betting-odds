@@ -92,6 +92,7 @@ package.json
 package-lock.json
 deck_data.json
 docs/build_deck.js
+docs/build_deck_short.js
 
 # ------------------------------------------------------------- misc -------
 # LibreOffice leaves these behind while a file is open
