@@ -17,6 +17,7 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{float}
+\usepackage{rotating}  % landscape pages for the wide Kelly figures
 \usepackage{graphicx}
 \graphicspath{{../results/}{./}}
 \usepackage{enumitem}
@@ -921,7 +922,7 @@ The difference from OGD is that FTRL is \emph{``lazy''}: it rebuilds the weights
 history each time, instead of stepping from the previous position.
 
 \paragraph{Why the regularisation term is needed.} The obvious strategy without $R$ (pick
-whatever was optimal so far, Follow-The-Leader) fails spectacularly. With two experts and
+whatever was optimal so far, known as Follow-The-Leader or FTL) fails spectacularly. With two experts and
 losses alternating as $(\tfrac12,0),(0,1),(1,0),(0,1),\dots$, FTL picks at every round exactly
 the expert about to lose the next round and incurs linear regret, whereas the best fixed expert
 loses about $T/2$. The term $R$ is what stabilises successive choices; the lemma below shows
@@ -1371,8 +1372,13 @@ growth rate of capital the opposite holds.
 \subsection{The Kelly criterion}
 \label{sec:kelly-theory}
 
-Given an estimated probability $p$ and decimal odds $o$, the fraction of capital maximising the
-expected logarithmic growth rate is the one of Kelly (1956)~\cite{kelly1956},
+Given an estimated probability $p$ and decimal odds $o$, staking a fraction $f$ of capital
+multiplies the capital by $1+f(o-1)$ if the outcome occurs and by $1-f$ if it does not, so the
+expected logarithmic growth rate is
+\[
+g(f) \;=\; p\ln\big(1+f(o-1)\big) \;+\; (1-p)\ln(1-f).
+\]
+The fraction that maximises it is the one of Kelly (1956)~\cite{kelly1956},
 \[
 f^{*} \;=\; \frac{p\,(o-1) - (1-p)}{o-1} \;=\; p - \frac{1-p}{o-1}.
 \]
@@ -1630,7 +1636,38 @@ For each company the source publishes two prices: the \emph{opening} one, when t
 and the \emph{closing} one, shortly before kick-off. The naming convention is that the suffix
 \file{C} denotes the closing price of the identically named company: \file{B365} and
 \file{B365C}, \file{PS} and \file{PSC}, and so on. The panel of 26 therefore splits cleanly into
-13 opening and 13 closing.
+13 opening and 13 closing. Table~\ref{tab:books} lists the thirteen companies with their codes.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{@{}llrr@{}}
+\toprule
+\textbf{Code} & \textbf{Company} & \textbf{opening} & \textbf{closing (C)} \\
+\midrule
+B365   & Bet365             & 99.8\% & 69.6\% \\
+BW     & Bet\&Win           & 95.0\% & 65.0\% \\
+PS     & Pinnacle           & 93.1\% & 93.8\% \\
+VC\_BV & VC Bet / BetVictor & 89.3\% & 59.3\% \\
+WH     & William Hill       & 85.5\% & 55.3\% \\
+IW     & Interwetten        & 74.7\% & 44.4\% \\
+LB     & Ladbrokes          & 27.4\% &  7.3\% \\
+BFE    & Betfair Exchange   & 19.3\% & 19.4\% \\
+BF     & Betfair            & 10.0\% & 10.0\% \\
+1XB    & 1XBet              &  9.8\% & 10.0\% \\
+BFD    & Betfred            &  9.9\% &  9.8\% \\
+BMGM   & BetMGM             &  9.5\% &  9.8\% \\
+CL     & Coral              &  7.0\% &  6.9\% \\
+\bottomrule
+\end{tabular}
+\caption{The thirteen companies of the panel, with the codes of the source. Each company enters
+twice: with its opening prices under the code shown and with its closing prices under the same
+code followed by \file{C}. The last two columns give the share of the 76,584 matches for which
+each series quoted a price. \file{VC\_BV} merges VC Bet and BetVictor, the same company before
+and after a change of name (\S\ref{sec:data-clean}), and Betfair Exchange is a betting exchange
+rather than a bookmaker.}
+\label{tab:books}
+\end{table}
 
 The distinction is not a technical detail but a substantive variable. The closing price has
 absorbed whatever information reached the market in the interim (team-sheet announcements,
@@ -1792,11 +1829,12 @@ criterion; the difference between the two is discussed below.}
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.92\linewidth]{learning_rate_study.png}
-  \caption{Sweep of the step multiplier for all three algorithms. Horizontal axis the step multiplier on a logarithmic scale, with $1$ the textbook schedule; vertical axis the resulting log-loss, lower better. One curve per algorithm, and for each a second curve showing the held-out tail. Selection is made on the chronological prefix; the tail is reported as verification. OGD exhibits a genuine interior optimum. The tail curves for Hedge and FTRL keep falling towards the left, but the selection is not made on them; see the remark on the caveat that turned out to be unfounded.}
+  \caption{Sweep of the step size for all three algorithms; in both panels lower log-loss is better, and blue is Hedge, orange OGD and green FTRL. (a) The multiplier applied to the textbook decaying schedule, on a logarithmic horizontal axis with $1$ the textbook value. Solid lines give the log-loss on the held-out tail and dashed lines on the full sample; the circled point on each solid line is the multiplier in use. OGD has a genuine interior optimum. The tail curves of Hedge and FTRL keep falling to the left, but the selection is made on the training prefix, not on them (see the caveat in the text of this section). (b) A constant step $\eta$ in place of the decaying schedule, on a logarithmic horizontal axis. Each solid line is the held-out log-loss of one algorithm; the dotted line of the same colour is that algorithm's decaying step in use.}
   \label{fig:lr}
 \end{figure}
 
-As Figure~\ref{fig:lr} shows, OGD wants a step a hundred times larger than the theoretical one,
+Table~\ref{app:lr} in the appendix lists every setting of the sweep. As Figure~\ref{fig:lr}
+shows, OGD wants a step a hundred times larger than the theoretical one,
 with a genuine interior optimum: a plateau over the range $\times 75$ to $\times 110$, with
 $\times 200$, $\times 500$
 and $\times 1000$ clearly worse. Hedge and FTRL want a \emph{smaller} step, by factors of 4 and
@@ -1840,8 +1878,12 @@ OGD   & $0.1$           & 0.99795 & 0.99765 & $0.021$  & decaying \\
 FTRL  & $10^{-5}$       & 0.99879 & 0.99889 & $0.001$  & \textbf{constant} \\
 \bottomrule
 \end{tabular}
-\caption{Constant against decaying step. $\eta$ is selected on the chronological prefix and the
-comparison is made on the tail with a moving block bootstrap.}
+\caption{Constant against decaying step. \textbf{constant $\eta$} is the constant step selected
+on the chronological prefix and \textbf{tail} the log-loss it gives on the held-out tail;
+\textbf{decaying} is the tail log-loss of the decaying schedule in force (the \textbf{tail}
+column of Table~\ref{tab:steps}). $p$ is the moving block bootstrap $p$-value of the paired
+difference between the two on the tail, and the last column names the better of the two, in
+bold where it is the constant step.}
 \label{tab:const-step}
 \end{table}
 
@@ -1861,7 +1903,7 @@ uniform average, and indeed at $\eta=10^{-9}$ it gives $0.99882$, the uniform av
 the tail.
 
 \paragraph{A methodological error worth reporting.} The original sweep had the grid
-$1, 2, 5, \dots, 1000$ and concluded that Hedge and FTRL were ``already optimal at $\times 1$''.
+$1, 2, 5,\allowbreak \dots,\allowbreak 1000$ and concluded that Hedge and FTRL were ``already optimal at $\times 1$''.
 But $1$ was the \emph{lower endpoint of the grid}, not an optimum, and nobody had looked to the
 left of it. Extending downwards revealed genuine interior minima, with gains of $+0.00013$ and
 $+0.00018$ respectively on the tail. The conclusion generalises: when a sweep's answer sits at the
@@ -1875,6 +1917,7 @@ entire accumulated loss, so increasing it collapses it towards follow-the-leader
 \section{Ranking and the choice of panel}
 
 \subsection{Ranking on the full panel}
+\label{sec:res-ranking}
 
 \begin{table}[H]
 \centering
@@ -1899,18 +1942,24 @@ BW             & bookmaker & opening & 1.00140 / 1.00065 & 0.59873 / 0.59833 \\
 B365           & bookmaker & opening & 1.00113 / 1.00073 & 0.59852 / 0.59832 \\
 \bottomrule
 \end{tabular}
-\caption{Ranking by calibrated log-loss, bookmakers with coverage $\geq$60\%.}
+\caption{Ranking by calibrated log-loss, bookmakers with coverage $\geq$60\%. \textbf{phase}
+says whether a bookmaker's prices are opening or closing ones; the algorithms and the uniform
+average combine both. Each cell gives the raw score and, after the slash, the score after
+temperature calibration (\S\ref{sec:calib-theory}); for both log-loss and Brier lower is
+better. Each series is scored over the matches it quoted, so differences between rows are
+tested in paired form in the text rather than read off the table.}
 \label{tab:ranking}
 \end{table}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.92\linewidth]{final_ranking.png}
-  \caption{Horizontal axis log-loss, lower better; one row per series, ordered best at the top. Each row is a short segment: the hollow circle is the raw log-loss and the filled one the calibrated value, so the segment's length is what calibration bought. Orange marks a bookmaker and blue an algorithm, here and in the figures that follow. The choice of a dot/slope plot rather than a bar chart is deliberate, since log-loss values cluster around $1.0$ with no meaningful zero and a bar chart with a truncated axis would visually exaggerate minute differences.}
+  \caption{Final ranking of the bookmakers and the algorithms over the full decade (coverage $\geq 60\%$). Horizontal axis log-loss, lower better; one row per series, ordered best at the top. Each row is a short segment whose hollow circle is the raw log-loss and whose filled circle is the calibrated one, so the segment's length is what calibration bought. Orange marks a bookmaker and blue an algorithm. A dot plot is used rather than a bar chart because log-loss values cluster around $1.0$ with no meaningful zero, and bars on a truncated axis would visually exaggerate minute differences.}
   \label{fig:ranking}
 \end{figure}
 
-Table~\ref{tab:ranking} gives the ranking and Figure~\ref{fig:ranking} plots it. The paired tests give:
+Table~\ref{tab:ranking} gives the ranking and Figure~\ref{fig:ranking} plots it; Table~\ref{app:ranking}
+in the appendix adds each series' coverage, number of rounds and accuracy. The paired tests give:
 
 \begin{itemize}
   \item All three algorithms significantly beat the uniform average: OGD $-0.00141$, Hedge
@@ -1962,14 +2011,18 @@ FTRL    & 1.00088 & 1.00033 & 0.99843 & 0.99782 & 0.99761 & 0.99714 \\
 Uniform & 1.00080 & 1.00022 & 0.99886 & 0.99824 & 0.99748 & 0.99703 \\
 \bottomrule
 \end{tabular}
-\caption{Log-loss by panel and de-vig method.}
+\caption{Raw log-loss of each method fitted on each panel, over the whole decade; lower is
+better. The number in parentheses is the number of bookmaker series in the panel, and
+\emph{basic} and \emph{Shin} are the two de-vig methods of \S\ref{sec:devig-theory}
+(proportional normalisation and Shin's method). The three panels cover between 76,521 and
+76,584 matches, and the differences are tested in paired form in the text.}
 \label{tab:panels}
 \end{table}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.92\linewidth]{opening_vs_closing.png}
-  \caption{Comparison of the three panels for each algorithm. Horizontal axis log-loss over the full history, lower better; one row per algorithm, and the three marks on a row are the same algorithm fitted on the opening-only panel, on the full 26-expert panel and on the closing-only panel. The spread within a row is therefore the effect of the panel, not of the method. The ordering closing $<$ all $<$ opening holds in every case.}
+  \caption{Log-loss of each algorithm on the three panels. Horizontal axis log-loss over the full history, lower better; one row per algorithm, each in its own colour. The three marks on a row are the same algorithm fitted on the opening-only panel (hollow), on the full 26-expert panel (grey) and on the closing-only panel (filled), so the spread within a row is the effect of the panel and not of the method. The ordering closing $<$ all $<$ opening holds in every row.}
   \label{fig:panels}
 \end{figure}
 
@@ -2020,14 +2073,20 @@ $\mathbf{-0.01158}$ \\
 $p$ & 0.052 & 0.050 & $<0.001$ & $<0.001$ & $<0.001$ \\
 \bottomrule
 \end{tabular}
-\caption{Closing advantage by quintile of line movement, 10,649--10,650 matches per quintile.}
+\caption{Closing advantage by quintile of line movement, 10,649--10,650 matches per quintile:
+Q1 holds the matches whose prices moved least and Q5 those whose prices moved most.
+\emph{Mean movement} is the mean total variation distance between the opening and the closing
+probabilities in the quintile. The two log-loss rows are the raw log-loss of OGD fitted on the
+opening-only and on the closing-only panel, over the matches of the quintile;
+\emph{closing $-$ opening} is their difference (negative means the closing panel is better)
+and $p$ the moving block bootstrap $p$-value of that paired difference.}
 \label{tab:arrival}
 \end{table}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{information_arrival.png}
-\caption{Left, the stratification by line movement; right, by anomaly of Shin's $z$. Horizontal axis the quintile, Q1 quietest and Q5 noisiest; vertical axis the log-loss of OGD, lower better. The three curves are the mixture fitted on the opening-only panel (grey), on the full panel (black) and on the closing-only panel (blue). The vertical gap between the grey and blue curves is the closing advantage, and it is that gap which widens from left to right.}
+\caption{Left, the stratification by line movement; right, by anomaly of Shin's $z$. Horizontal axis the quintile, Q1 quietest and Q5 noisiest; vertical axis the log-loss of OGD, lower better. The three curves are the mixture fitted on the opening-only panel (grey), on the full panel (black) and on the closing-only panel (orange). The vertical gap between the grey and orange curves is the closing advantage, and in the left panel it is that gap which widens from left to right.}
 \label{fig:arrival}
 \end{figure}
 
@@ -2076,7 +2135,13 @@ full panel, proportional             & 0.99728 & 0.99801 & 0.99508 \\
 full panel, Shin                     & 0.99731 & 0.99804 & 0.99512 \\
 \bottomrule
 \end{tabular}
-\caption{Calibrated log-loss of OGD by configuration, the same 71,818 matches throughout.}
+\caption{Calibrated log-loss of OGD by configuration, the same 71,818 matches throughout; lower
+is better. \textbf{full} is over all of them, \textbf{train} over their chronological 75\%
+prefix and \textbf{25\% tail} over the remaining matches, which no selection has looked at.
+\emph{PSC alone} is the benchmark bookmaker itself, calibrated the same way;
+\emph{closing-only} means the mixture uses only the closing panel, \emph{Shin} and
+\emph{proportional} name the de-vig method, and \emph{no single-season} drops the bookmakers
+active in only one season.}
 \label{tab:configs}
 \end{table}
 
@@ -2123,15 +2188,19 @@ closing-only (12) & \#1 of 9 & 0.99919 & OGD (itself)   & 3 wins, 2 ties \\
 opening-only (12) & \#5 of 9 & 0.99999 & VC\_BV 0.99987 & 3 wins, \textbf{1 loss}, 1 tie \\
 \bottomrule
 \end{tabular}
-\caption{Each panel is refitted from scratch and compared against the bookmakers of its own
-phase.}
+\caption{Each panel is refitted from scratch without the two Pinnacle columns (the number of
+experts left is in parentheses), and every series is scored on the matches common to all of
+them. \textbf{OGD rank} is OGD's position among the nine series compared, the four methods and
+five bookmakers, and \textbf{log-loss} is its calibrated log-loss. \textbf{First} is the series
+ranked first, with its log-loss, and \textbf{Paired} summarises OGD's paired tests against the
+five bookmakers.}
 \label{tab:nopinnacle}
 \end{table}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.92\linewidth]{no_pinnacle.png}
-  \caption{Full panel without any Pinnacle column. Horizontal axis log-loss, lower better; one row per series, drawn as a short segment whose hollow end is the raw value and whose filled end is the calibrated one, so the length of a segment is what calibration bought. Orange is a bookmaker, blue an algorithm. All four methods sit above all remaining bookmakers.}
+  \caption{Log-loss of the algorithms and the bookmakers on the full panel with both Pinnacle columns removed. Horizontal axis log-loss, lower better; one row per series, drawn as a short segment whose hollow end is the raw value and whose filled end is the calibrated one. All four methods (in blue) sit above all remaining bookmakers (in orange).}
   \label{fig:nopinn}
 \end{figure}
 
@@ -2184,14 +2253,16 @@ becomes correspondingly more demanding (Table~\ref{tab:recent}).
 10--14 & WH, PS, VC\_BV, BW, B365 & opening & 0.99771 and below \\
 \bottomrule
 \end{tabular}
-\caption{Last five seasons, full panel, calibrated log-loss.}
+\caption{Last five seasons (38,749 matches), full panel: calibrated log-loss of each series
+over the matches it quoted in the window, lower better. \textbf{phase} is opening or closing
+for a bookmaker and --- for the methods; the last row collects the five opening bookmakers.}
 \label{tab:recent}
 \end{table}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.92\linewidth]{recent_window.png}
-  \caption{Last five seasons. Five closing bookmakers clear the coverage threshold inside this window against three over the decade, which makes the comparison more demanding. Horizontal axis log-loss, lower better; one row per series, hollow end raw and filled end calibrated, orange for a bookmaker and blue for an algorithm.}
+  \caption{Log-loss over the last five seasons, full panel. Horizontal axis log-loss, lower better; one row per series, hollow end raw and filled end calibrated, orange for a bookmaker and blue for an algorithm. Five closing bookmakers clear the coverage threshold inside this window against three over the decade, which makes the comparison more demanding.}
   \label{fig:recent}
 \end{figure}
 
@@ -2225,14 +2296,17 @@ rounds of 2025--26, of which 8,151 are common. Table~\ref{tab:deploy-table} give
 8--10 & B365, BW, BFE & opening & 1.00371 -- 1.00758 \\
 \bottomrule
 \end{tabular}
-\caption{Trained up to 31/12/2024, measured on 2025--26.}
+\caption{Trained up to 31/12/2024, measured on 2025--26: calibrated log-loss over the 8,151
+matches of the test window that every listed series quoted, lower better. \emph{online}
+means the mixture keeps learning through the test window as results arrive, \emph{frozen} that
+its weights are locked at the cut; the last row collects the three opening prices.}
 \label{tab:deploy-table}
 \end{table}
 
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.92\linewidth]{deployment_test.png}
-  \caption{Deployment test. Horizontal axis the calibrated log-loss over the 2025--26 rounds, lower better; one dot per series, best at the top. Blue dots are the mixture in its four variants, orange dots the bookmakers still quoting in the test window. The opening prices sit clearly lower, while the closing prices and the variants of the mixture cluster together.}
+  \caption{Deployment test. Horizontal axis the calibrated log-loss over the 8,151 common matches of 2025--26, lower better; one dot per series, best at the top. Blue dots are the mixture in its four variants (closing-only or full panel, online or frozen), orange dots the closing prices still quoted in the test window and grey dots the opening ones. The opening prices sit clearly further down, while the closing prices and the variants of the mixture cluster together.}
   \label{fig:deploy}
 \end{figure}
 
@@ -2298,19 +2372,28 @@ B365C   &  7,643 & $1.05\times$  & $0.67\times$             & $0.24\times$     &
 PSC     & 19,497 & $0.54\times$  & $0.25\times$             & $0.0035\times$   & 0.37 \\
 \bottomrule
 \end{tabular}
-\caption{Final bankroll starting from $1$, calibrated probabilities, proportional normalisation.
-Every column plays the \emph{same} bets, since the choice of outcome does not depend on the size.
-The last column is the mean multiplier learned by Online Newton Step.}
+\caption{Final bankroll starting from $1$ against each closing target, calibrated
+probabilities, proportional normalisation. \textbf{Bets} is the number of bets placed; the next
+three columns are the final bankroll with the fixed quarter of the Kelly fraction, with the
+multiplier $\lambda$ learned online by Online Newton Step, and with the full Kelly fraction.
+Every column plays the \emph{same} bets, since the choice of outcome does not depend on the
+size. The last column is the mean multiplier learned by Online Newton Step.}
 \label{tab:oco-kelly}
 \end{table}
 
-\begin{figure}[H]
+\begin{sidewaysfigure}
 \centering
-\includegraphics[width=\textwidth]{oco_kelly.png}
-\caption{One column per target. Above, the path of the bankroll against the number of rounds on which a bet was offered, on a logarithmic vertical axis with a dotted line at the starting bankroll of $1$; below, the trajectory of the learned $\lambda$ over the same rounds, with a
-dotted line at the $\tfrac14$ in force.}
+\includegraphics[width=\textheight,height=0.8\textwidth,keepaspectratio]{oco_kelly_closing.png}
+\caption{The learned Kelly multiplier against the five closing targets, one column per target; colours give the staking rule, as in the legend. Top row: the bankroll, on a logarithmic vertical axis, against the number of rounds on which the target quoted a price, with a dotted line at the starting bankroll of $1$. The bankroll stays flat on rounds without a bet, which is why the two rows have different horizontal lengths. Bottom row: the learned multiplier $\lambda$ against the bet number, with a dotted line at the fixed $\tfrac14$.}
 \label{fig:ocokelly}
-\end{figure}
+\end{sidewaysfigure}
+
+\begin{sidewaysfigure}
+\centering
+\includegraphics[width=\textheight,height=0.8\textwidth,keepaspectratio]{oco_kelly_opening.png}
+\caption{As Figure~\ref{fig:ocokelly}, for the six opening targets.}
+\label{fig:ocokelly-open}
+\end{sidewaysfigure}
 
 \paragraph{The result has two parts that do not say the same thing.} On the closing targets, in
 the per-bet paired test the learned multiplier \textbf{ties} with the fixed $\tfrac14$: over
@@ -2339,13 +2422,13 @@ goes from systematic loss to a tie with a point-estimate advantage.
 the 20 cells, wins in 2 and loses in only 2. Its risk is concentrated almost entirely on PSC,
 where it wipes out the bankroll ($0.0035$). On the profitable targets, that is, the fixed
 $\tfrac14$ leaves a substantial part of the growth unused. The learned multiplier is the middle
-road: it keeps most of the upside and avoids the catastrophe. The paired tests are in
-Table~\ref{tab:vb-sig}.
+road: it keeps most of the upside and avoids the catastrophe.
 
 \paragraph{Where there is an edge.} An \emph{edge} here means an advantage over a bookmaker's
 price large enough to be detected statistically, that is a positive expected growth of capital
 when betting against it. Which bookmakers are beatable at all in this sense is mapped over eleven
-targets with the fixed $\tfrac14$, so that the rows stay comparable with one another.
+targets with the fixed $\tfrac14$ (Table~\ref{tab:vb-sig}), so that the rows stay comparable
+with one another.
 
 \begin{table}[H]
 \centering
@@ -2369,8 +2452,12 @@ PS      & opening & 26,675 & $0.26\times$  & $0.055$ & --- \\
 PSC     & closing & 39,997 & $0.0002\times$ & $<0.001$ & loss \\
 \bottomrule
 \end{tabular}
-\caption{The $p$ column concerns the mean log growth rate per bet. The final bankrolls are not
-comparable across rows, since the number of bets differs by an order of magnitude.}
+\caption{Value betting with the fixed $\tfrac14$ of the Kelly fraction against eleven targets.
+\textbf{Bets} is the number of bets placed and \textbf{Bankroll} the final bankroll starting
+from $1$. The $p$ column tests whether the mean log growth rate per bet differs from zero
+(moving block bootstrap), and the last column gives the verdict where it does. The final
+bankrolls are not comparable across rows, since the number of bets differs by an order of
+magnitude.}
 \label{tab:vb-sig}
 \end{table}
 
@@ -2383,7 +2470,8 @@ closing-only one, the result gets worse on \emph{every} closing target.
 \paragraph{The extension to opening targets.} The learned multiplier is applied to all six opening
 targets as well, with the corresponding opening-only panel. The causality requirement is stricter
 here: removing the target is not enough, the \emph{whole} closing side must go, since no closing
-price exists at the moment the bet is placed (Table~\ref{tab:oco-kelly-opening}). The
+price exists at the moment the bet is placed (Table~\ref{tab:oco-kelly-opening} and
+Figure~\ref{fig:ocokelly-open}). The
 hyperparameters are selected separately per
 phase, on that phase's own prefix of bets, so that the opening result does not depend on closing
 bets it is supposed to be independent of.
@@ -2405,8 +2493,8 @@ PS      & 26,675 & $0.26\times$  & $\mathbf{0.68\times}$ & $0.0003\times$ & 0.05
 \bottomrule
 \end{tabular}
 \caption{Opening targets: final bankroll starting from $1$, calibrated probabilities,
-proportional normalisation. The OCO $\lambda$ column gives the better of the two variants
-(ONS / OGD) and the mean $\lambda$ corresponds to it.}
+proportional normalisation, with the columns as in Table~\ref{tab:oco-kelly}. The OCO $\lambda$ column gives the better of the two variants
+(Online Newton Step or OGD) and the mean $\lambda$ corresponds to it.}
 \label{tab:oco-kelly-opening}
 \end{table}
 
@@ -2451,8 +2539,8 @@ stochastic.
 Two correctness checks come first. With full information and a linearised loss the code
 reproduces the implemented OGD \emph{exactly}, and the two-point estimator is identified with the
 true tangential gradient with relative error $0.6\%$ and cosine $0.99998$ over $200{,}000$
-samples. Table~\ref{tab:bandit} decomposes the margin and Figure~\ref{fig:bandit-fig} shows
-the sweep it rests on.
+samples. Table~\ref{tab:bandit} compares the two estimators with full information and
+Figure~\ref{fig:bandit-fig} shows the sweep on which their selection rests.
 
 \begin{table}[H]
 \centering
@@ -2469,16 +2557,18 @@ One-point BGD ($\xi=0.02$) & 0.997631 & 0.998297 & $+0.000706$ \\
 Uniform average & 0.998132 & 0.998862 & $+0.001206$ \\
 \bottomrule
 \end{tabular}
-\caption{Bandit against full information, the same 76,584 rounds, the same calibration. The last
+\caption{Bandit against full information, the same 76,584 rounds, the same calibration; lower
+log-loss is better. BGD is bandit gradient descent with the one- or two-point gradient estimator
+and shrinkage $\xi$, and \emph{No learning} is the same algorithm with its step set to zero. The last
 column is the paired difference from the implemented OGD in calibrated log-loss; positive means
-worse than it. The first row is a tie ($p=0.823$), the rest are significant at $p<0.001$.}
+worse than it. The first row is a tie ($p=0.934$), the rest are significant at $p<0.001$.}
 \label{tab:bandit}
 \end{table}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{bandit_oco.png}
-\caption{Left, the step profile on which the selection is made: horizontal axis the step multiplier on a logarithmic scale, vertical axis the log-loss on the held-out tail. Right, the final comparison: horizontal axis the calibrated log-loss, lower better, one bar per method. The flatness of the left panel is itself the result, since a profile with no interior minimum means there is nothing for the estimator to select.}
+\caption{(a) The step profile on which the selection is made: horizontal axis the step multiplier on a logarithmic scale, vertical axis the log-loss on the held-out tail, one curve per gradient estimator, with horizontal lines for full-information OGD and for the uniform average. (b) The final comparison: horizontal axis the calibrated log-loss, lower better, one row per method. The flatness of panel (a) at small steps is itself the result, since a profile with no interior minimum means there is nothing for the estimator to select.}
 \label{fig:bandit-fig}
 \end{figure}
 
@@ -2490,7 +2580,7 @@ non-uniform weights. Measured directly: at $\eta=0$ the weights are as far as $0
 uniform in max norm. The correct benchmark is therefore not the uniform average but \emph{the
 same algorithm with the step set to zero}: same shrinkage, same perturbations, same projection
 dynamics, no learning. Whatever lies between that control and BGD is what the bandit signal
-actually bought.
+actually bought, and Table~\ref{tab:bandit-decomp} splits the margin in exactly this way.
 
 \begin{table}[H]
 \centering
@@ -2505,7 +2595,9 @@ One-point BGD & $+0.000501$ \;(41.5\%) & $\mathbf{-0.000000}$ \;(0.0\%) \\
 \end{tabular}
 \caption{Decomposition of the full-information margin (uniform average $0.998132$ against OGD
 $0.996926$, i.e.\ $0.001206$) into what the projection gives with no learning at all and what the
-bandit feedback adds on top.}
+bandit feedback adds on top. Each cell is the fall in calibrated log-loss below the uniform
+average that the step contributes and, in parentheses, its share of the full-information
+margin.}
 \label{tab:bandit-decomp}
 \end{table}
 
@@ -2598,8 +2690,7 @@ and clean. Figure~\ref{fig:regime} shows both halves of it.
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{regime_switching.png}
-\caption{Left, the sweep of the belief sharpness. Right, the check of whether the latent regime
-corresponds to the measured information arrival.}
+\caption{(a) The sweep of the belief sharpness $\beta$: horizontal axis $\beta$ on a logarithmic scale, vertical axis the log-loss on the held-out tail, one line per forgetting factor $\gamma$ and a horizontal line for plain OGD. (b) The check of whether the latent regime corresponds to the measured information arrival. It is empty because the selected model's belief never changes, so there is nothing to stratify.}
 \label{fig:regime}
 \end{figure}
 
@@ -2615,12 +2706,12 @@ A series of plausible hypotheses was tested and rejected. We report them explici
 one bounds the method's scope.
 
 \paragraph{Per-league specialisation does not help.} A separate model per league loses to the
-single model in \emph{every} one of the six leagues tested. Two plausible causes: each league has
+single model in \emph{every} one of the six leagues tested (Table~\ref{app:ctx}). Two plausible causes: each league has
 only 2,231--3,800 matches, far too few for the online algorithm to converge on its own, and the
 specialists end up trusting largely the \emph{same} experts as the unified model, i.e.\ they do not
 discover anything local.
 
-\paragraph{Fixed-Share does not help.} Every $\alpha > 0$ worsens the log-loss ($0.99842$ at
+\paragraph{Fixed-Share does not help.} Every $\alpha > 0$ worsens the log-loss (Table~\ref{app:fs}: $0.99842$ at
 $\alpha=0$ against $0.99885$ and above); the $\alpha=0$ case reproduces plain Hedge exactly, which
 is what makes this a statement about Fixed-Share and not about the particular implementation of
 it. Sweeping $\alpha$ \emph{jointly} with the step shows why:
@@ -2662,7 +2753,8 @@ the wrong distribution and the shrinkage it produces does not correspond to the 
 
 \paragraph{Draws are practically unpredictable as a primary prediction.} Although they constitute
 $\sim$26\% of the matches, the best algorithm selects them as the most likely outcome in $0.4\%$
-of cases. This is a known phenomenon of football prediction, confirmed here quantitatively.
+of cases (Table~\ref{app:cls} gives the performance of every series by outcome class). This is a
+known phenomenon of football prediction, confirmed here quantitatively.
 
 \section{Discussion}
 \label{sec:discussion}
@@ -2841,7 +2933,9 @@ prediction model but because it operates on a low margin and does not restrict w
 so that its price is continuously corrected by informed bettors instead of their being shut out;
 in the 2025--26 window the best forecaster is not even a bookmaker but Betfair Exchange, where
 the price carries no operator margin; and over ten seasons the market did \emph{not} become more
-accurate (no series shows a significant trend in log-loss or ECE, $p$ from $0.21$ to $1.00$) but
+accurate (no series shows a significant trend in log-loss or in the expected calibration error,
+ECE, the average gap between forecast probability and observed frequency; $p$ from $0.21$ to
+$1.00$, Table~\ref{app:mk}) but
 it did become more expensive, the overround rising from $4.42\%$ to $6.00\%$ ($p=0.0007$).
 
 \paragraph{The odds appear as a property of the match.} De-vigging institutionalises the
@@ -2968,7 +3062,7 @@ tested by it.
 means every result is a statement about what the method \emph{would} have done. The framework
 itself does not require that: the three stages are online and causal, each round costs
 $O(N\log N)$, and the state is a single weight vector plus two scalars, so the whole chain runs in
-real time against a streaming odds API. What such an implementation would add is not speed but the
+real time against a streaming odds feed. What such an implementation would add is not speed but the
 two things a file cannot supply. First, the prices would be the ones actually available for
 staking rather than the ones recorded afterwards, which is precisely the gap
 \S\ref{sec:limits} identifies between a statistical and an exploitable edge: account limits,

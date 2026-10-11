@@ -95,6 +95,17 @@ def fit_config(P, awake, y, indices):
     return raw, calib, int(alive.sum())
 
 
+# The names the thesis prints for each configuration (Table 5.6); the stored
+# ones are shorthands ("A", "B") that mean nothing to a reader of the figure.
+CONFIG_DISPLAY = {
+    "A: closing + Shin": "closing-only + Shin",
+    "B: A minus single-season": "closing-only + Shin, no single-season",
+    "closing only, basic": "closing-only, proportional",
+    "baseline (full 26, basic)": "full panel, proportional",
+    "full 26, Shin": "full panel, Shin",
+}
+
+
 def plot_configs(table, out_path):
     cal = table[table["stage"] == "calibrated"].sort_values("val_log_loss")
     fig, ax = plt.subplots(figsize=(9, 0.6 * len(cal) + 2), facecolor="#fcfcfb")
@@ -109,14 +120,16 @@ def plot_configs(table, out_path):
         ax.scatter([r["val_log_loss"]], [yp], s=80, color=color, zorder=3,
                     edgecolor="#fcfcfb", linewidth=1.1)
     ax.set_yticks(ypos)
-    ax.set_yticklabels(cal["config"], fontsize=9, color="#0b0b0b")
+    ax.set_yticklabels([CONFIG_DISPLAY.get(c, c) for c in cal["config"]], fontsize=11.5,
+                       color="#0b0b0b")
     ax.set_xlabel("Calibrated log-loss, held-out tail (same rounds for every row)",
-                   color="#52514e")
+                   color="#52514e", fontsize=11.5)
     ax.set_title("Stacking the measured wins: does any configuration beat PSC?",
-                  color="#0b0b0b", fontsize=12, pad=12)
+                  color="#0b0b0b", fontsize=13, pad=12)
     _style_axes(ax)
+    ax.tick_params(axis="x", labelsize=10.5)
     ax.grid(False, axis="y")
-    leg = ax.legend(frameon=False, fontsize=8.5)
+    leg = ax.legend(frameon=False, fontsize=10.5)
     for t in leg.get_texts():
         t.set_color("#0b0b0b")
     fig.tight_layout()

@@ -767,16 +767,16 @@ def plot_bandit(sweep, tbl, ref_ho, out_path):
         ax1.axhline(ref_ho[label], color=BANDIT_COLORS[label], linestyle=style,
                     linewidth=1.6, zorder=2, label=label)
     ax1.set_xscale("log")
-    ax1.set_xlabel(f"πολλαπλασιαστής βήματος (ξ={XI_PROFILE}, λογαριθμικός άξονας)",
+    ax1.set_xlabel(f"step multiplier (ξ={XI_PROFILE}, log scale)", fontsize=12,
                    color=INK_SOFT)
-    ax1.set_ylabel("log-loss στην ουρά", color=INK_SOFT)
-    ax1.set_title("Προφίλ βήματος: bandit vs πλήρης πληροφόρηση",
-                  color=INK, fontsize=12, pad=12)
+    ax1.set_ylabel("log-loss on the held-out tail", color=INK_SOFT, fontsize=12)
+    ax1.set_title("(a) Step profile: bandit against full information",
+                  color=INK, fontsize=13, pad=12)
     ax1.set_ymargin(0.10)
     _style_axes(ax1)
     # the curves occupy the top-left and the reference lines span the full
     # width, so the mid-left band is the only reliably empty region
-    leg = ax1.legend(frameon=False, fontsize=8.5, loc="center left")
+    leg = ax1.legend(frameon=False, fontsize=10.5, loc="center left")
     for t in leg.get_texts():
         t.set_color(INK)
 
@@ -794,12 +794,13 @@ def plot_bandit(sweep, tbl, ref_ho, out_path):
                  markeredgecolor=SURFACE, markeredgewidth=2.0, zorder=3)
         ax2.annotate(f"{r['calibrated_log_loss']:.5f}",
                      (r["calibrated_log_loss"], yv), textcoords="offset points",
-                     xytext=(10, 0), va="center", fontsize=8.5, color=INK_SOFT)
+                     xytext=(10, 0), va="center", fontsize=10, color=INK_SOFT)
     ax2.set_yticks(ypos)
-    ax2.set_yticklabels(d["name"], fontsize=9)
-    ax2.set_xlabel("log-loss μετά από calibration (χαμηλότερο = καλύτερο)",
+    ax2.set_yticklabels([str(nm).replace("Χωρίς μάθηση", "No learning").replace("xi=", "ξ=")
+                         for nm in d["name"]], fontsize=10.5)
+    ax2.set_xlabel("log-loss after calibration (lower is better)", fontsize=12,
                    color=INK_SOFT)
-    ax2.set_title("Ίδιοι γύροι, ίδιο calibration", color=INK, fontsize=12, pad=12)
+    ax2.set_title("(b) Same rounds, same calibration", color=INK, fontsize=13, pad=12)
     # explicit limits + a plain formatter: the default ScalarFormatter factors
     # out a ~1.0 offset and prints it on top of the axis label
     ax2.set_xlim(lo - 0.10 * span, hi + 0.55 * span)

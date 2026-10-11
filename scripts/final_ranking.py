@@ -128,7 +128,7 @@ def plot_slope(table, out_path):
     ax.set_yticks(ypos)
     ax.set_yticklabels(df["name"], fontsize=9, color="#0b0b0b")
     ax.set_xlabel("Log-loss (full history)", color="#52514e")
-    ax.set_title("Final ranking: raw vs. temperature-calibrated log-loss (Tier A, coverage ≥ 70%)",
+    ax.set_title(f"Final ranking: raw vs. temperature-calibrated log-loss (Tier A, coverage ≥ {COVERAGE_THRESHOLD:.0f}%)",
                   color="#0b0b0b", fontsize=12, pad=12)
     ax.grid(True, axis="x", color="#e1e0d9", linewidth=0.8)
     ax.set_axisbelow(True)

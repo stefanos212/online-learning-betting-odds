@@ -120,11 +120,16 @@ def plot_deployment(table, out_path, n_test):
         ax.scatter([r["log_loss"]], [yp], s=80, color=colors[r["type"]],
                    edgecolor="#fcfcfb", linewidth=1.1, zorder=3)
     ax.set_yticks(ypos)
-    ax.set_yticklabels(df["name"], fontsize=9, color="#0b0b0b")
-    ax.set_xlabel(f"Βαθμονομημένο log-loss, {n_test} αγώνες του 2025+", color="#52514e")
-    ax.set_title("Εκπαίδευση ως 31/12/2024, πρόβλεψη 2025--2026",
-                 color="#0b0b0b", fontsize=12, pad=12)
+    # the series names are stored in Greek in the CSV; translate for display only
+    shown = [str(nm).replace("πλήρες panel", "full panel").replace("παγωμένο", "frozen")
+             for nm in df["name"]]
+    ax.set_yticklabels(shown, fontsize=11, color="#0b0b0b")
+    ax.set_xlabel(f"calibrated log-loss over the {n_test} common matches of 2025+ "
+                  "(lower is better)", color="#52514e", fontsize=12)
+    ax.set_title("Trained up to 31/12/2024, forecasting 2025-26",
+                 color="#0b0b0b", fontsize=13, pad=12)
     _style_axes(ax)
+    ax.tick_params(axis="x", labelsize=10.5)
     ax.grid(False, axis="y")
     fig.tight_layout()
     fig.savefig(out_path, dpi=150)

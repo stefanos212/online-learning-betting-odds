@@ -399,36 +399,37 @@ def plot_regimes(sweep, B, mov, ok, tau_star, K_star, base_ho, out_path):
         ax.set_facecolor("#fcfcfb")
     palette = [COLORS["Hedge"], COLORS["FTRL"], COLORS["Uniform average"],
                COLORS["muted"]]
-    ax1.axhline(base_ho, color=COLORS["OGD"], linewidth=1.6, label="απλό OGD")
+    ax1.axhline(base_ho, color=COLORS["OGD"], linewidth=1.6, label="plain OGD")
     A = sweep[sweep["stage"] == "A"]
     for i, g in enumerate(sorted(A["gamma"].unique())):
         s = A[A["gamma"] == g].sort_values("beta")
         ax1.plot(s["beta"], s["held_out"], marker="o", markersize=6, linewidth=2.0,
                  color=palette[i % len(palette)], label=f"γ={g:g}")
     ax1.set_xscale("log")
-    ax1.set_xlabel("οξύτητα πεποίθησης β (λογαριθμικός)", color="#52514e")
-    ax1.set_ylabel("log-loss στην ουρά", color="#52514e")
-    ax1.set_title("Εναλλαγή καθεστώτων: σάρωση", color="#0b0b0b", fontsize=12, pad=10)
+    ax1.set_xlabel("belief sharpness β (log scale)", color="#52514e", fontsize=12)
+    ax1.set_ylabel("log-loss on the held-out tail", color="#52514e", fontsize=12)
+    ax1.set_title("(a) Regime switching: sweep of the belief sharpness",
+                  color="#0b0b0b", fontsize=13, pad=10)
     _style_axes(ax1)
-    leg = ax1.legend(frameon=False, fontsize=9)
+    leg = ax1.legend(frameon=False, fontsize=10.5)
     for t in leg.get_texts():
         t.set_color("#0b0b0b")
 
     kb, means = most_variable_regime(B, mov, ok)
     if means is None:
-        ax2.text(0.5, 0.5, "η πεποίθηση δεν μεταβάλλεται·\nδεν υπάρχει τίποτα "
-                           "να στρωματοποιηθεί", ha="center", va="center",
-                 transform=ax2.transAxes, color="#52514e", fontsize=11)
+        ax2.text(0.5, 0.5, "the belief never changes:\nthere is nothing to stratify",
+                 ha="center", va="center",
+                 transform=ax2.transAxes, color="#52514e", fontsize=13)
         ax2.set_xticks([])
         ax2.set_yticks([])
     else:
         ax2.plot(range(1, len(means) + 1), means, marker="o", markersize=9,
                  linewidth=2.0, color=COLORS["Hedge"])
         ax2.set_xticks(range(1, len(means) + 1))
-        ax2.set_ylabel("μέση μετρημένη κίνηση γραμμής", color="#52514e")
-    ax2.set_xlabel(f"πεμπτημόριο πεποίθησης για το καθεστώς {kb}", color="#52514e")
-    ax2.set_title("Ανακαλύπτει το λανθάνον καθεστώς την άφιξη πληροφορίας;",
-                  color="#0b0b0b", fontsize=12, pad=10)
+        ax2.set_ylabel("mean measured line movement", color="#52514e", fontsize=12)
+    ax2.set_xlabel(f"quintile of the belief in regime {kb}", color="#52514e", fontsize=12)
+    ax2.set_title("(b) Does the latent regime track the arrival of information?",
+                  color="#0b0b0b", fontsize=13, pad=10)
     _style_axes(ax2)
     fig.tight_layout()
     fig.savefig(out_path, dpi=150)

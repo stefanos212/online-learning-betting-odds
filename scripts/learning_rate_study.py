@@ -232,62 +232,78 @@ def score(W, P, y, val_mask):
 
 
 def plot_study(table, out_path):
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5.8), facecolor="#fcfcfb")
+    """Two stacked panels, each the full width of the page.
 
-    sweep = table[table["family"] == "Hedge x mult"]
-    ax1.set_facecolor("#fcfcfb")
-    for col, lab, style in [("val_log_loss", "held-out tail", "-"),
-                             ("full_log_loss", "full sample", "--")]:
-        ax1.plot(sweep["setting"], sweep[col], marker="o", markersize=5,
-                  linestyle=style, linewidth=1.9, color=COLORS["Hedge"], alpha=1.0 if style == "-" else 0.5,
-                  label=f"Hedge, {lab}")
-    ogd = table[table["family"] == "OGD x mult"]
-    for col, lab, style in [("val_log_loss", "held-out tail", "-"),
-                             ("full_log_loss", "full sample", "--")]:
-        ax1.plot(ogd["setting"], ogd[col], marker="s", markersize=5,
-                  linestyle=style, linewidth=1.9, color=COLORS["OGD"], alpha=1.0 if style == "-" else 0.5,
-                  label=f"OGD, {lab}")
+    (a) the multiplier on the textbook decaying schedule, for all three
+        algorithms, with the multiplier in use circled;
+    (b) a constant step in place of the decaying schedule, for all three,
+        against each algorithm's decaying step in use on the same tail.
+    """
+    algos = [("Hedge", HEDGE_STEP_MULTIPLIER, "o"),
+             ("OGD", OGD_STEP_MULTIPLIER, "s"),
+             ("FTRL", FTRL_STEP_MULTIPLIER, "^")]
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 10.5), facecolor="#fcfcfb")
+    for ax in (ax1, ax2):
+        ax.set_facecolor("#fcfcfb")
+
+    for name, shipped, mk in algos:
+        s = table[table["family"] == f"{name} x mult"].copy()
+        if s.empty:
+            continue
+        s["setting"] = s["setting"].astype(float)
+        s = s.sort_values("setting")
+        c = COLORS[name]
+        ax1.plot(s["setting"], s["val_log_loss"], marker=mk, markersize=6,
+                 linewidth=2.2, color=c, label=f"{name}, held-out tail")
+        ax1.plot(s["setting"], s["full_log_loss"], marker=mk, markersize=5,
+                 linewidth=1.6, linestyle="--", color=c, alpha=0.55,
+                 label=f"{name}, full sample")
+        at = s[np.isclose(s["setting"], shipped)]
+        ax1.scatter(at["setting"], at["val_log_loss"], s=210, facecolor="none",
+                    edgecolor=c, linewidth=2.2, zorder=5)
     ax1.set_xscale("log")
-    ax1.set_xlabel("learning-rate multiplier (1 = textbook schedule)", color="#52514e")
-    ax1.set_ylabel("log-loss", color="#52514e")
-    ax1.set_title("Where is the bottom of the curve?\n"
-                   f"(OGD ships at x{OGD_STEP_MULTIPLIER:g}, Hedge at "
-                   f"x{HEDGE_STEP_MULTIPLIER:g}, FTRL at x{FTRL_STEP_MULTIPLIER:g})",
-                   color="#0b0b0b", fontsize=12, pad=10)
-    ax1.grid(True, color="#e1e0d9", linewidth=0.8)
-    ax1.set_axisbelow(True)
-    for s in ["top", "right"]:
-        ax1.spines[s].set_visible(False)
-    for s in ["left", "bottom"]:
-        ax1.spines[s].set_color("#c3c2b7")
-    ax1.tick_params(colors="#898781")
-    leg = ax1.legend(frameon=False, fontsize=8.5)
-    for t in leg.get_texts():
-        t.set_color("#0b0b0b")
+    ax1.set_xlabel("step multiplier on the textbook schedule (log scale; 1 = textbook)",
+                   color="#52514e", fontsize=12.5)
+    ax1.set_ylabel("log-loss (lower is better)", color="#52514e", fontsize=12.5)
+    ax1.set_title("(a) Scaling the decaying step; circled: the multiplier in use",
+                  color="#0b0b0b", fontsize=13.5, pad=10, loc="left")
 
-    const = table[table["family"] == "Hedge const eta"].sort_values("setting")
-    base = table[(table["family"] == "Hedge x mult") &
-                 (table["setting"] == HEDGE_STEP_MULTIPLIER)]["val_log_loss"].iloc[0]
-    ax2.set_facecolor("#fcfcfb")
-    ax2.axhline(base, color="#898781", linestyle="--", linewidth=1.5,
-                 label="shipped Hedge (held-out)")
-    ax2.plot(const["setting"], const["val_log_loss"], marker="o", markersize=6,
-              linewidth=2.0, color="#4a3aa7", label="constant eta (held-out)")
-    ax2.set_xlabel("constant eta  (1.0 = Bayesian mixture)", color="#52514e")
-    ax2.set_ylabel("log-loss, held-out tail", color="#52514e")
-    ax2.set_title("Constant-eta / Bayesian variant", color="#0b0b0b", fontsize=12, pad=10)
-    ax2.grid(True, color="#e1e0d9", linewidth=0.8)
-    ax2.set_axisbelow(True)
-    for s in ["top", "right"]:
-        ax2.spines[s].set_visible(False)
-    for s in ["left", "bottom"]:
-        ax2.spines[s].set_color("#c3c2b7")
-    ax2.tick_params(colors="#898781")
-    leg2 = ax2.legend(frameon=False, fontsize=8.5)
-    for t in leg2.get_texts():
-        t.set_color("#0b0b0b")
+    for name, shipped, mk in algos:
+        s = table[table["family"] == f"{name} const eta"].copy()
+        if s.empty:
+            continue
+        s["setting"] = s["setting"].astype(float)
+        s = s.sort_values("setting")
+        c = COLORS[name]
+        ax2.plot(s["setting"], s["val_log_loss"], marker=mk, markersize=6,
+                 linewidth=2.2, color=c, label=f"{name}, constant step")
+        dec = table[table["family"] == f"{name} x mult"].copy()
+        dec["setting"] = dec["setting"].astype(float)
+        dec = dec[np.isclose(dec["setting"], shipped)]["val_log_loss"]
+        if not dec.empty:
+            ax2.axhline(dec.iloc[0], color=c, linestyle=":", linewidth=1.9,
+                        label=f"{name}, decaying step in use")
+    ax2.set_xscale("log")
+    ax2.set_xlabel("constant step size $\\eta$ (log scale)", color="#52514e", fontsize=12.5)
+    ax2.set_ylabel("log-loss on the held-out tail", color="#52514e", fontsize=12.5)
+    ax2.set_title("(b) A constant step instead of the decaying one",
+                  color="#0b0b0b", fontsize=13.5, pad=10, loc="left")
 
-    fig.tight_layout()
+    for ax in (ax1, ax2):
+        ax.grid(True, color="#e1e0d9", linewidth=0.8)
+        ax.set_axisbelow(True)
+        for sp in ["top", "right"]:
+            ax.spines[sp].set_visible(False)
+        for sp in ["left", "bottom"]:
+            ax.spines[sp].set_color("#c3c2b7")
+        ax.tick_params(colors="#898781", labelsize=11)
+        # headroom, so the legend sits above the curves instead of across them
+        lo, hi = ax.get_ylim()
+        ax.set_ylim(lo, hi + 0.3 * (hi - lo))
+        leg = ax.legend(frameon=False, fontsize=10.5, ncol=3, loc="upper left")
+        for t in leg.get_texts():
+            t.set_color("#0b0b0b")
+    fig.tight_layout(h_pad=2.5)
     fig.savefig(out_path, dpi=150)
     print(f"\nSaved plot: {out_path}")
 

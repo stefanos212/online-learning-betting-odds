@@ -474,12 +474,13 @@ def plot_ranking(table, out_path):
     ax.set_yticks(ypos)
     ax.set_yticklabels([n + ("" if p == "---" else f"  ({p})")
                         for n, p in zip(df["name"], df["phase"])],
-                       fontsize=9, color="#0b0b0b")
-    ax.set_xlabel("Log-loss", color="#52514e")
-    ax.set_title(f"Τελευταίες {RECENT_SEASONS} σεζόν, πλήρες panel\n"
-                 "κενό = raw, γεμάτο = βαθμονομημένο",
-                 color="#0b0b0b", fontsize=12, pad=12)
+                       fontsize=11, color="#0b0b0b")
+    ax.set_xlabel("log-loss (lower is better)", color="#52514e", fontsize=12)
+    ax.set_title(f"Last {RECENT_SEASONS} seasons, full panel\n"
+                 "hollow = raw, filled = calibrated",
+                 color="#0b0b0b", fontsize=13, pad=12)
     _style_axes(ax)
+    ax.tick_params(axis="x", labelsize=10.5)
     ax.grid(False, axis="y")
     fig.tight_layout()
     fig.savefig(out_path, dpi=150)

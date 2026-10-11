@@ -73,14 +73,15 @@ boundary means the grid is too narrow.
 Produces:
   - results/oco_kelly.csv
   - results/oco_kelly_significance.csv
-  - results/oco_kelly.png
+  - results/oco_kelly_closing.png, results/oco_kelly_opening.png
+    (one figure per market phase, each a landscape page in the thesis)
 """
 
 import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FuncFormatter
+from matplotlib.ticker import FuncFormatter, MaxNLocator, NullFormatter
 
 from sleeping_experts import OUT_DIR, DATA_DIR, COLORS, load_match_order, load_universe_from, split_by_market_phase
 from significance_test import moving_block_bootstrap_test
@@ -475,49 +476,80 @@ def _style(ax):
     ax.tick_params(colors="#898781")
 
 
-def plot_kelly(curves, lam_curves, sweep, out_path):
-    books = sorted(curves)
-    n = len(books)
-    fig, axes = plt.subplots(2, n, figsize=(4.4 * n, 8.4), facecolor=SURFACE,
-                             squeeze=False)
-    for j, book in enumerate(books):
-        ax = axes[0][j]
-        ax.set_facecolor(SURFACE)
-        ax.axhline(1.0, color="#c3c2b7", linewidth=1.1, linestyle=":", zorder=1)
-        for label, bank in curves[book].items():
-            ax.plot(np.arange(1, len(bank) + 1), bank, linewidth=1.8, zorder=2,
-                    color=METHOD_COLORS.get(label, INK_SOFT), label=label)
-        ax.set_yscale("log")
-        ax.set_title(book, color=INK, fontsize=11, pad=8)
-        # the bankroll advances over every round the book quoted (it is flat on
-        # a no-bet round), NOT over bets -- the two axes below differ in length
-        # for exactly that reason
-        ax.set_xlabel("γύρος με προσφερόμενη απόδοση", color=INK_SOFT)
-        _style(ax)
+DISPLAY = {
+    "Kelly 1/4 (σταθερό)": "Kelly 1/4 (fixed)",
+    "Kelly πλήρες (σταθερό)": "full Kelly (fixed)",
+    "OCO λ (ONS)": "learned λ, Online Newton Step",
+    "OCO λ (OGD)": "learned λ, OGD",
+    "OCO f (παλαιό)": "learned stake f (earlier formulation)",
+}
 
-        ax2 = axes[1][j]
-        ax2.set_facecolor(SURFACE)
-        ax2.axhline(0.25, color="#c3c2b7", linewidth=1.1, linestyle=":", zorder=1)
-        for label, tr in lam_curves.get(book, {}).items():
-            if label.startswith("OCO λ"):
-                ax2.plot(np.arange(1, len(tr) + 1), tr, linewidth=1.8, zorder=2,
-                         color=METHOD_COLORS.get(label, INK_SOFT), label=label)
-        ax2.set_ylim(0, None)
-        ax2.set_xlabel("αριθμός στοιχήματος", color=INK_SOFT)
-        _style(ax2)
-    axes[0][0].set_ylabel("κεφάλαιο (log, αρχή 1,0)", color=INK_SOFT)
-    axes[1][0].set_ylabel("μαθαινόμενο λ (στικτή: το ισχύον 1/4)", color=INK_SOFT)
-    axes[1][0].yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:.2f}"))
-    handles, labels = axes[0][0].get_legend_handles_labels()
-    leg = fig.legend(handles, labels, frameon=False, fontsize=9, ncol=len(labels),
-                     loc="lower center", bbox_to_anchor=(0.5, -0.03))
-    for t in leg.get_texts():
-        t.set_color(INK)
-    fig.suptitle("OCO στον πολλαπλασιαστή Kelly: κεφάλαιο και τροχιά του λ "
-                 "(Basic, calibrated)", color=INK, fontsize=12.5, y=1.0)
-    fig.tight_layout()
-    fig.savefig(out_path, dpi=150, bbox_inches="tight")
-    print(f"Saved plot: {out_path}")
+
+def plot_kelly(curves, lam_curves, sweep, out_path):
+    """One landscape figure per market phase. A single strip with every target
+    side by side was unreadable once the opening targets were added, so the
+    closing targets go to <out>_closing.png and the opening ones to
+    <out>_opening.png. Method keys stay as stored; only the shown text changes.
+    """
+    root, ext = os.path.splitext(out_path)
+    phases = (("closing", sorted(b for b in curves if b.endswith("C"))),
+              ("opening", sorted(b for b in curves if not b.endswith("C"))))
+    for phase, books in phases:
+        if not books:
+            continue
+        n = len(books)
+        fig, axes = plt.subplots(2, n, figsize=(13.5, 7.4), facecolor=SURFACE,
+                                 squeeze=False)
+        for j, book in enumerate(books):
+            ax = axes[0][j]
+            ax.set_facecolor(SURFACE)
+            ax.axhline(1.0, color="#c3c2b7", linewidth=1.1, linestyle=":", zorder=1)
+            for label, bank in curves[book].items():
+                ax.plot(np.arange(1, len(bank) + 1), bank, linewidth=1.9, zorder=2,
+                        color=METHOD_COLORS.get(label, INK_SOFT),
+                        label=DISPLAY.get(label, label))
+            ax.set_yscale("log")
+            # on a range under one decade matplotlib labels the minor ticks too,
+            # in a different size and colour from the major ones
+            ax.yaxis.set_minor_formatter(NullFormatter())
+            ax.set_title(book, color=INK, fontsize=14, pad=8)
+            # the bankroll advances over every round the book quoted (flat on a
+            # no-bet round), NOT over bets: the two rows differ in length for
+            # exactly that reason
+            ax.set_xlabel("rounds quoted", color=INK_SOFT, fontsize=11.5)
+            ax.xaxis.set_major_locator(MaxNLocator(3))
+            _style(ax)
+            ax.tick_params(labelsize=10)
+
+            ax2 = axes[1][j]
+            ax2.set_facecolor(SURFACE)
+            ax2.axhline(0.25, color="#c3c2b7", linewidth=1.1, linestyle=":", zorder=1)
+            for label, tr in lam_curves.get(book, {}).items():
+                if label.startswith("OCO λ"):
+                    ax2.plot(np.arange(1, len(tr) + 1), tr, linewidth=1.9, zorder=2,
+                             color=METHOD_COLORS.get(label, INK_SOFT),
+                             label=DISPLAY.get(label, label))
+            ax2.set_ylim(0, None)
+            ax2.set_xlabel("bet number", color=INK_SOFT, fontsize=11.5)
+            ax2.xaxis.set_major_locator(MaxNLocator(3))
+            _style(ax2)
+            ax2.tick_params(labelsize=10)
+        axes[0][0].set_ylabel("bankroll (log scale, start = 1)", color=INK_SOFT, fontsize=12)
+        axes[1][0].set_ylabel("learned λ (dotted: the fixed 1/4)", color=INK_SOFT, fontsize=12)
+        axes[1][0].yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"{v:.2f}"))
+        handles, labels = axes[0][0].get_legend_handles_labels()
+        leg = fig.legend(handles, labels, frameon=False, fontsize=12, ncol=len(labels),
+                         loc="lower center", bbox_to_anchor=(0.5, -0.06))
+        for t in leg.get_texts():
+            t.set_color(INK)
+        fig.suptitle(f"Learned Kelly multiplier against the {phase} targets: "
+                     "bankroll (top row) and multiplier (bottom row)",
+                     color=INK, fontsize=14.5, y=1.01)
+        fig.tight_layout()
+        path = f"{root}_{phase}{ext}"
+        fig.savefig(path, dpi=150, bbox_inches="tight")
+        plt.close(fig)
+        print(f"Saved plot: {path}")
 
 
 if __name__ == "__main__":
