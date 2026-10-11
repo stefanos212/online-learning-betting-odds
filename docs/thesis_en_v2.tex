@@ -373,7 +373,7 @@ ability but also differing business strategy.
 Market microstructure theory supplies the framework for understanding how information becomes
 embedded in price. The models of Kyle (1985)~\cite{kyle1985} and Glosten \& Milgrom (1985)~\cite{glosten1985} show that, in the
 presence of informed traders, price movement is the mechanism through which private
-information becomes public, and that the bid--ask spread serves as the market maker's
+information becomes public, and that the bid--ask spread is the market maker's
 protection against them. That framework bears directly on the difference between opening and
 closing prices (\S\ref{sec:openclose}).
 
@@ -485,7 +485,7 @@ $f_1,\dots,f_{t-1}$. The regret is defined as
 
 An algorithm is considered successful when its regret grows sublinearly in $T$, that is
 $\mathrm{Regret}_T / T \to 0$: in the long run its average loss approaches that of the best
-fixed choice. What is crucial for our application is that this guarantee holds \textbf{for
+fixed choice. What matters for our application is that this guarantee holds \textbf{for
 every} sequence, with no assumption of independence or of a stationary distribution.
 
 This point deserves to be stated precisely, because it is the reason the OCO framework is
@@ -2171,7 +2171,7 @@ one, over its own rounds: we significantly beat PS ($-0.0022$ to $-0.0023$, $p$ 
 $0.019$, over 6,857 matches), and we tie with PSC ($p$ from $0.532$ to $0.796$, over 6,892
 matches).
 
-It is worth noting that the best forecaster in this window is not a bookmaker but \textbf{Betfair
+The best forecaster in this window is not a bookmaker but \textbf{Betfair
 Exchange}: an exchange where players bet against one another, that is a market price without an
 operator's margin.
 
@@ -2560,7 +2560,7 @@ market phase) select $\alpha = 0$ on the chronological prefix, i.e.\ collapse to
 paired tests confirm this with a mean difference of $0.000000$ \emph{exactly} and $p=1.000$,
 not approximately. The finding agrees with Fixed-Share: once the step itself is tuned, no
 post-hoc movement of mass has anything left to correct, because both control the same quantity.
-It is worth noting, however, that at \emph{large} $\alpha$ the structured kernels do measurably
+At \emph{large} $\alpha$, however, the structured kernels do measurably
 less damage than the uniform one, i.e.\ the panel's structure is real and detectable, merely
 redundant.
 
