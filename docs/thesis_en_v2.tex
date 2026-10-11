@@ -736,7 +736,7 @@ exponentially in that expert's loss:
 w_{t+1,i} \;\propto\; w_{t,i}\, e^{-\eta_t\, \ell_{t,i}},
 \qquad \ell_{t,i} = -\log p_{t,i}[y_t].
 \]
-With a suitable $\eta_t$ it attains regret $O(\sqrt{T \log N})$. The dependence on $N$ is only
+The quantity $\eta_t > 0$ is the \emph{step size}, also called the learning rate: it sets how far one round's loss is allowed to move the weights, and the whole of \S\ref{sec:res-steps} is about choosing it. With a suitable $\eta_t$ the algorithm attains regret $O(\sqrt{T \log N})$. The dependence on $N$ is only
 logarithmic, which is what makes large expert sets tractable.
 
 \begin{lemma}[Hoeffding]
@@ -1070,13 +1070,14 @@ this thesis tries all three. We separate them explicitly, because the negative r
 say nothing about the others.
 
 \paragraph{(a) A chain on the weight vector.} After the gradient step and the projection, mass is
-moved by a row-stochastic matrix $M$:
+moved by a row-stochastic matrix $Q$, that is a non-negative matrix whose every row sums to
+one ($Q$ rather than $M$, which already denotes the bound on a single round's loss):
 \[
-v_t = \Pi_{\Delta}(w_t), \qquad \hat{w} = v_t - \eta_t \ell_t, \qquad w_{t+1} = M^{\!\top}\hat{w}.
+v_t = \Pi_{\Delta}(w_t), \qquad \hat{w} = v_t - \eta_t \ell_t, \qquad w_{t+1} = Q^{\!\top}\hat{w}.
 \]
 The Fixed-Share of \S\ref{sec:fixed-share} is the special case
-$M = (1-\alpha)I + \tfrac{\alpha}{N}\mathbf{1}\mathbf{1}^{\!\top}$, that is a uniform leak. A
-general $M$ is strictly more expressive, because it can say \emph{where} the lost mass goes:
+$Q = (1-\alpha)I + \tfrac{\alpha}{N}\mathbf{1}\mathbf{1}^{\!\top}$, that is a uniform leak. A
+general $Q$ is strictly more expressive, because it can say \emph{where} the lost mass goes:
 e.g.\ to the opening/closing ``twin'' of the same house, or to peers in the same market phase.
 Row-stochasticity guarantees conservation of total mass, which is exactly what makes $\alpha=0$
 a genuine no-op rather than an approximate one.
@@ -1327,9 +1328,12 @@ $g(f^{*}) = e^2/(2\sigma^2)$.
 
 \begin{proposition}[The cost of fractional Kelly]
 \label{prop:fractional-kelly}
-In the quadratic approximation, betting a fraction $\lambda f^{*}$ with $\lambda\in(0,1]$ retains
-a proportion $\lambda(2-\lambda)$ of the maximal growth rate, while the variance of the capital
-is reduced by a factor $\lambda^2$.
+In the quadratic approximation, betting a fraction $\lambda f^{*}$, with the
+\emph{Kelly multiplier} $\lambda \in (0,1]$, retains a proportion $\lambda(2-\lambda)$ of the
+maximal growth rate, while the variance of the capital is reduced by a factor $\lambda^2$.
+(The symbol $\lambda$ is used here and for the rest of the thesis in this sense only; it is
+unrelated to Kyle's depth coefficient of \S\ref{sec:microstructure-theory}, which is written
+with the same letter by convention and appears nowhere else.)
 \end{proposition}
 
 For $\lambda=\tfrac14$, the value used here, one retains
@@ -2392,7 +2396,7 @@ worse than it. The first row is a tie ($p=0.823$), the rest are significant at $
 \label{fig:bandit-fig}
 \end{figure}
 
-\paragraph{The control that makes the numbers interpretable.} The obvious reading (``BGD beats
+\paragraph{The control that makes the numbers interpretable.} Write BGD for \emph{bandit gradient descent}, the estimator of \S\ref{sec:bandit-theory} run on the loss of the chosen mixture alone. The obvious reading (``BGD beats
 the uniform average, so the bandit feedback taught it something'') is wrong, and this thesis
 made it in a first draft before correcting it. Under the Sleeping Experts reduction the weight
 vector moves even with a \emph{zero} step: every time the awake set changes, the persistent
