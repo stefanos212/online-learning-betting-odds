@@ -228,7 +228,7 @@ def main():
         if t is not None:
             add(longtable(t, T(f"Panel $\\times$ αλγόριθμος --- {cap}.",
                                f"Panel $\\times$ algorithm --- {cap_en}."),
-                          "app:" + f[:12] + cap[:4]))
+                          "app:" + f[:12] + cap_en[:4]))
     for f, cap, cap_en in (("opening_vs_closing_vs_uniform.csv",
                             "αναλογική", "proportional"),
                            ("opening_vs_closing_vs_uniform_shin.csv", "Shin", "Shin")):
@@ -236,7 +236,7 @@ def main():
         if t is not None:
             add(longtable(t, T(f"Κάθε αλγόριθμος έναντι του απλού μέσου όρου, {cap}.",
                                f"Each algorithm against the plain average, {cap_en}."),
-                          "app:vsuni" + cap[:4]))
+                          "app:vsuni" + cap_en[:4]))
 
     add(T(r"\section{Διαμορφώσεις}", r"\section{Configurations}") + "\n")
     for f, cap, cap_en, lab in (

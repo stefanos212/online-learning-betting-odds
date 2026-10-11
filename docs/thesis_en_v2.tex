@@ -42,7 +42,7 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{proposition}[theorem]{Proposition}
 \newtheorem{corollary}[theorem]{Corollary}
-\theoremstyle{remark}
+\theoremstyle{definition}   % bold heading, upright body
 \newtheorem{remark}[theorem]{Remark}
 
 \begin{document}
@@ -160,8 +160,9 @@ The mixture significantly outperforms every individual bookmaker except the shar
 which it draws level in the configuration ultimately adopted. Under a deployment test with a
 genuine temporal cut (fitted through the end of 2024, evaluated on 2025--26) it significantly
 outperforms every opening price and draws level with the bookmakers' closing prices. The one
-series that significantly outperforms it is Betfair Exchange, which is not a bookmaker but an
-exchange, that is a market price carrying no operator's margin.
+source of odds that significantly outperforms it is Betfair Exchange, which is not a bookmaker
+but a betting exchange: a platform on which bettors bet against one another, so that its odds are
+set by the bettors themselves and carry no profit margin added by a company.
 
 The three broader findings are that learning pays only where experts are heterogeneous in
 quality; that better prediction does not translate directly into profit, since the quality
@@ -197,9 +198,11 @@ moving block bootstrap. Το σύνολο δεδομένων καλύπτει 22
 Το μείγμα ξεπερνά στατιστικά σημαντικά κάθε μεμονωμένο bookmaker πλην του σκληρότερου, με
 τον οποίο ισοπαλεί στη διαμόρφωση που επιλέγεται τελικά. Σε έλεγχο ανάπτυξης με πραγματική
 χρονική τομή (εκπαίδευση έως το τέλος του 2024, μέτρηση στο 2025--26) κερδίζει σημαντικά κάθε
-τιμή ανοίγματος και ισοπαλεί με τις τιμές κλεισίματος των bookmakers. Η μόνη σειρά που το
-ξεπερνά σημαντικά είναι το Betfair Exchange, που δεν είναι bookmaker αλλά ανταλλακτήριο,
-δηλαδή τιμή αγοράς χωρίς περιθώριο διαχειριστή.
+τιμή ανοίγματος και ισοπαλεί με τις τιμές κλεισίματος των bookmakers. Η μόνη πηγή
+αποδόσεων που το ξεπερνά σημαντικά είναι το Betfair Exchange, το οποίο δεν είναι στοιχηματική
+εταιρεία αλλά ανταλλακτήριο στοιχημάτων: οι παίκτες στοιχηματίζουν ο ένας απέναντι στον άλλον,
+οπότε τις αποδόσεις τις διαμορφώνουν οι ίδιοι και δεν περιέχουν περιθώριο κέρδους κάποιας
+εταιρείας.
 
 Τα τρία γενικότερα ευρήματα είναι ότι η μάθηση αποδίδει μόνο όταν οι experts έχουν
 ανομοιομορφία στην ποιότητα, ότι η καλύτερη πρόβλεψη δεν μεταφράζεται άμεσα σε κέρδος καθώς
@@ -229,7 +232,9 @@ thesis will struggle to compete with them on their own ground.
 
 This thesis changes the question. Rather than building yet another forecaster, it treats
 \emph{each betting company as an expert} that publishes, ahead of every match, its own
-probabilities $(p_H, p_D, p_A)$ over the three outcomes. The task then becomes: how are these
+probabilities $(p_H, p_D, p_A)$ over the three outcomes: $p_H$ that the home team wins, $p_D$
+that the match is drawn and $p_A$ that the away team wins, with $p_H + p_D + p_A = 1$. The task
+then becomes: how are these
 opinions to be combined, online and without knowledge of the future, so that the mixture is a
 better forecaster than any one of them taken separately?
 
@@ -262,7 +267,7 @@ thesis tests this gap explicitly, through a betting simulation based on the Kell
 
 \section{Contributions}
 
-The thesis contributes the following.
+The thesis makes the following contributions:
 
 \begin{itemize}
   \item A complete implementation of three OCO algorithms under the Sleeping Experts
@@ -283,7 +288,7 @@ The thesis contributes the following.
 
 \section{Thesis outline}
 
-Chapter~\ref{ch:related} reviews the related literature. Chapter~\ref{ch:theory} develops the
+The rest of the thesis is structured as follows. Chapter~\ref{ch:related} reviews the related literature. Chapter~\ref{ch:theory} develops the
 theoretical background. Chapter~\ref{ch:data} describes the data, its preprocessing and the
 experimental design. Chapter~\ref{ch:results} gives the results and discusses them.
 Chapter~\ref{ch:conclusion} summarises, states the limits of the method and proposes future
@@ -300,17 +305,29 @@ study of betting markets. This chapter sketches each and locates the present con
 
 \section{Online learning and regret theory}
 
+In \emph{prediction with expert advice} a learner must issue a forecast at every round, and before
+doing so it sees the forecasts of a fixed set of $N$ \emph{experts}; in this thesis each expert is
+a betting company and its forecast is the probabilities implied by its odds. The learner's
+performance is measured by its \emph{regret}: how much larger its total loss over $T$ rounds is
+than that of the best single expert, or the best fixed combination of experts, chosen in
+hindsight. A regret that grows more slowly than $T$ means that, averaged per round, the learner
+does as well as that best choice. The formal definitions are in Chapter~\ref{ch:theory}.
+
 The idea of prediction with expert advice predates modern machine learning. In its
 computational form it appears with the \emph{weighted majority} algorithm of Littlestone \&
 Warmuth (1994)~\cite{littlestone1994}, which showed that one can guarantee performance almost as good as that of the
 best expert in a set, with no assumption whatsoever about how the data are generated. The
-generalisation to continuous weights and convex losses led to Hedge and to the family of
-multiplicative updates.
+generalisation to continuous weights and convex losses led to \emph{Hedge} (Freund \& Schapire,
+1997)~\cite{freundschapire1997}, which keeps one weight per expert and after every round
+multiplies it by a factor that shrinks with that expert's loss, and more broadly to the family of
+\emph{multiplicative updates}.
 
 In parallel came the \emph{aggregating algorithm} of Vovk (1990)~\cite{vovk1990}, which exploits a stronger
-property of certain losses, \emph{exp-concavity}. When the loss is exp-concave (as the log-loss
-is) the regret can be bounded by $\ln N$, that is \emph{independently} of the horizon $T$,
-instead of $O(\sqrt{T \log N})$. That result is theoretically stronger, and this thesis
+property of certain losses, \emph{exp-concavity}. Exp-concavity is a curvature condition, stronger
+than convexity, which the logarithmic loss satisfies (it is defined in \S\ref{sec:expconcave}). Under it
+the regret can be bounded by $\ln N$, where $N$ is the number of experts, that is
+\emph{independently} of the \emph{horizon} $T$, the total number of rounds, instead of growing as
+$O(\sqrt{T \log N})$. That result is theoretically stronger, and this thesis
 provides an empirical case in which it nevertheless fails, for reasons connected to the
 non-stationarity of the expert set.
 
@@ -382,7 +399,7 @@ closing prices (\S\ref{sec:openclose}).
 The most systematically documented anomaly of betting markets is the
 \emph{favourite--longshot bias}: low-probability outcomes are systematically priced more
 expensively than their true frequency warrants. The phenomenon has been confirmed across
-multiple sports and decades.
+multiple sports and decades (Thaler \& Ziemba, 1988)~\cite{thalerziemba1988}.
 
 Shin (1992, 1993)~\cite{shin1992,shin1993} offered an explanation that treats it not as a psychological bias of bettors
 but as a \emph{rational response} by the bookmaker to the existence of informed traders. The
@@ -458,15 +475,17 @@ and economic performance.
 \label{ch:theory}
 % =====================================================================
 
-This chapter states the results the thesis relies on and explains what each one buys; proofs are
+This chapter presents the algorithms the thesis uses, the guarantees that come with them and the
+quantities by which their output is evaluated, and explains what each one contributes. Proofs are
 standard and are left to the cited sources.
 
 \section{The online learning framework}
 
 \subsection{Online learning and regret}
 
-In the online learning setting there is no separation into a training phase and an application
-phase. The algorithm operates in rounds: at round $t$ it issues a prediction based only on
+In the online learning setting (Cesa-Bianchi \& Lugosi, 2006; Shalev-Shwartz, 2012; Hazan,
+2016)~\cite{cesabianchi2006,shalevshwartz2012,hazan2016} there is no separation into a training
+phase and an application phase. The algorithm operates in rounds: at round $t$ it issues a prediction based only on
 what it has seen up to round $t-1$, the true outcome is then revealed, it incurs a loss, and
 it updates its state. Every prediction is therefore out of sample by construction, with no
 need to split the data.
@@ -490,7 +509,8 @@ every} sequence, with no assumption of independence or of a stationary distribut
 
 This point deserves to be stated precisely, because it is the reason the OCO framework is
 chosen here over the statistical one. In statistical learning theory the object of interest is
-a bound on the \emph{risk} $\mathbb{E}_{(x,y)\sim\mathcal{D}}[\ell(h(x),y)]$, which presupposes
+a bound on the \emph{risk} $\mathbb{E}_{(x,y)\sim\mathcal{D}}[\ell(h(x),y)]$, the expected loss $\ell$ of a
+predictor $h$ that maps an input $x$ to a forecast of the outcome $y$, which presupposes
 that a fixed distribution $\mathcal{D}$ exists and that samples are drawn independently from
 it. Neither assumption is harmless here: odds are set by a market that changes over the
 decade, and consecutive matches share matchday, league and season. Regret requires neither.
@@ -513,8 +533,11 @@ of information returned to the algorithm after each round defines different prob
 different optimal bounds. In the full information model the whole of $f_t$ is revealed, and
 hence its gradient at every point.
 
-\paragraph{Are the bounds tight?} The bounds that follow are upper bounds, and an upper bound
-on its own does not say whether an algorithm is good or merely whether its analysis is loose.
+\paragraph{Are the bounds tight?} The regret bounds proved for the algorithms below are
+\emph{upper} bounds: each says that the regret is at most so large. An upper bound on its own
+does not say whether an algorithm is good or merely whether its analysis is loose. That is
+settled by a \emph{lower} bound, which says that no algorithm whatsoever can do better, and
+Theorem~\ref{thm:lower-bound} is such a bound.
 For the experts problem the answer is known, and it rules out any improvement in order of
 magnitude.
 
@@ -589,6 +612,11 @@ Let $p$ be the true outcome distribution and $q$ the reported one. Then
 with equality if and only if $q = p$.
 \end{theorem}
 
+Here $H(p) = -\sum_y p_y \log p_y$ is the Shannon entropy of $p$, the loss that remains even with
+perfect knowledge of the distribution, and $\mathrm{KL}(p\,\|\,q) = \sum_y p_y \log(p_y/q_y)$ is
+the Kullback--Leibler divergence of $q$ from $p$, the extra loss paid for reporting $q$ instead
+(Cover \& Thomas, 2006)~\cite{coverthomas2006}.
+
 The corollary is that a forecaster has no incentive whatsoever to report probabilities other
 than those it genuinely holds. This property fails for accuracy: a forecaster interested only
 in the proportion of correct picks may report $100\%$ confidence on every match at no penalty,
@@ -618,7 +646,7 @@ Let $\hat{p} = \sum_i w_i p_i$ with $w \in \Delta_N$. Then:
 \end{enumerate}
 \end{proposition}
 
-In words: the mixture is always \emph{less} confident than the average confidence of its
+In other words, the mixture is always \emph{less} confident than the average confidence of its
 members, and the confidence it loses is exactly their disagreement. This is not a defect of the
 implementation but a property of the operator: linear pooling systematically pushes
 probabilities toward the centre of the simplex. Logarithmic pooling does not have this
@@ -636,8 +664,8 @@ reliability term; pooling improves the former and worsens the latter.
 \subsection{De-vigging}
 \label{sec:devig-theory}
 
-Before any algorithm there is a modelling step that is not neutral. Published odds are not
-probabilities: their reciprocals sum to more than one. If $o_i$ is the decimal odds of outcome
+Before any algorithm there is a modelling step whose result depends on an assumption, and which
+can therefore affect every number that follows. Published odds are not probabilities: their reciprocals sum to more than one. If $o_i$ is the decimal odds of outcome
 $i$ and $\pi_i = 1/o_i$, then
 \[
 B \;=\; \sum_{i} \pi_i \;>\; 1,
@@ -654,8 +682,8 @@ p_i \;=\; \frac{\pi_i}{B}.
 It is transparent and even-handed across outcomes, but it embeds a strong implicit assumption:
 that the bookmaker charges the same percentage margin on a favourite and on a longshot. The
 empirical literature does not bear this out. The well-known \emph{favourite--longshot bias}
-(the systematic overpricing of unlikely outcomes in published odds) means precisely that the
-margin is heavier on longshots.
+(the systematic overpricing of unlikely outcomes in published odds; Thaler \& Ziemba,
+1988~\cite{thalerziemba1988}) means precisely that the margin is heavier on longshots.
 
 \paragraph{Shin's method.} Shin (1992, 1993)~\cite{shin1992,shin1993} derives the distribution of the margin from a
 microeconomic argument rather than assuming it. The model posits that a proportion $z$ of
@@ -671,7 +699,12 @@ p_i(z) \;=\; \frac{\sqrt{z^2 + 4(1-z)\,\pi_i^2/B} \;-\; z}{2(1-z)},
 \]
 with $z$ determined by the requirement $\sum_i p_i(z) = 1$. The equation has no analytic
 solution; in the implementation $z$ is found per match by bisection over the interval
-$[0,\,0.4]$.
+$[0,\,0.4]$. The interval is a generous bracket rather than a modelling choice: $z$ is a
+proportion of bettors, and on these data it comes out at $3.1\%$ on average, with a 99th percentile
+of $6.3\%$. The upper end is reached by $495$ of the $835{,}550$ quotes ($0.06\%$), all but one of
+them opening prices of Betfair Exchange with overrounds of $68\%$ and above, against a median of
+$6\%$ for the data as a whole; no $z$ in the interval satisfies the condition there, and the cap
+acts as a bound.
 
 \paragraph{Why both are retained.} The de-vig choice is an assumption, not a datum, and could
 in principle determine a conclusion. For that reason the entire dataset is built twice, once
@@ -697,7 +730,8 @@ The models of Glosten \& Milgrom (1985)~\cite{glosten1985} and Kyle (1985)~\cite
 to refuse to trade but to price with a \emph{margin}: the maker charges enough that the profits
 from the uninformed cover the losses to the informed. The overround is exactly that margin, and
 its size is an increasing function of the estimated proportion of informed traders. In Kyle's
-model the price moves linearly with order flow, with a coefficient $\lambda$ measuring market
+model the price moves linearly with the \emph{order flow}, the net volume of orders arriving on
+each side (here, the amount bet on each outcome), with a coefficient $\lambda$ measuring market
 \emph{depth}; each transaction reveals part of the private information and the price converges
 toward fundamental value as expiry approaches.
 
@@ -728,10 +762,16 @@ our data (\S\ref{sec:disc-material}).
 
 \section{The algorithms}
 
+Three algorithms are used to learn the weights of the experts: \emph{Hedge},
+\emph{Online Gradient Descent} (OGD) and \emph{Follow-The-Regularized-Leader} (FTRL). They are
+presented in that order, followed by the \emph{Aggregating Algorithm}, which exploits a stronger
+property of the loss, and by the reduction that lets all of them handle experts that do not quote
+every match.
+
 \subsection{Hedge}
 
-The Hedge, or multiplicative weights, algorithm maintains one weight per expert and decays it
-exponentially in that expert's loss:
+The Hedge, or multiplicative weights, algorithm (Freund \& Schapire, 1997)~\cite{freundschapire1997}
+maintains one weight per expert and decays it exponentially in that expert's loss:
 \[
 w_{t+1,i} \;\propto\; w_{t,i}\, e^{-\eta_t\, \ell_{t,i}},
 \qquad \ell_{t,i} = -\log p_{t,i}[y_t].
@@ -739,7 +779,7 @@ w_{t+1,i} \;\propto\; w_{t,i}\, e^{-\eta_t\, \ell_{t,i}},
 The quantity $\eta_t > 0$ is the \emph{step size}, also called the learning rate: it sets how far one round's loss is allowed to move the weights, and the whole of \S\ref{sec:res-steps} is about choosing it. With a suitable $\eta_t$ the algorithm attains regret $O(\sqrt{T \log N})$. The dependence on $N$ is only
 logarithmic, which is what makes large expert sets tractable.
 
-\begin{lemma}[Hoeffding]
+\begin{lemma}[Hoeffding, 1963~\cite{hoeffding1963}]
 \label{lem:hoeffding}
 Let $X$ be a random variable taking values in an interval of width $M$. Then for every
 $\lambda\in\mathbb{R}$
@@ -777,15 +817,6 @@ simultaneously, without the horizon being known.
 This choice has consequences examined empirically in \S\ref{sec:res-steps}, where the constant
 $c$ dictated by theory is found to be, for these data, seriously wrong, too large for Hedge,
 and too small by two orders of magnitude for OGD.
-
-\begin{remark}[The structure of $\eta$ and the direction of tuning]
-The reason Hedge and OGD respond in \emph{opposite} directions to scaling of the step is
-structural and visible in the formulas. In Hedge, $\eta$ sits in an \emph{exponent} over a
-single round's loss: a smaller $\eta$ means slower exponential decay, hence \emph{longer
-memory}. In OGD, $\eta$ \emph{multiplies} a single round's gradient: a larger $\eta$ simply
-means a larger step in the same direction. The two parameters, despite sharing a name, do not
-control the same quantity.
-\end{remark}
 
 \subsection{Online Gradient Descent}
 
@@ -836,8 +867,8 @@ Let $v \in \mathbb{R}^n$ and $\Pi_{\Delta_n}(v) = \arg\min_{w\in\Delta_n}\|w-v\|
 \[
 \Pi_{\Delta_n}(v)_i \;=\; \max\{v_i - \theta,\, 0\},
 \]
-where $\theta$ is the unique number satisfying $\sum_i \max\{v_i-\theta,0\} = 1$. If $u$ is $v$
-sorted in decreasing order and
+where $\theta$ is the unique number satisfying $\sum_i \max\{v_i-\theta,0\} = 1$. If $u$ denotes the vector $v$
+with its entries sorted in decreasing order and
 $\rho = \max\{j : u_j - \frac{1}{j}(\sum_{r\leq j} u_r - 1) > 0\}$, then
 $\theta = \frac{1}{\rho}\big(\sum_{r\leq\rho} u_r - 1\big)$.
 \end{theorem}
@@ -864,17 +895,28 @@ and with $\eta = D/(G\sqrt{T})$ it follows that $\mathrm{Regret}_T \leq D G \sqr
 
 In our case $\mathcal{K}=\Delta_N$, so $D=\sqrt{2}$, and $G$ is bounded by the $M$ of
 \S\ref{sec:res-steps}. This structure (that $\eta$ multiplies the gradient of \emph{one} round)
-explains why OGD responds to step scaling in the opposite way to FTRL.
+explains why OGD responds to step scaling in the opposite way to Hedge.
+
+\begin{remark}[The structure of $\eta$ and the direction of tuning]
+The reason Hedge and OGD respond in \emph{opposite} directions to scaling of the step is
+structural and visible in the formulas. In Hedge, $\eta$ sits in an \emph{exponent} over a
+single round's loss: a smaller $\eta$ means slower exponential decay, hence \emph{longer
+memory}. In OGD, $\eta$ \emph{multiplies} a single round's gradient: a larger $\eta$ simply
+means a larger step in the same direction. The two parameters, despite sharing a name, do not
+control the same quantity.
+\end{remark}
 
 \subsection{Follow-The-Regularized-Leader}
 
-FTRL selects at each round the point minimising the entire accumulated loss, plus a
-regularisation term preventing excessively abrupt movement:
+FTRL (Shalev-Shwartz, 2012; Hazan, 2016)~\cite{shalevshwartz2012,hazan2016} selects at each round
+the point minimising the entire accumulated loss, plus a regularisation term $R$ preventing
+excessively abrupt movement:
 \[
 w_{t+1} \;=\; \arg\min_{w \in \Delta_N} \Big\{ \eta_t \sum_{s=1}^{t} \langle \ell_s, w \rangle
 + R(w) \Big\}.
 \]
-With $R(w) = \tfrac12\|w - w_0\|^2$ the solution is again given by projection onto the simplex.
+With $R(w) = \tfrac12\|w - w_0\|^2$, where $w_0$ is the uniform starting vector, the solution is
+again given by projection onto the simplex.
 The difference from OGD is that FTRL is \emph{``lazy''}: it rebuilds the weights from the whole
 history each time, instead of stepping from the previous position.
 
@@ -923,7 +965,8 @@ single round.
 \subsection{Exp-concavity and the Aggregating Algorithm}
 \label{sec:expconcave}
 
-The bounds above are of order $O(\sqrt{T})$ and hold for any convex loss. For certain losses a
+The bounds of Theorems~\ref{thm:hedge}, \ref{thm:ogd} and \ref{thm:ftrl} grow as $O(\sqrt{T})$
+and hold for any convex loss. For certain losses a
 substantially stronger result is attainable.
 
 \begin{definition}[Exp-concavity]
@@ -1069,7 +1112,9 @@ The term ``Markov chain OGD'' is used in the literature for at least three diffe
 this thesis tries all three. We separate them explicitly, because the negative results of one
 say nothing about the others.
 
-\paragraph{(a) A chain on the weight vector.} After the gradient step and the projection, mass is
+\paragraph{(a) A chain on the weight vector.} This generalises Fixed-Share along the lines of
+the mixing schemes of Bousquet \& Warmuth (2002)~\cite{bousquetwarmuth2002}. After the gradient
+step and the projection, mass is
 moved by a row-stochastic matrix $Q$, that is a non-negative matrix whose every row sums to
 one ($Q$ rather than $M$, which already denotes the bound on a single round's loss):
 \[
@@ -1080,9 +1125,12 @@ $Q = (1-\alpha)I + \tfrac{\alpha}{N}\mathbf{1}\mathbf{1}^{\!\top}$, that is a un
 general $Q$ is strictly more expressive, because it can say \emph{where} the lost mass goes:
 e.g.\ to the opening/closing ``twin'' of the same house, or to peers in the same market phase.
 Row-stochasticity guarantees conservation of total mass, which is exactly what makes $\alpha=0$
-a genuine no-op rather than an approximate one.
+leave the weights exactly, not approximately, unchanged.
 
-\paragraph{(b) A chain on a latent state (hidden Markov model).} Here the hidden variable is not
+\paragraph{(b) A chain on a latent state (hidden Markov model).} A hidden Markov model
+(Rabiner, 1989)~\cite{rabiner1989} describes a system that moves between unobserved states
+according to a Markov chain, while only the effects of those states are observed. Here the
+hidden variable is not
 the weights but a state $k\in\{1,\dots,K\}$, and each state carries its own weight vector. The
 belief $b_t$ over the states is updated by the \emph{forward recursion}:
 \[
@@ -1104,7 +1152,8 @@ present instead of the sum of history, and a per-state clock so that none of the
 \end{remark}
 
 \paragraph{(c) Markov Chain Gradient Descent: dependent sampling.} This is what Sun, Sun \& Yin
-(2018)~\cite{sun2018} study, and it has nothing to do with weight transitions. The classical analysis of SGD
+(2018)~\cite{sun2018} study, and it has nothing to do with weight transitions. The classical analysis of
+\emph{stochastic gradient descent} (SGD), which updates on one randomly drawn sample at a time,
 assumes independent samples; when the samples are consecutive points of a Markov trajectory,
 after $t$ rounds the algorithm has seen \emph{less} than $t$ independent units of information. If
 the dependence horizon is $\tau$ rounds, the effective number of samples is $\sim t/\tau$ and the
@@ -1112,14 +1161,23 @@ schedule becomes
 \[
 \eta_t \;=\; \frac{D}{M\sqrt{t/\tau + 1}} \;\approx\; \sqrt{\tau}\;\eta_t^{\text{iid}},
 \]
-that is, a dependent sequence \emph{justifies} a step inflated by $\sqrt{\tau}$.
+where $\eta_t^{\text{iid}}$ is the schedule that would apply if the samples were independent and
+identically distributed (iid); that is, a dependent sequence \emph{justifies} a step inflated by
+$\sqrt{\tau}$.
 
-\begin{remark}[An independent theoretical explanation of the empirical $\times100$]
-Taking as $\tau$ the same block length $b \approx n^{1/3} \approx 42$ that the moving block
-bootstrap (\S\ref{sec:bootstrap-theory}) selects for an entirely different reason, the inflation
-is $\sqrt{42}\approx 6.5$. Multiplied by the factor $13.82/3.76 \approx 3.7$ arising from the
-fact that $M=\log(1/\varepsilon)$ is an overly conservative bound for realistic de-vigged
-probabilities, this gives $\approx 24$. This does not reach the empirically tuned $\times100$,
+\begin{remark}[An independent theoretical explanation of OGD's step multiplier]
+The empirical tuning of \S\ref{sec:res-steps} finds that OGD performs best with a step $100$
+times larger than the textbook schedule (a multiplier of $\times100$). The argument above
+predicts part of that inflation from theory alone, and it needs two numbers. The first is the
+dependence horizon $\tau$. For it we take the block length of the moving block bootstrap
+(\S\ref{sec:bootstrap-theory}), which estimates the same quantity for an entirely different
+purpose: $b \approx n^{1/3}$, and with $n = 76{,}584$ rounds this gives $b \approx 42$, so the
+inflation is $\sqrt{42}\approx 6.5$. The second is the loss bound $M$ in the schedule. Theory
+sets $M = \ln(1/\varepsilon) \approx 13.82$, the largest loss a probability clipped at
+$\varepsilon = 10^{-6}$ can produce (\S\ref{sec:tuning-step}), whereas the largest loss
+actually observed in the data is $3.76$; since the step is inversely proportional to $M$, using
+the observed bound inflates it by a further $13.82/3.76 \approx 3.7$. Together the two give
+$6.5 \times 3.7 \approx 24$. This does not reach the empirical $\times100$,
 but it is a partial explanation obtained \emph{without any grid search}, and for that reason
 worth reporting, even when the algorithm itself improves nothing.
 \end{remark}
@@ -1179,13 +1237,15 @@ results.
 three adaptations that are not decorative:
 
 \begin{itemize}
-  \item the simplex is $(N\!-\!1)$-dimensional, so the perturbation must lie in the
+  \item the simplex is $(N\!-\!1)$-dimensional (the constraint $\sum_i w_i = 1$ removes one of
+        the $N$ degrees of freedom), so the perturbation must lie in the
         \emph{tangent space} $\{u : \sum_i u_i = 0\}$ and the factor in
         Lemma~\ref{lem:one-point} is $d = N-1$, not $N$. A perturbation along a random direction
         of $\mathbb{R}^N$ would take the point off the plane $\sum_i w_i = 1$;
   \item the point about which we perturb must stay away from the boundary, otherwise the
         perturbation is infeasible. We use the \emph{shrunk} simplex
-        $\Delta^{\xi} = \{w : w_i \geq \xi/N\}$, and the choice $\delta = \xi/N$ guarantees
+        $\Delta^{\xi} = \{w \in \Delta_N : w_i \geq \xi/N\}$, where $\xi \in (0,1)$ is a small
+        shrinkage parameter that fixes the minimum weight, and the choice $\delta = \xi/N$ guarantees
         feasibility for free: since $|u_i|\leq 1$, every coordinate of $w \pm \delta u$ remains
         non-negative, while the sum stays exactly $1$;
   \item the shrinkage introduces its own bias, since the optimum may lie on the boundary,
@@ -1210,8 +1270,10 @@ the second answers the question ``what did we actually learn''.
 \subsection{Proper scoring rules and calibration}
 \label{sec:calib-theory}
 
-Beyond log-loss we use the Brier score, $\frac{1}{T}\sum_t \|\hat{p}_t - e_{y_t}\|^2$, also
-strictly proper. The general theory (Gneiting \& Raftery, 2007)~\cite{gneiting2007} shows that every proper scoring
+Beyond log-loss we use the Brier score, $\frac{1}{T}\sum_t \|\hat{p}_t - e_{y_t}\|^2$, where
+$e_{y_t}$ is the vector with $1$ in the position of the outcome $y_t$ that occurred and $0$
+elsewhere, so that the score is the mean squared distance of the forecast from what happened.
+It is also strictly proper. The general theory (Gneiting \& Raftery, 2007)~\cite{gneiting2007} shows that every proper scoring
 rule corresponds to a convex function $G$ on the simplex via Savage's representation,
 \[
 S(q,y) \;=\; G(q) \;+\; \langle \nabla G(q),\, e_y - q\rangle,
@@ -1219,7 +1281,9 @@ S(q,y) \;=\; G(q) \;+\; \langle \nabla G(q),\, e_y - q\rangle,
 where the expected score $\mathbb{E}_{y\sim p}[S(q,y)]$ is minimised at $q=p$ precisely because
 $G$ is convex. Log-loss arises for $G$ the negative entropy and Brier for $G(q)=\|q\|^2$. The two
 are therefore not independent choices but two points of the same family: a fact that explains
-why, as observed empirically, they agree on $18$ verdicts out of $18$, whereas accuracy, which
+why, as observed empirically, they agree on $18$ verdicts out of $18$ (the comparisons of each
+algorithm against the plain average on every panel, \S\ref{sec:res-panels} and
+Tables~\ref{app:vsuniprop}--\ref{app:vsuniShin}), whereas accuracy, which
 does not belong to the family, reproduces none of them.
 
 \paragraph{Murphy's decomposition.} If predictions are grouped into classes sharing a common
@@ -1275,7 +1339,9 @@ and one-sided: for a positively correlated sequence,
 \mathrm{Var}\Big(\tfrac{1}{n}\sum_t d_t\Big) \;=\; \frac{\sigma^2}{n}
 \Big( 1 + 2\sum_{k\geq 1} \big(1-\tfrac{k}{n}\big)\rho_k \Big) \;>\; \frac{\sigma^2}{n},
 \]
-so the independence formula \emph{underestimates} the variance, confidence intervals come out far
+where $d_t$ is the difference between the two forecasters' losses at round $t$, $\sigma^2$ its
+variance and $\rho_k$ the correlation between differences $k$ rounds apart. Since the $\rho_k$ are
+positive, the independence formula \emph{underestimates} the variance, confidence intervals come out far
 too narrow and results look significant when they are not.
 
 We use the \emph{moving block bootstrap} (Künsch, 1989)~\cite{kunsch1989}, which resamples with replacement
@@ -1316,8 +1382,9 @@ senses: it maximises the growth rate of capital almost surely, and it minimises 
 for the capital to reach any prescribed large level. Logarithmic utility therefore follows from
 the repeated structure of the problem, not from an assumption about the bettor's preferences.
 
-\paragraph{Why fractional Kelly.} Full Kelly is notorious for its volatility and for its
-sensitivity to errors in estimating $p$. The trade-off is quantified by the second-order
+\paragraph{Why fractional Kelly.} Staking the whole fraction $f^*$ is called \emph{full Kelly};
+staking a fixed share of it, $\lambda f^*$ with $0<\lambda<1$, is called \emph{fractional Kelly}.
+Full Kelly is notorious for its volatility and for its sensitivity to errors in estimating $p$. The trade-off is quantified by the second-order
 expansion of $g$ around zero. Writing $b=o-1$ and $e = pb-(1-p)$ for the expected return per
 unit,
 \[
@@ -1343,7 +1410,7 @@ is an \emph{estimate}: if the true probability is lower than the estimated one, 
 overbets, and the damage from overshooting is asymmetrically larger than the gain from the
 corresponding undershoot, since $g$ falls to $-\infty$ as $f\to 1$.
 
-\paragraph{More than two outcomes.} With three mutually exclusive outcomes the exact solution
+\paragraph{Betting when there are three possible outcomes.} With three mutually exclusive outcomes the exact solution
 requires simultaneous optimisation of the vector of stakes. The implementation simplifies: at
 each round the outcome with the largest positive expected value is selected and only that one is
 backed, using the two-outcome formula. The simplification is conservative (a portfolio of
@@ -1427,7 +1494,7 @@ so a fixed weight vector corresponds to nothing interpretable. The reduction to 
 multiplier is the way to retain a meaningful comparator in a problem where the set of available
 bets changes completely from round to round.
 
-\subsection{A Bayesian version of Kelly and MCMC sampling}
+\subsection{A Bayesian version of Kelly and Markov chain Monte Carlo sampling}
 \label{sec:mcmc-theory}
 
 Both the closed form and the learned multiplier treat $\hat{p}$ as \emph{known}. It is not: it is
@@ -1436,6 +1503,13 @@ the estimate is reliable, and when they disagree it is not. The natural formulat
 point maximum with the \emph{posterior expected} one: \[ f^{\mathrm{B}} \;=\; \arg\max_{f} \;
 \mathbb{E}_{\theta \sim \pi(\cdot\mid\mathcal{D})} \big[\, g(f,\theta) \,\big], \] \[
 g(f,\theta) \;=\; \theta_k \log\big(1+f(o_k-1)\big) \;+\; (1-\theta_k)\log(1-f). \]
+Here $\theta = (\theta_H, \theta_D, \theta_A)$ is the unknown true outcome distribution of the match,
+$\pi(\cdot\mid\mathcal{D})$ is the posterior distribution of $\theta$ given the data $\mathcal{D}$ (the
+experts' forecasts for that match), $k$ is the outcome being backed, and $g(f,\theta)$ is the
+expected logarithmic growth of capital when a fraction $f$ is staked on it at odds $o_k$, the
+quantity the Kelly criterion maximises. Maximising its posterior expectation, rather than its
+value at a point estimate, is the Bayesian Kelly criterion of Browne \& Whitt
+(1996)~\cite{brownewhitt1996}.
 
 \begin{proposition}[The Bayesian version is always more conservative]
 \label{prop:bayes-conservative}
@@ -1455,10 +1529,10 @@ $w_i$. The parameter $\kappa$ controls how tightly the experts are assumed to cl
 truth: large $\kappa$ means a concentrated posterior and returns the method to the closed form,
 small $\kappa$ means a wide posterior and strong shrinkage.
 
-\paragraph{Why MCMC is needed.} The resulting posterior is not conjugate ($\theta$ appears
+\paragraph{Why Markov chain Monte Carlo (MCMC) is needed.} The resulting posterior is not conjugate ($\theta$ appears
 inside the Dirichlet parameters of the evidence), so there is no closed form either for it or
 for the integral $\mathbb{E}_{\pi}[g(f,\theta)]$. We use random-walk
-\emph{Metropolis--Hastings} sampling: from the current state $\theta$ a proposal $\theta'$ is
+\emph{Metropolis--Hastings} sampling (Hastings, 1970)~\cite{hastings1970}: from the current state $\theta$ a proposal $\theta'$ is
 made and accepted with probability \[ a(\theta\to\theta') \;=\; \min\!\left\{1,\;
 \frac{\pi(\theta'\mid\mathcal{D})\,q(\theta\mid\theta')}{\pi(\theta\mid\mathcal{D})\,q(\theta'\mid\theta)}\right\}.
 \] With a symmetric proposal ($q(\theta'\mid\theta)=q(\theta\mid\theta')$) the ratio simplifies
@@ -1470,7 +1544,8 @@ distribution of the chain; with ergodicity, time averages converge to expectatio
 \begin{remark}[Parallel chains instead of one long one]
 The implementation runs $N$ \emph{parallel} chains for a few iterations instead of one long one.
 The two options are equivalent with respect to the stationary distribution, but not with respect
-to cost: parallel chains turn a scalar Python loop into vectorised numpy operations, which is
+to cost: parallel chains turn a scalar Python loop into vectorised operations of the NumPy library
+(Harris et al., 2020)~\cite{harris2020}, which is
 what makes the per-bet cost manageable over tens of thousands of bets. The price is that no chain
 has time to forget its initialisation completely, so the approximation rests on the burn-in being
 sufficient: an assumption not formally checked here and reported as a limitation.
@@ -1496,7 +1571,7 @@ prediction, and must be compared against quantities measured on exactly the same
 
 \subsection{Source and scope}
 
-Table~\ref{tab:dataset} summarises the result. The data come from \file{football-data.co.uk}, section ``Main Leagues'', which publishes for each
+Table~\ref{tab:dataset} summarises the result. The data come from \file{football-data.co.uk}~\cite{footballdata}, section ``Main Leagues'', which publishes for each
 match the result and the odds of a number of betting companies. The ``Extra Leagues'' section has
 a different format and usually does not contain odds, so it is out of scope.
 
@@ -1511,7 +1586,9 @@ Bookmakers as experts & 26 (13 opening / 13 closing) \\
 Coverage range per bookmaker & 6.9\% -- 99.8\% \\
 \bottomrule
 \end{tabular}
-\caption{The dataset after preprocessing.}
+\caption{The dataset after preprocessing, that is after the cleaning steps of
+\S\ref{sec:data-clean}: aggregate columns removed, rebranded companies merged into one
+identity, and matches without a single usable price dropped.}
 \label{tab:dataset}
 \end{table}
 
@@ -1526,7 +1603,8 @@ companies' analysts, so the heterogeneity among the experts is greater there.
 
 \paragraph{Aggregate columns.} Beyond the individual companies, football-data.co.uk also
 publishes columns with the maximum and the average of the market (\file{Max}, \file{Avg}), as
-well as the Betbrain equivalents for the older seasons. These are excluded: they are not
+well as the equivalents computed by Betbrain, an odds-comparison service, for the older
+seasons~\cite{footballdata}. These are excluded: they are not
 independent experts but functions of the rest, and their presence would violate the framework's
 assumption that the experts give separate opinions.
 
@@ -1613,12 +1691,13 @@ the choice between panels) a chronological 25\% tail that the choice never saw i
 reported, so that it is visible whether the choice was fitting noise.
 
 \subsection{Tuning the step}
+\label{sec:tuning-step}
 
 The theoretically optimal step of all three algorithms contains a bound $M$ on the maximum loss
 of a single round. Because probabilities are clipped at $\varepsilon = 10^{-6}$ so that the
 log-loss stays finite, this gives
 \[
-M \;=\; \ln(1/\varepsilon) \;=\; 6\ln 10 \;\approx\; 13.82 .
+M \;=\; \ln(1/\varepsilon) \;=\; \ln 10^{6} \;=\; 6\ln 10 \;\approx\; 13.82 .
 \]
 This bound presupposes a bookmaker pricing the outcome that actually occurred at one in a
 million. The largest loss actually observed in the data is 3.76, that is the worst-case step is
@@ -1681,9 +1760,9 @@ which the weights are frozen at the cut, which is the strict reading of ``traine
 \section{Tuning the step}
 \label{sec:res-steps}
 
-The sweep over step multipliers comes before everything else, since it determines the algorithms
-with which the remaining results are produced. All three needed changing, and (this is the
-non-obvious part) \textbf{in opposite directions}. Table~\ref{tab:steps} lists the multipliers that are in force everywhere else in this chapter.
+The step multipliers are tuned first, since they determine the algorithms with which all the
+remaining results are produced. The multipliers of all three algorithms needed changing, and
+(this is the non-obvious part) \textbf{in opposite directions}. Table~\ref{tab:steps} lists the multipliers that are in force everywhere else in this chapter.
 
 \begin{table}[H]
 \centering
@@ -1697,7 +1776,12 @@ Hedge & $\times 0.25$  & 0.99828 & 0.99842 & 0.99883 & $\times 0.25$  & $\times 
 FTRL  & $\times 0.05$  & 0.99828 & 0.99843 & 0.99889 & $\times 0.05$  & $\times 0.005$ \\
 \bottomrule
 \end{tabular}
-\caption{Step multipliers in force. Selection is made exclusively on the chronological prefix, so
+\caption{Step multipliers in force. \textbf{Mult.} is the factor applied to the textbook step
+schedule. \textbf{train}, \textbf{full} and \textbf{tail} are the log-loss obtained with it on
+the chronological 75\% prefix, on the whole sample and on the held-out 25\% tail.
+\textbf{train min.} and \textbf{tail min.} are the multipliers that would minimise the log-loss
+on the prefix and on the tail respectively. Selection is made exclusively on the chronological
+prefix, so
 the decisive column is \textbf{train min.}: for all three algorithms it coincides with the
 multiplier actually used, the one exception being OGD's $\times 110$, which gives a tail identical
 to $\times 100$ ($0.99765$). The \textbf{tail min.} column is reported for comparison and not as a
@@ -1741,7 +1825,7 @@ $1/\sqrt{t}$ is derived for a \emph{static} comparator, whereas the panel here i
 step that never stops moving is the theoretically indicated alternative. It had been tried only
 for Hedge and only over $[0.1, 2]$, while Hedge's decaying schedule passes $\eta \approx 0.033$
 at the first round and $\eta \approx 1.7\cdot10^{-4}$ by the middle of the period, i.e.\ the
-entire interesting region lay \emph{below} the old grid. The sweep was extended over five
+entire interesting region lay \emph{below} the old grid $[0.1, 2]$. The sweep was extended over five
 decades and to all three algorithms, with selection on the prefix and a paired test on the
 tail. Table~\ref{tab:const-step} gives the comparison.
 
@@ -1974,7 +2058,7 @@ difference of two.
 \subsection{The configuration that is selected}
 \label{sec:res-config}
 
-Three improvements had been measured separately (the corrected step, the closing-only panel,
+Three improvements have been measured separately (the corrected step, the closing-only panel,
 Shin) and are combined here. Every configuration is scored on the same 71,818 matches, the
 intersection of all of them with PSC, following the principle of \S\ref{sec:common-rounds}. Table~\ref{tab:configs} stacks them.
 
@@ -2258,7 +2342,9 @@ $\tfrac14$ leaves a substantial part of the growth unused. The learned multiplie
 road: it keeps most of the upside and avoids the catastrophe. The paired tests are in
 Table~\ref{tab:vb-sig}.
 
-\paragraph{Where there is an edge.} Which bookmakers are beatable at all is mapped over ten
+\paragraph{Where there is an edge.} An \emph{edge} here means an advantage over a bookmaker's
+price large enough to be detected statistically, that is a positive expected growth of capital
+when betting against it. Which bookmakers are beatable at all in this sense is mapped over eleven
 targets with the fixed $\tfrac14$, so that the rows stay comparable with one another.
 
 \begin{table}[H]
@@ -2397,8 +2483,7 @@ worse than it. The first row is a tie ($p=0.823$), the rest are significant at $
 \end{figure}
 
 \paragraph{The control that makes the numbers interpretable.} Write BGD for \emph{bandit gradient descent}, the estimator of \S\ref{sec:bandit-theory} run on the loss of the chosen mixture alone. The obvious reading (``BGD beats
-the uniform average, so the bandit feedback taught it something'') is wrong, and this thesis
-made it in a first draft before correcting it. Under the Sleeping Experts reduction the weight
+the uniform average, so the bandit feedback taught it something'') is wrong. Under the Sleeping Experts reduction the weight
 vector moves even with a \emph{zero} step: every time the awake set changes, the persistent
 state is reprojected onto a simplex of different dimension, and that churn alone produces
 non-uniform weights. Measured directly: at $\eta=0$ the weights are as far as $0.69$ from
@@ -2473,8 +2558,8 @@ The Markov chain on the \emph{weight vector} has already been tried and rejected
 transition kernel selects $\alpha=0$ on train, i.e.\ collapses to plain OGD. Here the chain runs
 over a different object, over \emph{market states}. We maintain $K$ latent regimes, one weight
 vector per regime under Sleeping Experts, and a belief updated by the forward recursion of a
-hidden Markov model; each regime steps in proportion to its responsibility. $K=1$ reproduces
-\file{run\_ogd\_sleeping} exactly.
+hidden Markov model; each regime steps in proportion to its responsibility. $K=1$, a single regime, reproduces
+the plain Sleeping-Experts OGD of \S\ref{sec:sleeping} exactly.
 
 The motivation is measured and not hypothetical: \S\ref{sec:res-panels} and the information
 arrival analysis show that the closing advantage varies 26-fold depending on how much the line
@@ -2679,7 +2764,18 @@ a few experts is punished exactly by an expert that disappears.
 \label{ch:conclusion}
 % =====================================================================
 
+This thesis treated the betting companies that quote a football match as experts, and learned
+online how to combine their forecasts with three Online Convex Optimization algorithms adapted
+to experts that do not quote every match. Two further online stages calibrate the combined
+forecast and size the stake of a bet. Over 76,584 matches from 22 leagues and ten seasons, every
+comparison was tested with a moving block bootstrap, and a deployment test with a real date cut
+checked what a model trained up to the end of 2024 would have done in 2025--26. This chapter
+summarises the findings, interprets them, states the limits of the method and proposes future
+work.
+
 \section{Conclusions}
+
+The main conclusions of the present work are the following.
 
 \begin{enumerate}
   \item \textbf{The OCO framework applies successfully to betting markets.} An online mixture of
@@ -2720,8 +2816,8 @@ a few experts is punished exactly by an expert that disappears.
         not contain the closed form and because it throws away the probability the two preceding
         stages have just produced. Learning the \emph{multiplier} on top of the closed form ties
         with the fixed coefficient on the closing targets and significantly beats it on the opening
-        ones, by 8 wins to 2 losses, discovering a different risk appetite for each opponent
-        without ever being told who that opponent is. It is also the only place in the thesis where
+        ones, by 8 wins to 2 losses, learning to stake more against some opponents and less
+        against others without ever being told who the opponent is. It is also the only place in the thesis where
         theory's a-priori constant came out right without correction, precisely because the
         algorithm that uses it exploits the structure of the loss.
 
@@ -2907,9 +3003,15 @@ online convex optimization with multi-point bandit feedback. \emph{COLT}, 28--40
 \bibitem{blum2007} Blum, A., \& Mansour, Y. (2007). From external to internal regret.
 \emph{Journal of Machine Learning Research}, 8, 1307--1324.
 
+\bibitem{bousquetwarmuth2002} Bousquet, O., \& Warmuth, M. K. (2002). Tracking a small set of
+experts by mixing past posteriors. \emph{Journal of Machine Learning Research}, 3, 363--396.
+
 \bibitem{breiman1961} Breiman, L. (1961). Optimal gambling systems for favorable games.
 \emph{Proceedings of the Fourth Berkeley Symposium on Mathematical Statistics and
 Probability}, 1, 65--78.
+
+\bibitem{brownewhitt1996} Browne, S., \& Whitt, W. (1996). Portfolio choice and the Bayesian
+Kelly criterion. \emph{Advances in Applied Probability}, 28(4), 1145--1176.
 
 \bibitem{cesabianchi2006} Cesa-Bianchi, N., \& Lugosi, G. (2006).
 \emph{Prediction, Learning, and Games}. Cambridge University Press.
@@ -2917,12 +3019,19 @@ Probability}, 1, 65--78.
 \bibitem{cover1991} Cover, T. M. (1991). Universal portfolios.
 \emph{Mathematical Finance}, 1(1), 1--29.
 
+\bibitem{coverthomas2006} Cover, T. M., \& Thomas, J. A. (2006). \emph{Elements of Information
+Theory} (2nd ed.). Wiley.
+
 \bibitem{duchi2008} Duchi, J., Shalev-Shwartz, S., Singer, Y., \& Chandra, T. (2008).
 Efficient projections onto the $\ell_1$-ball for learning in high dimensions.
-\emph{ICML}.
+\emph{ICML}, 272--279.
 
 \bibitem{duchi2011} Duchi, J., Hazan, E., \& Singer, Y. (2011). Adaptive subgradient methods
 for online learning and stochastic optimization. \emph{JMLR}, 12, 2121--2159.
+
+\bibitem{freundschapire1997} Freund, Y., \& Schapire, R. E. (1997). A decision-theoretic
+generalization of on-line learning and an application to boosting. \emph{Journal of Computer
+and System Sciences}, 55(1), 119--139.
 
 \bibitem{freund1997} Freund, Y., Schapire, R. E., Singer, Y., \& Warmuth, M. K. (1997).
 Using and combining predictors that specialize. \emph{STOC}, 334--343.
@@ -2930,6 +3039,9 @@ Using and combining predictors that specialize. \emph{STOC}, 334--343.
 \bibitem{flaxman2005} Flaxman, A. D., Kalai, A. T., \& McMahan, H. B. (2005). Online convex
 optimization in the bandit setting: gradient descent without a gradient. \emph{SODA},
 385--394.
+
+\bibitem{footballdata} Football-Data.co.uk. Historical football results and betting odds data.
+\url{https://www.football-data.co.uk/data.php}. Accessed 2026.
 
 \bibitem{glosten1985} Glosten, L. R., \& Milgrom, P. R. (1985). Bid, ask and transaction
 prices in a specialist market with heterogeneously informed traders.
@@ -2940,10 +3052,16 @@ prediction, and estimation. \emph{Journal of the American Statistical Associatio
 359--378.
 
 \bibitem{guo2017} Guo, C., Pleiss, G., Sun, Y., \& Weinberger, K. Q. (2017). On calibration
-of modern neural networks. \emph{ICML}.
+of modern neural networks. \emph{ICML}, PMLR 70, 1321--1330.
 
 \bibitem{hall1995} Hall, P., Horowitz, J. L., \& Jing, B.-Y. (1995). On blocking rules for
 the bootstrap with dependent data. \emph{Biometrika}, 82(3), 561--574.
+
+\bibitem{harris2020} Harris, C. R., Millman, K. J., van der Walt, S. J., et al. (2020). Array
+programming with NumPy. \emph{Nature}, 585(7825), 357--362.
+
+\bibitem{hastings1970} Hastings, W. K. (1970). Monte Carlo sampling methods using Markov
+chains and their applications. \emph{Biometrika}, 57(1), 97--109.
 
 \bibitem{hazan2007} Hazan, E., Agarwal, A., \& Kale, S. (2007). Logarithmic regret
 algorithms for online convex optimization. \emph{Machine Learning}, 69(2--3), 169--192.
@@ -2953,6 +3071,9 @@ algorithms for online convex optimization. \emph{Machine Learning}, 69(2--3), 16
 
 \bibitem{herbster1998} Herbster, M., \& Warmuth, M. K. (1998). Tracking the best expert.
 \emph{Machine Learning}, 32(2), 151--178.
+
+\bibitem{hoeffding1963} Hoeffding, W. (1963). Probability inequalities for sums of bounded
+random variables. \emph{Journal of the American Statistical Association}, 58(301), 13--30.
 
 \bibitem{kaunitz2017} Kaunitz, L., Zhong, S., \& Kreiner, J. (2017). Beating the bookies with
 their own numbers -- and how the online sports betting market is rigged.
@@ -2986,6 +3107,12 @@ Die trinitarische Formel.
 expert aggregation to temperature prediction part II: Second order bounds with sleeping
 experts. \emph{arXiv:2506.15216}.
 
+\bibitem{rabiner1989} Rabiner, L. R. (1989). A tutorial on hidden Markov models and selected
+applications in speech recognition. \emph{Proceedings of the IEEE}, 77(2), 257--286.
+
+\bibitem{shalevshwartz2012} Shalev-Shwartz, S. (2012). Online learning and online convex
+optimization. \emph{Foundations and Trends in Machine Learning}, 4(2), 107--194.
+
 \bibitem{shin1992} Shin, H. S. (1992). Prices of state contingent claims with insider traders,
 and the favourite-longshot bias. \emph{The Economic Journal}, 102(411), 426--435.
 
@@ -2993,12 +3120,16 @@ and the favourite-longshot bias. \emph{The Economic Journal}, 102(411), 426--435
 for state-contingent claims. \emph{The Economic Journal}, 103(420), 1141--1153.
 
 \bibitem{sun2018} Sun, T., Sun, Y., \& Yin, W. (2018). On Markov chain gradient descent.
-\emph{Advances in Neural Information Processing Systems (NeurIPS)}, 31.
+\emph{Advances in Neural Information Processing Systems (NeurIPS)}, 31, 9896--9905.
 
 \bibitem{strumbelj2014} Štrumbelj, E. (2014). On determining probability forecasts from
 betting odds. \emph{International Journal of Forecasting}, 30(4), 934--943.
 
-\bibitem{vovk1990} Vovk, V. G. (1990). Aggregating strategies. \emph{COLT}, 371--386.
+\bibitem{thalerziemba1988} Thaler, R. H., \& Ziemba, W. T. (1988). Anomalies: parimutuel
+betting markets: racetracks and lotteries. \emph{Journal of Economic Perspectives}, 2(2),
+161--174.
+
+\bibitem{vovk1990} Vovk, V. G. (1990). Aggregating strategies. \emph{COLT}, 371--383.
 
 \bibitem{zhu2024} Zhu, H., Soen, A., Cheung, Y. K., \& Xie, L. (2024). Online learning in
 betting markets: profit versus prediction. \emph{ICML}.
