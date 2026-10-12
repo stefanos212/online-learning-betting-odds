@@ -319,6 +319,12 @@ def read(name):
     return pd.read_csv(p) if os.path.exists(p) else None
 
 
+def count(n):
+    """An integer count in the edition's thousands separator."""
+    s = f"{int(n):,}"
+    return s if EN else s.replace(",", ".")
+
+
 def T(el, en):
     """Pick the Greek or English string for the edition being generated."""
     return en if EN else el
@@ -627,36 +633,41 @@ the series quoted."""), "app:rw",
     t = read("recent_window_live_market.csv")
     if t is not None:
         # one CSV, two tables: the ranking rows, then OGD's tests against the books
+        n_live = count(t.loc[t["bookmaker"].notna(), "n"].iloc[0])
         add(longtable(t[t["rank"].notna()], T(
             r"""Η αγορά του σήμερα: οι σειρές που περνούν το κατώφλι κάλυψης στο τελευταίο
-τέταρτο του συνόλου των δεδομένων (19.146 αγώνες), κατά βαθμονομημένο log-loss στους 7.699 από
+τέταρτο του συνόλου των δεδομένων (19.146 αγώνες), κατά βαθμονομημένο log-loss στους @N@ από
 αυτούς τους αγώνες που κάλυψαν όλες. Τα μείγματα προσαρμόζονται σε όλο το ιστορικό σε μία
 αιτιακή διέλευση, και η \textbf{Κάλυψη} υπολογίζεται μόνο στο τελευταίο τέταρτο.""",
             r"""The market of today: the series that clear the coverage threshold in the last
-quarter of the full history (19,146 matches), ranked by calibrated log-loss on the 7,699 of
+quarter of the full history (19,146 matches), ranked by calibrated log-loss on the @N@ of
 those matches that all of them quoted. The mixtures are fitted on the full history in one
-causal run, and \textbf{Coverage} is computed on the last quarter alone."""), "app:rwlive",
+causal run, and \textbf{Coverage} is computed on the last quarter alone.""").replace("@N@", n_live),
+            "app:rwlive",
             cols=["rank", "name", "phase", "coverage_tail_pct", "log_loss"]))
         add(longtable(t[t["bookmaker"].notna()], T(
             r"""Το OGD έναντι κάθε bookmaker του Πίνακα~\ref{app:rwlive}, ζευγαρωτά στους ίδιους
-7.699 αγώνες· αρνητική \textbf{Μ. διαφορά} σημαίνει ότι το OGD είναι καλύτερο.""",
-            r"""OGD against each bookmaker of Table~\ref{app:rwlive}, paired over the same 7,699
-matches; a negative \textbf{Mean diff.} means that OGD is better."""), "app:rwlivesig",
+@N@ αγώνες· αρνητική \textbf{Μ. διαφορά} σημαίνει ότι το OGD είναι καλύτερο.""",
+            r"""OGD against each bookmaker of Table~\ref{app:rwlive}, paired over the same @N@
+matches; a negative \textbf{Mean diff.} means that OGD is better.""").replace("@N@", n_live),
+            "app:rwlivesig",
             cols=["bookmaker", "phase", "n", "mean_diff", "ci_low", "ci_high", "p_value",
                   "verdict"]))
     t = read("deployment_test.csv")
-    if t is not None:
+    s = read("deployment_test_significance.csv")
+    if t is not None and s is not None:
+        n_dep = count(s.loc[~s["aside"].astype(bool), "n"].iloc[0])
         add(longtable(t, T(
             r"""Έλεγχος ανάπτυξης: εκπαίδευση έως 31/12/2024 και βαθμονομημένο log-loss στους
-8.151 αγώνες του 2025--26 που κάλυψαν όλες οι σειρές· ο Πίνακας~\ref{tab:deploy-table} πλήρης.
+@N@ αγώνες του 2025--26 που κάλυψαν όλες οι σειρές· ο Πίνακας~\ref{tab:deploy-table} πλήρης.
 \textbf{Κάλυψη} είναι το ποσοστό των αγώνων του παραθύρου που κάλυψε η σειρά, και
 \emph{online} και \emph{frozen} οι δύο αναγνώσεις του μείγματος που ορίζει η
 \S\ref{sec:res-deploy}.""",
             r"""Deployment test: trained up to 31/12/2024 and scored by calibrated log-loss on
-the 8,151 matches of 2025--26 that every listed series quoted; Table~\ref{tab:deploy-table} in
+the @N@ matches of 2025--26 that every listed series quoted; Table~\ref{tab:deploy-table} in
 full. \textbf{Coverage} is the share of the test window's matches a series quoted, and
 \emph{online} and \emph{frozen} are the two readings of the mixture defined in
-\S\ref{sec:res-deploy}."""), "app:dep",
+\S\ref{sec:res-deploy}.""").replace("@N@", n_dep), "app:dep",
             cols=["rank", "name", "type", "coverage_test_pct", "log_loss"]))
     t = read("deployment_test_significance.csv")
     if t is not None:

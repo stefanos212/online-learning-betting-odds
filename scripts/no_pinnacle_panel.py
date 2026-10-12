@@ -50,14 +50,16 @@ TRAIN_FRACTION = 0.75            # chronological split, same protocol as elsewhe
 # best_configuration.py found it to be the project's best configuration --
 # significantly better than the full 26-expert panel (-0.00034, p<0.001) and
 # statistically TIED with PSC, where the full panel loses to it significantly.
-# Its coverage floor has to be lower: closing columns only exist from ~2019/20
-# for most bookmakers, so once PSC is removed NOTHING in that panel reaches
-# the 70% used elsewhere (the next best, B365C, sits at 69.6%).
+# The full panel uses the Tier-A threshold of final_ranking.py, so the
+# bookmakers it is compared against are exactly those of the main ranking
+# minus Pinnacle. The homogeneous panels need a lower floor: closing columns
+# only exist from ~2019/20 for most bookmakers, so once PSC is removed only
+# B365C (69.6%) and BWC (65.0%) would clear 60%.
 # The opening panel is there for symmetry: PS and PSC are the same company, so
 # "without Pinnacle" has to mean dropping it from whichever phase is on the
 # table, not only from the closing side.
 PANELS = [
-    ("full panel (24 experts)", None, 70.0),
+    ("full panel (24 experts)", None, COVERAGE_THRESHOLD),
     ("closing-only panel (12 experts)", "closing", 40.0),
     ("opening-only panel (12 experts)", "opening", 40.0),
 ]

@@ -23,6 +23,13 @@ AGGREGATE_PREFIXES = {"Max", "Avg", "MaxC", "AvgC", "BbAv", "BbMx", "BbAvC", "Bb
 
 MERGE_ALIASES = {"VC": "VC_BV", "BV": "VC_BV", "VCC": "VC_BVC", "BVC": "VC_BVC"}
 
+# A quote whose overround exceeds this is a data fault, not a price. The median
+# overround is 6%, and no bookmaker exceeds 15.2% even at its own 99.9th
+# percentile; above 25% sit 787 of 835,550 quotes, 781 of them Betfair Exchange
+# opening prices from a thin book (up to 196%), which also pinned Shin's z at
+# the edge of its search interval. Such a quote is treated as missing.
+MAX_OVERROUND = 0.25
+
 KNOWN_BOOKMAKER_PREFIXES = {
     "PSC", "BFC", "BFEC", "1XBC", "LB", "LBC", "CLC", "B365C", "BMGMC",
     "VC", "BV", "VCC", "BVC",   # VC/BV rebrand: ποτέ και τα δύο στην ίδια σεζόν
@@ -124,6 +131,7 @@ def load_one_file(path):
         d = pd.to_numeric(df[colD], errors="coerce")
         a = pd.to_numeric(df[colA], errors="coerce")
         valid = h.notna() & d.notna() & a.notna() & (h > 1) & (d > 1) & (a > 1)
+        valid &= (1 / h + 1 / d + 1 / a - 1) <= MAX_OVERROUND
         if not valid.any():
             continue
 

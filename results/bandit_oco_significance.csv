@@ -1,17 +1,17 @@
 stage,series,vs,n,verdict,block_length,mean_diff,ci_low,ci_high,p_value,significant_95
-calibrated,"OGD (full info, exact grad)","OGD (full info, linearised)",76584,ισοπαλία,42,2.1894183684078848e-06,-5.659425599948778e-05,5.8909335488339015e-05,0.934,False
-calibrated,BGD two-point (xi=0.0003125),"OGD (full info, linearised)",76584,OGD better,42,0.0004425823859222562,0.00031820516641031023,0.0005851039102294717,0.0,True
-calibrated,BGD one-point (xi=0.02),"OGD (full info, linearised)",76584,OGD better,42,0.0007055540058323685,0.0005119428053420828,0.0009154871333571229,0.0,True
-calibrated,"Χωρίς μάθηση (η=0, ξ=0.0003125)","OGD (full info, linearised)",76584,OGD better,42,0.0007066990804017483,0.0005109272275020319,0.0009171707707890507,0.0,True
-calibrated,"Χωρίς μάθηση (η=0, ξ=0.02)","OGD (full info, linearised)",76584,OGD better,42,0.0007055540058321614,0.0005119428053419867,0.0009154871333567351,0.0,True
-calibrated,"BGD one-point, batch=500","OGD (full info, linearised)",76584,OGD better,42,0.0007055539748902643,0.0005119428127382806,0.0009154870567466757,0.0,True
-calibrated,Uniform average,"OGD (full info, linearised)",76584,OGD better,42,0.0012062888486598761,0.0009390231715154357,0.0014875144401395334,0.0,True
-raw,"OGD (full info, exact grad)","OGD (full info, linearised)",76584,ισοπαλία,42,9.927331006082847e-07,-5.261367639284746e-05,5.467225840522095e-05,0.955,False
-raw,BGD two-point (xi=0.0003125),"OGD (full info, linearised)",76584,OGD better,42,0.0005498685921090076,0.00042710371492650094,0.000682214468951488,0.0,True
-raw,BGD one-point (xi=0.02),"OGD (full info, linearised)",76584,OGD better,42,0.0008432817268432658,0.0006633157818265576,0.00103669785033561,0.0,True
-raw,"Χωρίς μάθηση (η=0, ξ=0.0003125)","OGD (full info, linearised)",76584,OGD better,42,0.000843423787433943,0.0006622558727051154,0.0010379125376717077,0.0,True
-raw,"Χωρίς μάθηση (η=0, ξ=0.02)","OGD (full info, linearised)",76584,OGD better,42,0.0008432817268428674,0.0006633157818261328,0.0010366978503350407,0.0,True
-raw,"BGD one-point, batch=500","OGD (full info, linearised)",76584,OGD better,42,0.0008432817129318582,0.0006633158299533641,0.0010366978188886048,0.0,True
-raw,Uniform average,"OGD (full info, linearised)",76584,OGD better,42,0.0014080696082694319,0.0011503064428725921,0.0016722649205743515,0.0,True
-played_raw,BGD two_point (played),OGD (played),76584,OGD better,42,0.0005498685930939393,0.000427103715885328,0.0006822144699390925,0.0,True
-played_raw,BGD one_point (played),OGD (played),76584,OGD better,42,0.000842903725669195,0.0006629034571180736,0.001036343407931528,0.0,True
+calibrated,"OGD (full info, exact grad)","OGD (full info, linearised)",76584,ισοπαλία,42,-7.751431926364762e-06,-5.188196332306192e-05,3.750148267364466e-05,0.742,False
+calibrated,BGD two-point (xi=0.0003125),"OGD (full info, linearised)",76584,OGD better,42,0.0004463925610134707,0.00031096683793136094,0.0005872649707742072,0.0,True
+calibrated,BGD one-point (xi=0.02),"OGD (full info, linearised)",76584,OGD better,42,0.0006988027471153892,0.0005064442916001198,0.0009102385568125192,0.0,True
+calibrated,"Χωρίς μάθηση (η=0, ξ=0.0003125)","OGD (full info, linearised)",76584,OGD better,42,0.0006994864143955991,0.0005051808811081289,0.0009108022212422228,0.0,True
+calibrated,"Χωρίς μάθηση (η=0, ξ=0.02)","OGD (full info, linearised)",76584,OGD better,42,0.0006988027471151524,0.0005064442915998572,0.0009102385568121825,0.0,True
+calibrated,"BGD one-point, batch=500","OGD (full info, linearised)",76584,OGD better,42,0.0006988027262304413,0.0005064443006108109,0.0009102385231756373,0.0,True
+calibrated,Uniform average,"OGD (full info, linearised)",76584,OGD better,42,0.0012052045289936792,0.0009367089672938864,0.0014828733130558926,0.0,True
+raw,"OGD (full info, exact grad)","OGD (full info, linearised)",76584,ισοπαλία,42,-1.3722096881448642e-05,-5.51616633358555e-05,2.881233764213286e-05,0.53,False
+raw,BGD two-point (xi=0.0003125),"OGD (full info, linearised)",76584,OGD better,42,0.0005418431156480396,0.00041640078302728975,0.0006720755548654855,0.0,True
+raw,BGD one-point (xi=0.02),"OGD (full info, linearised)",76584,OGD better,42,0.0008388491152148677,0.0006620031768387532,0.0010308939668931608,0.0,True
+raw,"Χωρίς μάθηση (η=0, ξ=0.0003125)","OGD (full info, linearised)",76584,OGD better,42,0.0008385839715215756,0.0006613654062549459,0.0010318845064558792,0.0,True
+raw,"Χωρίς μάθηση (η=0, ξ=0.02)","OGD (full info, linearised)",76584,OGD better,42,0.0008388491152144376,0.0006620031768383961,0.0010308939668927555,0.0,True
+raw,"BGD one-point, batch=500","OGD (full info, linearised)",76584,OGD better,42,0.0008388491131833396,0.000662003197603792,0.001030893946346218,0.0,True
+raw,Uniform average,"OGD (full info, linearised)",76584,OGD better,42,0.0013993953400895382,0.00114629370869527,0.001661428570652021,0.0,True
+played_raw,BGD two_point (played),OGD (played),76584,OGD better,42,0.0005418431165552427,0.000416400783949632,0.0006720755557742366,0.0,True
+played_raw,BGD one_point (played),OGD (played),76584,OGD better,42,0.0008386257546935159,0.0006618462375781742,0.0010309081395801852,0.0,True
