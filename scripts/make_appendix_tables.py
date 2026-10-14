@@ -59,6 +59,8 @@ HEAD_EL = {
     "block_length": "Μπλοκ", "best_lr_scale": "$c$", "common_rounds": "Κοινοί",
     "bet_rate_pct": "Ρυθμός \\%", "active_rounds": "Ενεργοί",
     "n_bookmakers": "Experts", "n_seasons_active": "Σεζόν",
+    "dataset": "Σύνολο", "step_multiplier": "Βήμα", "tail_log_loss": "ουρά",
+    "tail_mean_diff": "Μ. διαφ. ουράς", "tail_p_value": "$p$ ουράς",
     "single_season": "Μία σεζόν", "hedge_weight_last_awake": "Βάρος Hedge",
     "rank": "\\#", "family": "Οικογένεια", "setting": "Ρύθμιση",
     "stratifier": "Διαστρωμάτωση", "stratum": "Πεμπτ.", "window": "Παράθυρο",
@@ -91,6 +93,8 @@ HEAD_EN = {
     "block_length": "Block", "best_lr_scale": "$c$", "common_rounds": "Common",
     "bet_rate_pct": "Rate \\%", "active_rounds": "Active",
     "n_bookmakers": "Experts", "n_seasons_active": "Seasons",
+    "dataset": "Dataset", "step_multiplier": "Step", "tail_log_loss": "tail",
+    "tail_mean_diff": "Tail diff.", "tail_p_value": "Tail $p$",
     "single_season": "Single season", "hedge_weight_last_awake": "Hedge weight",
     "rank": "\\#", "family": "Family", "setting": "Setting",
     "stratifier": "Stratified by", "stratum": "Quintile", "window": "Window",
@@ -122,7 +126,8 @@ _VERDICT = {
 _VERDICT.update({f"{k} better": (f"νίκη {v[0]}", f"{v[1]} better")
                  for k, v in _CONFIG.items()})
 VALUES = {
-    "config": _CONFIG, "vs": _CONFIG, "panel": _PANEL, "verdict": _VERDICT,
+    "config": _CONFIG, "vs": _CONFIG, "verdict": _VERDICT,
+    "panel": {**_PANEL, "B'": ("B$'$", "B$'$")}, "dataset": {"B'": ("B$'$", "B$'$")},
     "stage": {"raw": ("raw", "raw"), "calibrated": ("βαθμ.", "cal.")},
     "market": {"full": ("πλήρες", "full")},
     "metric": {"log_loss": ("log-loss", "log-loss"), "brier": ("Brier", "Brier"),
@@ -220,7 +225,8 @@ FORMAT.update({
     "coverage_pct": "{:.1f}", "coverage_test_pct": "{:.1f}", "coverage_tail_pct": "{:.1f}",
     "rank": "{:.0f}", "n": "{:,.0f}", "n_bets": "{:,.0f}", "rounds": "{:,.0f}",
     "n_matches": "{:,.0f}", "S": "{:.0f}", "Z": "{:.2f}", "best_lr_scale": "{:g}",
-    "alpha": "{:g}",
+    "alpha": "{:g}", "step_multiplier": "{:g}", "tail_log_loss": "{:.5f}",
+    "tail_mean_diff": "{:+.5f}", "tail_p_value": _p,
     "hedge_weight_last_awake": "{:.3f}", "final_bankroll": _bankroll,
     "setting": _setting, "p_value": _p, "mean_diff": "{:+.5f}",
     "mean_log_growth_per_bet": "{:+.5f}", "stratum": lambda s: f"Q{int(s) + 1}",
@@ -415,6 +421,13 @@ the market a bettor can actually use today, that is the series still quoting in 
 quarter of the full history. There OGD significantly beats every opening price and ties with
 every closing one. Tables~\ref{app:dep} and~\ref{app:depsig} complete
 \S\ref{sec:res-deploy}."""),
+ "common": (
+  r"""Οι Πίνακες~\ref{app:common}--\ref{app:common-vb} συμπληρώνουν την \S\ref{sec:res-common}: τις
+επιδόσεις όλων των σειρών στους κοινούς αγώνες, τους ζευγαρωτούς ελέγχους και το value betting
+στα σύνολα B και B$'$.""",
+  r"""Tables~\ref{app:common}--\ref{app:common-vb} complete \S\ref{sec:res-common}: the scores of
+every series on the common matches, the paired tests, and the value betting on datasets B and
+B$'$."""),
  "value": (
   r"""Ο Πίνακας~\ref{app:vball} δίνει τον χάρτη πλεονεκτήματος του Πίνακα~\ref{tab:vb-sig} με
 raw και με βαθμονομημένες πιθανότητες, ο Πίνακας~\ref{app:vbsweep} την πλήρη σάρωση μεθόδου
@@ -682,6 +695,41 @@ Pinnacle (PS, PSC), whose coverage falls below the threshold in this window, is 
 its own rounds, hence its smaller $n$."""), "app:depsig",
             cols=["variant", "bookmaker", "n", "mean_diff", "ci_low", "ci_high", "p_value",
                   "verdict"]))
+
+    add(section("Κοινοί αγώνες", "Common matches", "common"))
+    t = read("common_matches_table.csv")
+    if t is not None:
+        add(longtable(t, T(
+            r"""Βαθμονομημένο log-loss κάθε σειράς στους αγώνες που κάλυψαν όλες οι σειρές του
+συνόλου, σε όλους τους αγώνες και στην ουρά 25\%, μικρότερο καλύτερο. \textbf{Βήμα} είναι ο
+πολλαπλασιαστής βήματος που επιλέγει κάθε αλγόριθμος στο χρονολογικό πρόθεμα 75\%.""",
+            r"""Calibrated log-loss of every series on the matches that every series of the
+dataset quoted, over all of them and over the 25\% tail, lower better. \textbf{Step} is the
+step multiplier each algorithm selects on the chronological 75\% prefix."""), "app:common",
+            cols=["dataset", "series", "step_multiplier", "calibrated_log_loss",
+                  "tail_log_loss"]))
+    t = read("common_matches_significance.csv")
+    if t is not None:
+        add(longtable(t, T(
+            r"""Οι ζευγαρωτοί έλεγχοι της \S\ref{sec:res-common}, σε όλους τους αγώνες του
+συνόλου και στην ουρά 25\%· αρνητική διαφορά σημαίνει ότι η σειρά που κατονομάζεται πρώτη είναι
+καλύτερη.""",
+            r"""The paired tests of \S\ref{sec:res-common}, over all matches of the dataset and
+over its 25\% tail; a negative difference means that the first-named series is better."""),
+            "app:commonsig",
+            cols=["dataset", "comparison", "mean_diff", "ci_low", "ci_high", "p_value",
+                  "tail_mean_diff", "tail_p_value"]))
+    t = read("common_matches_value_betting.csv")
+    if t is not None:
+        add(longtable(t, T(
+            r"""Value betting στα σύνολα B και B$'$ (χωρίς Pinnacle), με το σταθερό $\tfrac14$
+του κλάσματος Kelly απέναντι στις πραγματικές αποδόσεις και μείγμα OGD της φάσης του στόχου,
+χωρίς τον ίδιο τον στόχο· στήλες όπως στον Πίνακα~\ref{app:vbsweep}.""",
+            r"""Value betting on datasets B and B$'$ (without Pinnacle), with the fixed $\tfrac14$
+of the Kelly fraction against the real odds and an OGD mixture of the target's phase without the
+target itself; columns as in Table~\ref{app:vbsweep}."""), "app:common-vb",
+            cols=["panel", "bookmaker", "phase", "n_bets", "final_bankroll",
+                  "mean_log_growth_per_bet", "ci_low", "ci_high", "p_value"]))
 
     add(section("Value betting", "Value betting", "value"))
     t = read("value_betting_all_bookmakers_table.csv")

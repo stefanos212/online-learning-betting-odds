@@ -72,6 +72,7 @@ STEPS = [
     ("recent_window_value_betting", "value betting inside that window"),
 
     ("deployment_test",             "real date cut, 2025-26"),
+    ("common_matches",              "common matches only, classical experts"),
     ("accuracy_by_band",            "accuracy by probability band"),
     ("learning_rate_study",         "step multiplier and constant-step sweeps"),
     ("markov_ogd",                  "transition kernels on the weight vector"),

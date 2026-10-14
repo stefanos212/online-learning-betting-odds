@@ -2347,6 +2347,95 @@ The best forecaster in this window is not a bookmaker but \textbf{Betfair
 Exchange}: an exchange where players bet against one another, that is a market price without an
 operator's margin.
 
+\subsection{Common matches, without Sleeping Experts}
+\label{sec:res-common}
+
+Every result so far comes from a panel in which bookmakers appear and disappear, handled by the
+Sleeping Experts reduction. Two questions remain open. The first is whether the findings depend
+on that partial coverage rather than on the learning itself. The second is whether Betfair
+Exchange, which beats us in the deployment test, forecasts better than Pinnacle, or is only the
+best forecaster left once Pinnacle stopped quoting. Both are answered on datasets that contain
+\emph{only the matches every chosen series quoted}. On these every expert is present in every
+round, so Hedge, OGD and FTRL are the classical algorithms, and every series is scored on the
+same matches, so the log-losses of Table~\ref{tab:common} compare directly.
+
+\paragraph{Design.} The series are chosen so that the intersection of their matches is as large as
+possible. Three datasets are examined: (B) 12 series, six opening and six closing, on 31,596
+matches from 2019/20 to 2023/24; (B$'$) the same matches without the two Pinnacle columns, that
+is 10 series; and (C) 10 series that include Betfair Exchange, on 6,941 matches of 2024/25.
+Dataset B keeps between 61\% and 90\% of the matches of every one of the 22 leagues in its
+period, so its league mix is close to that of the full data. Each algorithm's step multiplier is
+selected again on the chronological 75\% prefix of each dataset, every series is calibrated as in
+the rest of this chapter, and every comparison is a paired moving block bootstrap.
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{@{}lrrrrrrl@{}}
+\toprule
+\textbf{Dataset} & \textbf{Matches} & \textbf{Hedge} & \textbf{OGD} & \textbf{FTRL} &
+\textbf{Uniform} & \textbf{PSC} & \textbf{Best other closing} \\
+\midrule
+B      & 31,596 & 0.99916 & 0.99910 & 0.99895 & 1.00048 & 0.99893 & VC\_BVC 0.99949 \\
+B$'$   & 31,596 & 0.99945 & 0.99944 & 0.99940 & 1.00061 & ---     & VC\_BVC 0.99949 \\
+C      &  6,941 & 0.99838 & 0.99819 & 0.99813 & 0.99900 & 0.99775 & BFEC 0.99820 \\
+\bottomrule
+\end{tabular}
+\caption{Calibrated log-loss on matches that every series of the dataset quoted, lower better.
+B: 12 series (six opening, six closing), 2019/20--2023/24; B$'$: the same matches without
+Pinnacle; C: 10 series including Betfair Exchange, 2024/25. \textbf{Uniform} is the plain average
+of the dataset's series, \textbf{PSC} Pinnacle's closing price, and \textbf{Best other closing}
+the best of the remaining closing prices, with its log-loss. The step multipliers selected on
+each dataset's 75\% prefix are, for B, B$'$ and C respectively, $\times 100$, $\times 100$,
+$\times 30$ for Hedge, $\times 30$, $\times 3$, $\times 100$ for OGD and $\times 1000$,
+$\times 100$, $\times 30$ for FTRL, against $\times 0.25$, $\times 100$ and $\times 0.05$ on the
+full panel (Table~\ref{tab:steps}). Table~\ref{app:common} gives every series.}
+\label{tab:common}
+\end{table}
+
+\paragraph{Without partial coverage the step changes completely.} Hedge and FTRL, which on the
+full panel select a step four and twenty times smaller than the textbook one
+(\S\ref{sec:res-steps}), here select steps between 30 and 1000 times larger than it. When every
+expert is always present and one is clearly the best, the optimal behaviour is to move the
+weight onto it quickly. When experts come and go, as on the full panel, the same behaviour is
+punished and a longer memory pays. The optimal step is therefore a property of the panel's
+structure, not of the algorithm.
+
+\paragraph{With Pinnacle, the algorithms reach it (dataset B).} All three algorithms tie with
+PSC: FTRL by $+0.00002$ ($p=0.691$), OGD by $+0.00017$ ($p=0.134$) and Hedge by $+0.00023$
+($p=0.099$). OGD significantly beats the second best closing price (VC\_BVC, $-0.00039$,
+$p=0.003$), and all three significantly beat the plain average. On the full panel over the
+decade PSC stays significantly ahead (\S\ref{sec:res-ranking}); on the common matches of
+2019--2024 the gap disappears, as it narrows in the recent window (\S\ref{sec:res-recent}).
+
+\paragraph{Without Pinnacle, the mixture ties with the best closing price (dataset B$'$).} On the
+same matches the algorithms lose $0.0003$ to $0.0004$ in log-loss and remain first, but their
+difference from the best remaining closing price (VC\_BVC) is not significant ($p$ from $0.151$
+to $0.618$). The plain average, by contrast, loses to it significantly ($+0.00112$,
+$p<0.001$). The finding of \S\ref{sec:res-nopinnacle} repeats: without Pinnacle, what keeps the
+mixture level with the closing prices is the learning and not the averaging.
+
+\paragraph{Pinnacle and Betfair Exchange cannot be told apart (dataset C).} When both quote, PSC
+has the lower log-loss ($0.99775$ against $0.99820$ for BFEC), but the difference is not
+significant ($p=0.122$), and the algorithms tie with both. The advantage of Betfair Exchange in
+the deployment test (\S\ref{sec:res-deploy}) therefore does not show that it forecasts better
+than Pinnacle: it coincides with the period in which Pinnacle stopped quoting.
+
+\paragraph{Value betting.} Repeating the simulation of \S\ref{sec:res-value} on dataset B, with the
+same quarter Kelly against the real odds and a mixture of the target's phase without the target,
+gives significant profits against four closing prices (WHC $32.9\times$, IWC $3.66\times$, BWC
+$2.38\times$, VC\_BVC $2.01\times$) and no significant loss. Without Pinnacle in the mixture
+(dataset B$'$) two remain, WHC ($23.3\times$, $p<0.001$) and IWC ($4.30\times$, $p=0.009$): the
+profits against BWC and VC\_BVC came from Pinnacle being inside the mixture. The profit against
+WHC is the only one that survives every version of the analysis. Table~\ref{app:common-vb}
+gives every target.
+
+\paragraph{Caveats.} The datasets cover a shorter period than the decade, five seasons for B and
+B$'$ and a single one for C, and they keep only the matches that every chosen series quoted; the
+series themselves were chosen by their coverage over the whole period. Twelve targets were
+tested in the value betting, so the marginal profits ($p$ between $0.011$ and $0.033$) should be
+read with care.
+
 \section{Value betting and the learned stake size}
 \label{sec:res-value}
 
@@ -2897,7 +2986,9 @@ The main conclusions of the present work are the following.
         statistically significant. In the deployment test it significantly beats every opening
         price and ties with the bookmakers' closing prices. The limit is set by Betfair Exchange,
         which is not a bookmaker but an exchange, that is a market price without an operator's
-        margin: that one significantly beats us.
+        margin: that one significantly beats us. On matches that every series quoted, with no
+        partial coverage, the algorithms tie with Pinnacle, and Pinnacle and Betfair Exchange
+        cannot be told apart (\S\ref{sec:res-common}).
 
   \item \textbf{A substantial part of the apparent superiority is not learning.} Under the
         Sleeping Experts reduction the weight vector moves even with a zero step, because the
