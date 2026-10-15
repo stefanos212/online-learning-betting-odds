@@ -158,17 +158,19 @@ Newton Step. Every comparison is tested with a moving block bootstrap. The datas
 22 leagues, 10 seasons and 76,584 matches.
 
 The mixture significantly outperforms every individual bookmaker except the sharpest, with
-which it draws level in the configuration ultimately adopted. Under a deployment test with a
+which its best algorithm, Hedge, draws level over the whole decade. Under a deployment test with a
 genuine temporal cut (fitted through the end of 2024, evaluated on 2025--26) it significantly
 outperforms every opening price and draws level with the bookmakers' closing prices. The one
 source of odds that significantly outperforms it is Betfair Exchange, which is not a bookmaker
 but a betting exchange: a platform on which bettors bet against one another, so that its odds are
 set by the bettors themselves and carry no profit margin added by a company.
 
-The three broader findings are that learning pays only where experts are heterogeneous in
+The four broader findings are that learning pays mostly where experts are heterogeneous in
 quality; that better prediction does not translate directly into profit, since the quality
-gain falls short of the market's margin; and that part of the advantage over the uniform
-average is due not to learning but to the geometry of the Sleeping Experts reduction.
+gain falls short of the market's margin; that part of OGD's advantage over the uniform average
+is due not to learning but to the geometry of the Sleeping Experts reduction; and that a bound
+of the theory, checked against the data, exposed an implementation error that had kept Hedge
+in third place.
 
 \vspace{1em}
 \noindent\textbf{Keywords:} online convex optimization, prediction with expert advice,
@@ -197,7 +199,7 @@ moving block bootstrap. Το σύνολο δεδομένων καλύπτει 22
 αγώνες.
 
 Το μείγμα ξεπερνά στατιστικά σημαντικά κάθε μεμονωμένο bookmaker πλην του σκληρότερου, με
-τον οποίο ισοπαλεί στη διαμόρφωση που επιλέγεται τελικά. Σε έλεγχο ανάπτυξης με πραγματική
+τον οποίο ο καλύτερος αλγόριθμος, ο Hedge, ισοπαλεί σε όλη τη δεκαετία. Σε έλεγχο ανάπτυξης με πραγματική
 χρονική τομή (εκπαίδευση έως το τέλος του 2024, μέτρηση στο 2025--26) κερδίζει σημαντικά κάθε
 τιμή ανοίγματος και ισοπαλεί με τις τιμές κλεισίματος των bookmakers. Η μόνη πηγή
 αποδόσεων που το ξεπερνά σημαντικά είναι το Betfair Exchange, το οποίο δεν είναι στοιχηματική
@@ -205,11 +207,12 @@ moving block bootstrap. Το σύνολο δεδομένων καλύπτει 22
 οπότε τις αποδόσεις τις διαμορφώνουν οι ίδιοι και δεν περιέχουν περιθώριο κέρδους κάποιας
 εταιρείας.
 
-Τα τρία γενικότερα ευρήματα είναι ότι η μάθηση αποδίδει μόνο όταν οι experts έχουν
-ανομοιομορφία στην ποιότητα, ότι η καλύτερη πρόβλεψη δεν μεταφράζεται άμεσα σε κέρδος καθώς
-η διαφορά ποιότητας υπολείπεται του περιθωρίου της αγοράς, και ότι ένα μέρος της υπεροχής
+Τα τέσσερα γενικότερα ευρήματα είναι ότι η μάθηση αποδίδει κυρίως όταν οι experts έχουν
+ανομοιομορφία στην ποιότητα· ότι η καλύτερη πρόβλεψη δεν μεταφράζεται άμεσα σε κέρδος, καθώς
+η διαφορά ποιότητας υπολείπεται του περιθωρίου της αγοράς· ότι ένα μέρος της υπεροχής του OGD
 έναντι της ομοιόμορφης μέσης τιμής δεν οφείλεται στη μάθηση αλλά στη γεωμετρία της αναγωγής
-Sleeping Experts.
+Sleeping Experts· και ότι ένα όριο της θεωρίας, ελεγμένο στα δεδομένα, αποκάλυψε ένα σφάλμα
+υλοποίησης που κρατούσε τον Hedge στην τρίτη θέση.
 
 \vspace{1em}
 \noindent\textbf{Λέξεις-κλειδιά:} online κυρτή βελτιστοποίηση, πρόβλεψη με συμβουλή ειδικών,
@@ -283,6 +286,9 @@ The thesis makes the following contributions:
         rather than comparison of point estimates.
   \item A deployment test with a genuine temporal cut, answering the question of what a model
         fitted through 2024 would do today.
+  \item The use of the theory's bounds as a check on the implementation: the bound of the
+        Aggregating Algorithm under sleeping experts was violated fifty-fold, and the violation
+        located an error in the handling of absent experts that had kept Hedge in third place.
   \item A series of negative findings that bound the scope of the method and are, in our view,
         as useful as the positive ones.
 \end{itemize}
@@ -328,9 +334,9 @@ property of certain losses, \emph{exp-concavity}. Exp-concavity is a curvature c
 than convexity, which the logarithmic loss satisfies (it is defined in \S\ref{sec:expconcave}). Under it
 the regret can be bounded by $\ln N$, where $N$ is the number of experts, that is
 \emph{independently} of the \emph{horizon} $T$, the total number of rounds, instead of growing as
-$O(\sqrt{T \log N})$. That result is theoretically stronger, and this thesis
-provides an empirical case in which it nevertheless fails, for reasons connected to the
-non-stationarity of the expert set.
+$O(\sqrt{T \log N})$. In this thesis the corresponding algorithm, with experts that do not
+participate in every round handled correctly, draws level with the best bookmaker without any
+tuning; handled incorrectly, it violates its own bound (\S\ref{sec:res-steps}).
 
 The unification of the above under the common heading of \emph{online convex optimization} is
 due in large part to Zinkevich (2003)~\cite{zinkevich2003}, who showed that simple projected gradient descent
@@ -443,8 +449,9 @@ movement of the weight vector that must be controlled for before any gain is rea
 (\S\ref{sec:res-bandit}).
 
 That finding bears directly on our results. This thesis shows that learned combination beats
-the simple average when the experts differ substantively in quality, and falls short of it
-when they do not. The puzzle is therefore not a general law but a statement about homogeneous
+the simple average by far more when the experts differ substantively in quality; when they do
+not, the gain shrinks by a factor of three to five, and for one of the three algorithms it turns
+into a loss. The puzzle is therefore not a general law but a statement mainly about homogeneous
 panels: the condition it depends on is the spread in expert quality, and that condition is
 measurable in advance.
 
@@ -814,8 +821,8 @@ simultaneously, without the horizon being known.
 \end{proposition}
 
 This choice has consequences examined empirically in \S\ref{sec:res-steps}, where the constant
-$c$ dictated by theory is found to be, for these data, seriously wrong, too large for Hedge,
-and too small by two orders of magnitude for OGD.
+$c$ dictated by theory is found to be, for these data, seriously wrong: too small by two orders
+of magnitude for Hedge and for OGD, and too large for FTRL.
 
 \subsection{Online Gradient Descent}
 
@@ -894,15 +901,17 @@ and with $\eta = D/(G\sqrt{T})$ it follows that $\mathrm{Regret}_T \leq D G \sqr
 
 In our case $\mathcal{K}=\Delta_N$, so $D=\sqrt{2}$, and $G$ is bounded by the $M$ of
 \S\ref{sec:res-steps}. This structure (that $\eta$ multiplies the gradient of \emph{one} round)
-explains why OGD responds to step scaling in the opposite way to Hedge.
+explains why OGD responds to step scaling in the opposite way to FTRL.
 
 \begin{remark}[The structure of $\eta$ and the direction of tuning]
-The reason Hedge and OGD respond in \emph{opposite} directions to scaling of the step is
-structural and visible in the formulas. In Hedge, $\eta$ sits in an \emph{exponent} over a
-single round's loss: a smaller $\eta$ means slower exponential decay, hence \emph{longer
-memory}. In OGD, $\eta$ \emph{multiplies} a single round's gradient: a larger $\eta$ simply
-means a larger step in the same direction. The two parameters, despite sharing a name, do not
-control the same quantity.
+\label{rem:eta-structure}
+The parameter called $\eta$ does not control the same quantity in the three algorithms. In
+Hedge it sits in an \emph{exponent} over a single round's loss; in OGD it \emph{multiplies} a
+single round's gradient; in FTRL it multiplies the \emph{entire} accumulated loss. In the first
+two it is local: a larger $\eta$ means faster adaptation to the latest round, which these data
+reward. In FTRL it is global: a larger $\eta$ drives the algorithm towards the unstable
+Follow-The-Leader, which these data punish. This distinction is why, in \S\ref{sec:res-steps},
+Hedge and OGD want a step larger than the theoretical one and FTRL a smaller one.
 \end{remark}
 
 \subsection{Follow-The-Regularized-Leader}
@@ -1003,13 +1012,10 @@ contradict the lower bound of Theorem~\ref{thm:lower-bound}: that one concerns \
 losses, which are not exp-concave, and the difference between the two cases is exactly the
 curvature that the linearisation of Lemma~\ref{lem:linearization} throws away.
 
-This result is theoretically far stronger. It is therefore worth stating explicitly that on our
-data the corresponding algorithm performs \emph{worse than the uniform average}. The
-explanation is not that the bound is wrong but that it concerns a \emph{static} comparator: it
-guarantees that we will not do much worse than the best \emph{fixed} expert. When the best
-expert stops participating in the middle of the period, the guarantee remains formally true but
-practically vacuous, and an algorithm that rapidly concentrates its mass on a few experts is
-penalised for precisely that.
+This result is theoretically far stronger, and on our data it is borne out. With the reduction
+of \S\ref{sec:sleeping} implemented correctly, the algorithm trails every bookmaker on that
+bookmaker's own rounds by at most $3.00$ in total, inside the bound of $\ln 26$, and draws level
+with the best bookmaker without any tuning (\S\ref{sec:res-steps}).
 
 \subsection{The Sleeping Experts reduction}
 \label{sec:sleeping}
@@ -1026,7 +1032,13 @@ experts at round $t$. Then:
   \item the prediction is formed only from the awake ones, with their weights renormalised so
         as to constitute a distribution over $A(t)$ and nothing else;
   \item after the round only the state of the awake experts is updated; the sleeping ones
-        remain \emph{frozen} exactly as they were;
+        remain exactly as they were. In Hedge the awake group is rescaled, after the
+        multiplicative step, back to the total mass it held before it (the specialists update):
+        \[
+        w_{t+1,i} \;=\; w_{t,i}\, e^{-\eta \ell_{t,i}} \cdot
+        \frac{\sum_{j\in A(t)} w_{t,j}}{\sum_{j\in A(t)} w_{t,j}\, e^{-\eta \ell_{t,j}}},
+        \qquad i\in A(t);
+        \]
   \item a round in which nobody is awake is skipped entirely.
 \end{itemize}
 
@@ -1036,7 +1048,8 @@ which it was awake}, instead of requiring participation in all of them.
 \begin{theorem}[Per-expert regret under partial participation]
 \label{thm:sleeping}
 Let $T_i = \{t : i \in A(t)\}$ be the rounds in which expert $i$ is awake and $n_i = |T_i|$.
-Hedge with the above reduction satisfies, for every $i$ simultaneously,
+Hedge with the above reduction, including the rescaling of the awake mass, satisfies, for
+every $i$ simultaneously,
 \[
 \sum_{t \in T_i} \Big( \langle \bar{w}_t, \ell_t\rangle - \ell_{t,i} \Big)
 \;\leq\; \frac{\ln N}{\eta} \;+\; \frac{\eta M^2 n_i}{8},
@@ -1059,21 +1072,25 @@ same point in time, so the mixture chases the rare experts. The bound is not wro
 simply that the quantity it guarantees is not the one we are interested in minimising.
 \end{remark}
 
-Two details prove critical in the implementation. First, the persistent weight vector must never
-be renormalised globally, only the copy used for the prediction. The reason lies in how
+Three details prove critical in the implementation. First, the persistent weight vector must
+never be renormalised globally, only the copy used for the prediction. The reason lies in how
 Theorem~\ref{thm:sleeping} is established: the lower bound relies on the weight $w_{t,i}$ of a
 sleeping expert remaining
 \emph{literally} unchanged, and a global renormalisation changes it. Second, the last row of
 the weight matrix is not ``the final weight of each expert'', since it is zero for anyone who
 did not participate in the last round; the interpretable quantity is the weight each one held
-the last time it was awake.
+the last time it was awake. Third, the rescaling of the awake mass is not optional. Without it
+the awake group loses mass to the sleeping experts every round, an expert returning after a
+long absence comes back over-weighted, and the guarantee of Theorem~\ref{thm:sleeping} is lost;
+the loss is directly visible in the data (\S\ref{sec:res-steps}). When nobody sleeps the factor
+is common to all experts and cancels in the prediction, so the omission shows nowhere else.
 
 \subsection{Fixed-Share}
 \label{sec:fixed-share}
 
-The Sleeping Experts reduction creates a side problem: an expert that sleeps for a long stretch
-keeps its weight frozen, and that weight is not eroded by the losses of the others. Rare experts
-can thus end up with disproportionate influence. The Fixed-Share algorithm (Herbster \& Warmuth,
+The Sleeping Experts reduction leaves a side problem: an expert that sleeps for a long stretch
+returns with the share it held when it fell asleep, which may no longer reflect its quality. The
+Fixed-Share algorithm (Herbster \& Warmuth,
 1998)~\cite{herbster1998} introduces a small leak $\alpha$ towards the uniform distribution after every update:
 \[
 w_{t+1,i} \;=\; (1-\alpha)\,\tilde{w}_{t,i} \;+\; \frac{\alpha}{N}\sum_{j} \tilde{w}_{t,j},
@@ -1744,8 +1761,8 @@ M \;=\; \ln(1/\varepsilon) \;=\; \ln 10^{6} \;=\; 6\ln 10 \;\approx\; 13.82 .
 This bound presupposes a bookmaker pricing the outcome that actually occurred at one in a
 million. The largest loss actually observed in the data is 3.76, that is the worst-case step is
 an order of magnitude more conservative than the data warrant. The multipliers are therefore
-tuned empirically, with the protocol of \S\ref{sec:protocol} and over the same grid for all three
-algorithms, so that the comparison between them stays fair.
+tuned empirically for all three algorithms, with the protocol of \S\ref{sec:protocol}, over
+grids extended until each optimum is interior, so that the comparison between them stays fair.
 
 \subsection{Comparing series with different coverage}
 \label{sec:common-rounds}
@@ -1804,7 +1821,8 @@ which the weights are frozen at the cut, which is the strict reading of ``traine
 
 The step multipliers are tuned first, since they determine the algorithms with which all the
 remaining results are produced. The multipliers of all three algorithms needed changing, and
-(this is the non-obvious part) \textbf{in opposite directions}. Table~\ref{tab:steps} lists the multipliers that are in force everywhere else in this chapter.
+(this is the non-obvious part) \textbf{in opposite directions}: upwards for Hedge and OGD,
+downwards for FTRL. Table~\ref{tab:steps} lists the multipliers that are in force everywhere else in this chapter.
 
 \begin{table}[H]
 \centering
@@ -1814,7 +1832,7 @@ remaining results are produced. The multipliers of all three algorithms needed c
 \textbf{train min.} & \textbf{tail min.} \\
 \midrule
 OGD   & $\times 100$   & 0.99739 & 0.99746 & 0.99766 & $\times 110$   & $\times 100$ \\
-Hedge & $\times 0.25$  & 0.99828 & 0.99839 & 0.99873 & $\times 0.25$  & $\times 0.05$ \\
+Hedge & $\times 250$   & 0.99668 & 0.99690 & 0.99756 & $\times 250$   & $\times 2000$ \\
 FTRL  & $\times 0.05$  & 0.99828 & 0.99841 & 0.99880 & $\times 0.05$  & $\times 0.005$ \\
 \bottomrule
 \end{tabular}
@@ -1826,7 +1844,8 @@ on the prefix and on the tail respectively. Selection is made exclusively on the
 prefix, so
 the decisive column is \textbf{train min.}: for all three algorithms it coincides with the
 multiplier actually used, the one exception being OGD's $\times 110$, which gives a tail identical
-to $\times 100$ ($0.99766$). The \textbf{tail min.} column is reported for comparison and not as a
+to $\times 100$ ($0.99766$). Hedge's prefix curve is flat to within $10^{-6}$ from $\times 200$ to
+$\times 1000$, and $\times 250$ is its minimum. The \textbf{tail min.} column is reported for comparison and not as a
 criterion; the difference between the two is discussed below.}
 \label{tab:steps}
 \end{table}
@@ -1834,7 +1853,7 @@ criterion; the difference between the two is discussed below.}
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.92\linewidth]{learning_rate_study.png}
-  \caption{Sweep of the step size for all three algorithms; in both panels lower log-loss is better, and blue is Hedge, orange OGD and green FTRL. (a) The multiplier applied to the textbook decaying schedule, on a logarithmic horizontal axis with $1$ the textbook value. Solid lines give the log-loss on the held-out tail and dashed lines on the full sample; the circled point on each solid line is the multiplier in use. OGD has a genuine interior optimum. The tail curves of Hedge and FTRL keep falling to the left, but the selection is made on the training prefix, not on them (see the caveat in the text of this section). (b) A constant step $\eta$ in place of the decaying schedule, on a logarithmic horizontal axis. Each solid line is the held-out log-loss of one algorithm; the dotted line of the same colour is that algorithm's decaying step in use.}
+  \caption{Sweep of the step size for all three algorithms; in both panels lower log-loss is better, and blue is Hedge, orange OGD and green FTRL. (a) The multiplier applied to the textbook decaying schedule, on a logarithmic horizontal axis with $1$ the textbook value. Solid lines give the log-loss on the held-out tail and dashed lines on the full sample; the circled point on each solid line is the multiplier in use. OGD and Hedge have interior optima to the right of $1$, Hedge on a wide plateau; the tail curve of FTRL keeps falling to the left, but the selection is made on the training prefix, not on it (\S\ref{sec:res-steps}). (b) A constant step $\eta$ in place of the decaying schedule, on a logarithmic horizontal axis. Each solid line is the held-out log-loss of one algorithm; the dotted line of the same colour is that algorithm's decaying step in use.}
   \label{fig:lr}
 \end{figure}
 
@@ -1842,22 +1861,24 @@ Table~\ref{app:lr} in the appendix lists every setting of the sweep. As Figure~\
 shows, OGD wants a step a hundred times larger than the theoretical one,
 with a genuine interior optimum: a plateau over the range $\times 75$ to $\times 110$, with
 $\times 200$, $\times 500$
-and $\times 1000$ clearly worse. Hedge and FTRL want a \emph{smaller} step, by factors of 4 and
-20 respectively.
+and $\times 1000$ clearly worse. Hedge also wants a larger step, $\times 250$, on a plateau from
+$\times 200$ to $\times 1000$ over which the prefix score varies by less than $10^{-6}$. FTRL wants a
+\emph{smaller} step, by a factor of 20.
 
-\paragraph{A caveat that turned out to be unfounded.} The \emph{tail} minimum for Hedge and FTRL
-lies below the values used, at $\times 0.05$ and $\times 0.005$ respectively, and for a time this
-thesis carried the caveat that those two algorithms were reported with a sub-optimal step. The
+\paragraph{A caveat that turned out to be unfounded.} The \emph{tail} minimum differs from the
+multiplier in force for Hedge ($\times 2000$ against $\times 250$) and for FTRL ($\times 0.005$
+against $\times 0.05$), and for a time this thesis carried the caveat that FTRL was reported
+with a sub-optimal step. The
 caveat was wrong, and the reason is worth stating: \textbf{selecting on the tail is selecting on
 the test set}, which is exactly what the protocol of \S\ref{sec:protocol} exists to prevent.
 Because the log-loss is a plain mean over rounds, the prefix figure is recoverable exactly from
 the full sample and the tail, as
 $(\text{full}\cdot T - \text{tail}\cdot n_{\text{tail}})/n_{\text{train}}$, and under the protocol
-the answer reverses: Hedge selects $\times 0.25$ and FTRL $\times 0.05$, that is \emph{exactly}
+the answer reverses: Hedge selects $\times 250$ and FTRL $\times 0.05$, that is \emph{exactly}
 the multipliers in force.
 
-The numbers also show why. For Hedge, $\times 0.05$ gives a train figure of $0.99838$ against
-$0.99828$ for $\times 0.25$; for FTRL, $\times 0.005$ gives $0.99862$ against $0.99828$ for
+The numbers also show why. For Hedge, $\times 2000$ gives a train figure of $0.99669$ against
+$0.99668$ for $\times 250$; for FTRL, $\times 0.005$ gives $0.99862$ against $0.99828$ for
 $\times 0.05$. In both cases the ordering \emph{reverses} between prefix and tail, which is the
 signature of fitting the tail rather than evidence of better tuning. OGD remains optimal at
 $\times 100$, with $\times 110$ giving an identical tail: a tie inside the plateau already
@@ -1866,11 +1887,8 @@ described.
 \paragraph{A constant step: the one schedule idea that had not been tested properly.} The decaying
 $1/\sqrt{t}$ is derived for a \emph{static} comparator, whereas the panel here is not static, so a
 step that never stops moving is the theoretically indicated alternative. It had been tried only
-for Hedge and only over $[0.1, 2]$, while Hedge's decaying schedule passes $\eta \approx 0.033$
-at the first round and $\eta \approx 1.7\cdot10^{-4}$ by the middle of the period, i.e.\ the
-entire interesting region lay \emph{below} the old grid $[0.1, 2]$. The sweep was extended over five
-decades and to all three algorithms, with selection on the prefix and a paired test on the
-tail. Table~\ref{tab:const-step} gives the comparison.
+for Hedge and only over $[0.1, 2]$. The sweep was extended over five decades and to all three
+algorithms, with selection on the prefix and a paired test on the tail. Table~\ref{tab:const-step} gives the comparison.
 
 \begin{table}[H]
 \centering
@@ -1878,7 +1896,7 @@ tail. Table~\ref{tab:const-step} gives the comparison.
 \toprule
 & \textbf{constant $\eta$} & \textbf{tail} & \textbf{decaying} & \textbf{$p$} & \\
 \midrule
-Hedge & $3\cdot10^{-4}$ & 0.99882 & 0.99873 & $<0.001$ & decaying \\
+Hedge & $1$             & 0.99729 & 0.99756 & $<0.001$ & \textbf{constant} \\
 OGD   & $0.1$           & 0.99794 & 0.99766 & $0.029$  & decaying \\
 FTRL  & $10^{-5}$       & 0.99870 & 0.99880 & $<0.001$ & \textbf{constant} \\
 \bottomrule
@@ -1892,14 +1910,27 @@ bold where it is the constant step.}
 \label{tab:const-step}
 \end{table}
 
-The result is negative for two of them and \textbf{positive for one}. For Hedge and OGD the
-constant step loses significantly, by $+0.000091$ and $+0.000279$ respectively. For FTRL, however,
-it wins significantly, by $-0.000102$ ($p<0.001$), and the critical point is that the two
-schemes have an \emph{identical} score on the prefix ($0.99828$ for both). With nothing to
+The result is negative for OGD and \textbf{positive for the other two}. For OGD the constant
+step loses significantly, by $+0.000279$. For Hedge it wins significantly, by $-0.00027$
+($p<0.001$), and the constant step selected on the prefix is exactly $\eta=1$: the Aggregating
+Algorithm of \S\ref{sec:expconcave}, with the constant the theory supplies and no correction.
+For FTRL it also wins significantly, by $-0.000102$ ($p<0.001$), and the critical point there is
+that the two schemes have an \emph{identical} score on the prefix ($0.99828$ for both). With nothing to
 separate the two on the training data, the selection cannot have favoured the constant step in
-order to flatter the tail, and the advantage emerges only out of sample. The explanation is the same asymmetry that explains the opposite tuning directions:
-FTRL's $\eta$ multiplies the entire accumulated loss, not one round's gradient, so it is the
-one of the three for which ``non-decaying'' means something qualitatively different.
+order to flatter the tail, and the advantage emerges only out of sample. The explanation is the
+asymmetry of Remark~\ref{rem:eta-structure}: FTRL's $\eta$ multiplies the entire accumulated
+loss, not one round's, so for it ``non-decaying'' means something qualitatively different.
+
+\paragraph{The bound used as a test.} Since Hedge at $\eta=1$ is the Aggregating Algorithm,
+Theorem~\ref{thm:aa} makes a prediction that can be checked directly: on the rounds in which a
+bookmaker was awake, the mixture trails that bookmaker by at most $\ln 26 = 3.26$ in total. The
+first implementation in this thesis, without the rescaling of the awake mass of
+\S\ref{sec:sleeping}, trailed PSC by $165$, fifty times the bound, and performed worse than the
+uniform average. With the rescaling the largest shortfall against any bookmaker is $3.00$, inside
+the bound. The difference is a single line of code that has no effect when nobody sleeps, which
+is why the results on the common matches (\S\ref{sec:res-common}) are identical under both
+implementations. With the fix, Hedge moves from third place to first
+(\S\ref{sec:res-ranking}).
 
 The sweep needed extending here too, for the same reason as before: FTRL's minimum initially sat
 on the grid's lower endpoint. Extended down to $10^{-9}$ it became genuinely interior, and the
@@ -1908,16 +1939,16 @@ uniform average, and indeed at $\eta=10^{-9}$ it gives $0.99880$, the uniform av
 the tail.
 
 \paragraph{A methodological error worth reporting.} The original sweep had the grid
-$1, 2, 5,\allowbreak \dots,\allowbreak 1000$ and concluded that Hedge and FTRL were ``already optimal at $\times 1$''.
+$1, 2, 5,\allowbreak \dots,\allowbreak 1000$ and concluded that FTRL was ``already optimal at $\times 1$''.
 But $1$ was the \emph{lower endpoint of the grid}, not an optimum, and nobody had looked to the
-left of it. Extending downwards revealed genuine interior minima, with gains of $+0.00014$ and
-$+0.00024$ respectively on the tail. The conclusion generalises: when a sweep's answer sits at the
+left of it. Extending downwards revealed a genuine interior minimum, with a gain of $+0.00024$ on
+the tail. The conclusion generalises: when a sweep's answer sits at the
 endpoint of the grid, the grid must be extended before the answer is believed.
 
-The opposite direction has a structural explanation. OGD's $\eta$ multiplies the gradient of
-\emph{one} round, so increasing it means moving further. Hedge's $\eta$ sits in an exponent over
-one round's loss, so decreasing it \emph{lengthens the memory}. FTRL's $\eta$ multiplies the
-entire accumulated loss, so increasing it collapses it towards follow-the-leader.
+The opposite directions have the structural explanation of Remark~\ref{rem:eta-structure}.
+The $\eta$ of OGD and of Hedge acts on the latest round, so increasing it means adapting faster.
+FTRL's $\eta$ multiplies the entire accumulated loss, so increasing it collapses the algorithm
+towards Follow-The-Leader.
 
 \section{Ranking and the choice of panel}
 
@@ -1932,9 +1963,9 @@ entire accumulated loss, so increasing it collapses it towards follow-the-leader
 & & \textbf{phase} & \textbf{log-loss} & \textbf{Brier} \\
 & & & (raw / cal.) & (raw / cal.) \\
 \midrule
+Hedge          & algorithm & ---     & 0.99690 / 0.99656 & 0.59577 / 0.59560 \\
 PSC (Pinnacle) & bookmaker & closing & 0.99714 / 0.99685 & 0.59592 / 0.59577 \\
 OGD            & algorithm & ---     & 0.99746 / 0.99693 & 0.59612 / 0.59586 \\
-Hedge          & algorithm & ---     & 0.99839 / 0.99772 & 0.59671 / 0.59636 \\
 FTRL           & algorithm & ---     & 0.99841 / 0.99773 & 0.59672 / 0.59636 \\
 Uniform        & baseline  & ---     & 0.99886 / 0.99814 & 0.59702 / 0.59664 \\
 B365C          & bookmaker & closing & 0.99953 / 0.99910 & 0.59732 / 0.59711 \\
@@ -1967,12 +1998,13 @@ Table~\ref{tab:ranking} gives the ranking and Figure~\ref{fig:ranking} plots it;
 in the appendix adds each series' coverage, number of rounds and accuracy. The paired tests give:
 
 \begin{itemize}
-  \item All three algorithms significantly beat the uniform average: OGD $-0.00140$, Hedge
-        $-0.00046$, FTRL $-0.00045$, all $p<0.001$. OGD's margin is about threefold.
-  \item OGD significantly beats Hedge ($-0.00094$), FTRL ($-0.00095$) and B365C ($-0.00063$).
-  \item Calibration significantly improves all four methods, by $+0.00053$ to $+0.00072$.
-  \item PSC remains significantly ahead of OGD in this configuration: $+0.00043$ calibrated,
-        $p<0.001$, over the 71,818 common matches.
+  \item \textbf{Hedge ties with PSC} over the whole decade: $+0.00005$ calibrated, $p=0.425$, over
+        the 71,818 common matches.
+  \item All three algorithms significantly beat the uniform average: Hedge $-0.00196$, OGD
+        $-0.00140$, FTRL $-0.00045$, all $p<0.001$.
+  \item Hedge significantly beats OGD ($-0.00056$), FTRL ($-0.00151$) and B365C ($-0.00101$).
+  \item Calibration significantly improves all four methods, by $+0.00034$ to $+0.00072$.
+  \item PSC remains significantly ahead of OGD: $+0.00043$ calibrated, $p<0.001$.
 \end{itemize}
 
 \paragraph{A necessary caveat.} Three of the twelve closing columns clear the 60\% coverage
@@ -2011,7 +2043,7 @@ significant, as expected, since it is not a proper scoring rule.
 & basic & Shin & basic & Shin & basic & Shin \\
 \midrule
 OGD     & 1.00076 & 1.00024 & 0.99746 & 0.99710 & 0.99723 & 0.99690 \\
-Hedge   & 1.00078 & 1.00021 & 0.99839 & 0.99779 & 0.99762 & 0.99714 \\
+Hedge   & 1.00019 & 0.99989 & 0.99690 & 0.99664 & 0.99711 & 0.99683 \\
 FTRL    & 1.00078 & 1.00021 & 0.99841 & 0.99780 & 0.99761 & 0.99714 \\
 Uniform & 1.00077 & 1.00019 & 0.99886 & 0.99824 & 0.99748 & 0.99703 \\
 \bottomrule
@@ -2027,31 +2059,35 @@ better. The number in parentheses is the number of bookmaker series in the panel
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.92\linewidth]{opening_vs_closing.png}
-  \caption{Log-loss of each algorithm on the three panels. Horizontal axis log-loss over the full history, lower better; one row per algorithm, each in its own colour. The three marks on a row are the same algorithm fitted on the opening-only panel (hollow), on the full 26-expert panel (grey) and on the closing-only panel (filled), so the spread within a row is the effect of the panel and not of the method. The ordering closing $<$ all $<$ opening holds in every row.}
+  \caption{Log-loss of each algorithm on the three panels. Horizontal axis log-loss over the full history, lower better; one row per algorithm, each in its own colour. The three marks on a row are the same algorithm fitted on the opening-only panel (hollow), on the full 26-expert panel (grey) and on the closing-only panel (filled), so the spread within a row is the effect of the panel and not of the method. The ordering closing $<$ all $<$ opening holds in every row except Hedge's, where the full and the closing-only panel coincide.}
   \label{fig:panels}
 \end{figure}
 
-Table~\ref{tab:panels} reports the grid and, as Figure~\ref{fig:panels} makes visible, the ordering closing $<$ all $<$ opening holds
-in every cell, and in all 24 comparisons (4
-algorithms $\times$ 3 comparisons $\times$ 2 normalisations) the difference is statistically
-significant. That closing prices beat opening ones is expected. What is unexpected is that the
-closing-only panel also beats the \emph{full} one: the opening bookmakers do not act as useful
-diversification but as pure dead weight in the mixture.
+Table~\ref{tab:panels} reports the grid and, as Figure~\ref{fig:panels} makes visible, the
+ordering closing $<$ all $<$ opening holds for OGD, FTRL and the uniform average, and 22 of the
+24 comparisons (4 algorithms $\times$ 3 comparisons $\times$ 2 normalisations) are statistically
+significant. The two exceptions are Hedge's: for it the full panel and the closing-only one tie
+($p=0.628$ with proportional normalisation, $p=0.337$ with Shin). That closing prices beat opening
+ones is expected. What is unexpected is that for OGD, FTRL and the average the closing-only
+panel also beats the \emph{full} one: the opening bookmakers act there not as useful
+diversification but as dead weight. Hedge learns to ignore them.
 
 Comparing each algorithm with the plain average \emph{inside} the same panel explains the
 mechanism and is, in our view, the most generally useful finding of the thesis:
 
 \begin{itemize}
-  \item On the \textbf{full} panel all three algorithms significantly beat the average.
-  \item On the \textbf{restricted} panels the advantage disappears. On the closing panel Hedge
-        and FTRL \emph{significantly lose} to the average, in 4 tests out of 4, and only OGD
-        still wins; on the opening panel all three tie with it.
+  \item On the \textbf{full} panel all three algorithms significantly beat the average, Hedge
+        by $0.0020$ and OGD by $0.0014$.
+  \item On the \textbf{restricted} panels the advantage shrinks by a factor of three to five. On
+        the closing panel Hedge still wins, by $0.0004$, and OGD by $0.0003$, while FTRL
+        \emph{significantly loses} to the average; on the opening panel only Hedge wins, by
+        $0.0006$, and the other two tie with it.
 \end{itemize}
 
 The full panel contains 13 good closing and 13 systematically worse opening experts, that is a
 clear quality difference available to be learned. In a homogeneous panel that difference is
-absent: there the adaptation buys nothing, and on the closing panel it costs two of the three
-algorithms more than it returns.
+absent: there the adaptation buys much less, and on the closing panel it costs FTRL more than it
+returns.
 
 \subsection{Where exactly closing prices are superior}
 \label{sec:res-arrival}
@@ -2072,18 +2108,18 @@ Figure~\ref{fig:arrival} plots it beside the same exercise run on Shin's $z$.
 \textbf{Movement quintile} & Q1 & Q2 & Q3 & Q4 & Q5 \\
 \midrule
 Mean movement & 0.0082 & 0.0143 & 0.0212 & 0.0320 & 0.0587 \\
-log-loss opening & 0.99120 & 1.00384 & 1.00170 & 1.00602 & 1.00989 \\
-log-loss closing & 0.99075 & 1.00317 & 0.99968 & 1.00180 & 0.99809 \\
+log-loss opening & 0.99075 & 1.00366 & 1.00110 & 1.00551 & 1.00946 \\
+log-loss closing & 0.99048 & 1.00315 & 0.99966 & 1.00143 & 0.99794 \\
 \midrule
-\textbf{closing $-$ opening} & $-0.00045$ & $-0.00067$ & $-0.00202$ & $-0.00422$ &
-$\mathbf{-0.01180}$ \\
-$p$ & 0.048 & 0.048 & $<0.001$ & $<0.001$ & $<0.001$ \\
+\textbf{closing $-$ opening} & $-0.00027$ & $-0.00051$ & $-0.00144$ & $-0.00408$ &
+$\mathbf{-0.01152}$ \\
+$p$ & 0.266 & 0.144 & 0.008 & $<0.001$ & $<0.001$ \\
 \bottomrule
 \end{tabular}
 \caption{Closing advantage by quintile of line movement, 10,649--10,650 matches per quintile:
 Q1 holds the matches whose prices moved least and Q5 those whose prices moved most.
 \emph{Mean movement} is the mean total variation distance between the opening and the closing
-probabilities in the quintile. The two log-loss rows are the raw log-loss of OGD fitted on the
+probabilities in the quintile. The two log-loss rows are the raw log-loss of Hedge fitted on the
 opening-only and on the closing-only panel, over the matches of the quintile;
 \emph{closing $-$ opening} is their difference (negative means the closing panel is better)
 and $p$ the moving block bootstrap $p$-value of that paired difference.}
@@ -2093,30 +2129,30 @@ and $p$ the moving block bootstrap $p$-value of that paired difference.}
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth]{information_arrival.png}
-\caption{Left, the stratification by line movement; right, by anomaly of Shin's $z$. Horizontal axis the quintile, Q1 quietest and Q5 noisiest; vertical axis the log-loss of OGD, lower better. The three curves are the mixture fitted on the opening-only panel (grey), on the full panel (black) and on the closing-only panel (orange). The vertical gap between the grey and orange curves is the closing advantage, and in the left panel it is that gap which widens from left to right.}
+\caption{Left, the stratification by line movement; right, by anomaly of Shin's $z$. Horizontal axis the quintile, Q1 quietest and Q5 noisiest; vertical axis the log-loss of Hedge, lower better. The three curves are the mixture fitted on the opening-only panel (grey), on the full panel (black) and on the closing-only panel (orange). The vertical gap between the grey and orange curves is the closing advantage, and in the left panel it is that gap which widens from left to right.}
 \label{fig:arrival}
 \end{figure}
 
-\paragraph{The prediction is confirmed, with a 26-fold gradient.} The closing advantage runs from
-$-0.00045$ in the quiet fifth of the matches to $-0.01180$ in the noisy one. In Q1 it is
-\textbf{only just significant} ($p=0.048$) and 26 times smaller: in the fifth of matches where the
-line barely moved, the closing advantage is barely measurable. The ``superiority of closing prices'' is
+\paragraph{The prediction is confirmed, with a 42-fold gradient.} The closing advantage runs from
+$-0.00027$ in the quiet fifth of the matches to $-0.01152$ in the noisy one. In Q1 it is
+\textbf{not significant} ($p=0.266$), nor in Q2 ($p=0.144$), and it is 42 times smaller: in the
+two fifths of matches where the line moved least, the closing advantage is not measurable. The ``superiority of closing prices'' is
 therefore not a general property of final prices but a phenomenon of the top quintile.
 
 \paragraph{A necessary caveat.} Movement is measured from the \emph{same} closing prices that the
 closing panel uses, so the near-null result in Q1 is partly mechanical: if the two prices nearly
 coincide, the two mixtures cannot differ much. The non-trivial part is the \emph{direction} at
 the other extreme. A large movement could perfectly well go the wrong way; that the later price
-is systematically the better one by $0.0118$ is exactly the market-efficiency claim, localised
+is systematically the better one by $0.0115$ is exactly the market-efficiency claim, localised
 where it actually operates. A useful control: the \emph{difficulty} of the matches is not
-monotone across the quintiles (the full panel's log-loss runs $0.99076$, $1.00317$, $0.99974$,
-$1.00200$, $0.99864$), whereas the advantage is, so the gradient is not an artefact of the form
+monotone across the quintiles (the full panel's log-loss runs $0.99033$, $1.00301$, $0.99956$,
+$1.00136$, $0.99813$), whereas the advantage is, so the gradient is not an artefact of the form
 ``harder matches, larger differences''.
 
 \paragraph{Shin's $z$ is a much weaker indicator.} Stratifying instead by the anomaly of $z$
 (the quantity that \S\ref{sec:microstructure-theory} identifies with the estimated proportion
-of informed traders) the gradient is only $-0.00283$ to $-0.00417$, that is a factor of $1.5$
-against $26$, with all quintiles significant. So $z$ does detect something, but the actual
+of informed traders) the gradient is only $-0.00233$ to $-0.00457$, that is a factor of $2.0$
+against $42$, with all quintiles significant. So $z$ does detect something, but the actual
 price movement is an incomparably cleaner indicator that information has arrived, reasonably
 so, since $z$ is estimated from a single moment of the market whereas movement observes the
 difference of two.
@@ -2135,14 +2171,14 @@ intersection of all of them with PSC, following the principle of \S\ref{sec:comm
 \textbf{Configuration} & \textbf{full} & \textbf{train} & \textbf{25\% tail} \\
 \midrule
 PSC alone                            & 0.99685 & 0.99746 & 0.99502 \\
-closing-only $+$ Shin                & 0.99691 & 0.99753 & 0.99506 \\
-closing-only, proportional           & 0.99693 & 0.99756 & 0.99505 \\
-closing-only $+$ Shin, no single-season & 0.99692 & 0.99754 & 0.99507 \\
-full panel, proportional             & 0.99727 & 0.99801 & 0.99508 \\
-full panel, Shin                     & 0.99732 & 0.99804 & 0.99515 \\
+closing-only $+$ Shin                & 0.99685 & 0.99750 & 0.99492 \\
+closing-only, proportional           & 0.99686 & 0.99750 & 0.99491 \\
+closing-only $+$ Shin, no single-season & 0.99687 & 0.99750 & 0.99497 \\
+full panel, proportional             & 0.99690 & 0.99755 & 0.99495 \\
+full panel, Shin                     & 0.99692 & 0.99756 & 0.99499 \\
 \bottomrule
 \end{tabular}
-\caption{Calibrated log-loss of OGD by configuration, the same 71,818 matches throughout; lower
+\caption{Calibrated log-loss of Hedge by configuration, the same 71,818 matches throughout; lower
 is better. \textbf{full} is over all of them, \textbf{train} over their chronological 75\%
 prefix and \textbf{25\% tail} over the remaining matches, which no selection has looked at.
 \emph{PSC alone} is the benchmark bookmaker itself, calibrated the same way;
@@ -2155,29 +2191,33 @@ active in only one season.}
 \begin{figure}[htbp]
   \centering
   \includegraphics[width=0.92\linewidth]{best_configuration.png}
-  \caption{The configurations on the held-out tail, with PSC as the reference line. Horizontal axis the calibrated log-loss on the held-out 25\%, lower better; one dot per configuration. The dashed vertical line is PSC scored on the same rounds, so a dot to its left beats Pinnacle and a dot to its right does not. All of them, PSC included, lie within $0.00013$ of one another.}
+  \caption{The configurations on the held-out tail, with PSC as the reference line. Horizontal axis the calibrated log-loss on the held-out 25\%, lower better; one dot per configuration. The dashed vertical line is PSC scored on the same rounds, so a dot to its left beats Pinnacle and a dot to its right does not. All of them, PSC included, lie within $0.00011$ of one another.}
   \label{fig:bestconfig}
 \end{figure}
 
 \begin{itemize}
-  \item \textbf{The panel does all the work.} Closing-only $+$ Shin beats the full panel by
-        $-0.00036$ ($p<0.001$), and closing-only with proportional normalisation by $-0.00034$
-        ($p<0.001$).
-  \item \textbf{Shin on its own offers nothing measurable} over the full panel ($+0.00004$,
-        $p=0.115$), consistent with Shin and temperature scaling correcting the same
-        favourite-longshot bias, so that the second absorbs the first.
-  \item \textbf{Against PSC}: the full panel significantly loses ($+0.00043$, $p<0.001$), while
-        closing-only $+$ Shin \emph{ties} ($+0.00007$, $p=0.259$) and closing-only with
-        proportional normalisation likewise ($+0.00008$, $p=0.154$). Before calibration
-        closing-only $+$ Shin is in fact narrowly ahead of PSC ($-0.00013$, $p=0.049$), but
-        calibration helps PSC more and the edge does not survive it.
+  \item \textbf{For Hedge the configuration makes no measurable difference.} After calibration
+        none of the five differs significantly from the full panel with proportional
+        normalisation ($|\text{diff}|\leq0.00005$, $p\geq0.49$). Hedge already ignores the opening
+        prices (\S\ref{sec:res-panels}), so removing them buys nothing.
+  \item \textbf{Shin on its own} improves the full panel before calibration ($-0.00023$,
+        $p<0.001$) and nothing after it ($+0.00002$, $p=0.653$), consistent with Shin and
+        temperature scaling correcting the same favourite-longshot bias, so that the second
+        absorbs the first.
+  \item \textbf{Against PSC}: every configuration \emph{ties} after calibration, from the full panel
+        ($+0.00005$, $p=0.425$) to closing-only $+$ Shin ($+0.00000$, $p=0.950$). Before
+        calibration closing-only $+$ Shin is significantly \emph{ahead} of PSC ($-0.00021$,
+        $p<0.001$), and so is the same without the single-season bookmakers ($-0.00019$,
+        $p=0.001$), but calibration helps PSC more and the edge does not survive it.
 \end{itemize}
 
-The 25\% tail does not produce a winner: all six rows gather within $0.00013$
-(Table~\ref{tab:configs}, Figure~\ref{fig:bestconfig}). It thus
-confirms the tie, and it would not be honest to present it as a win. Note also that in every
-closing configuration PSC is \emph{inside} the mixture: ``we reach PSC'' reads as ``the mixture
-reaches its own best member''.
+The 25\% tail does not produce a winner: all six rows gather within $0.00011$
+(Table~\ref{tab:configs}, Figure~\ref{fig:bestconfig}), with PSC the last of them. It thus
+confirms the tie, and it would not be honest to present it as a win. The configuration selected on
+the prefix is closing-only $+$ Shin, but with Hedge it is indistinguishable from the plain full
+panel, which already ties with PSC (\S\ref{sec:res-ranking}). Note also that in every
+configuration PSC is \emph{inside} the mixture: ``we reach PSC'' reads as ``the mixture reaches
+its own best member''.
 
 \subsection{Without Pinnacle}
 \label{sec:res-nopinnacle}
@@ -2190,19 +2230,19 @@ anyway. Removing both of its columns and refitting from scratch on three panels 
 \small
 \begin{tabular}{@{}llrll@{}}
 \toprule
-\textbf{Panel} & \textbf{OGD rank} & \textbf{log-loss} & \textbf{First} & \textbf{Paired} \\
+\textbf{Panel} & \textbf{Hedge rank} & \textbf{log-loss} & \textbf{Second} & \textbf{Paired} \\
 \midrule
-full (24)         & \#3 of 11 & 0.99933 & FTRL 0.99924   & 6 wins, 1 tie \\
-closing-only (12) & \#1 of 9  & 0.99917 & OGD (itself)   & 3 wins, 2 ties \\
-opening-only (12) & \#5 of 9  & 1.00001 & VC\_BV 0.99989 & 3 wins, \textbf{1 loss}, 1 tie \\
+full (24)         & \#1 of 11 & 0.99924 & FTRL 0.99924   & 6 wins, 1 tie \\
+closing-only (12) & \#1 of 9  & 0.99914 & OGD 0.99917    & 3 wins, 2 ties \\
+opening-only (12) & \#1 of 9  & 0.99986 & VC\_BV 0.99989 & 4 wins, 1 tie \\
 \bottomrule
 \end{tabular}
 \caption{Each panel is refitted from scratch without the two Pinnacle columns (the number of
 experts left is in parentheses), and every series is scored on the matches common to all of
-them. \textbf{OGD rank} is OGD's position among the series compared: the four methods and the
-bookmakers of the panel that clear its coverage threshold, seven on the full panel and five on
-each of the other two. \textbf{log-loss} is OGD's calibrated log-loss, \textbf{First} the series
-ranked first, with its log-loss, and \textbf{Paired} summarises OGD's paired tests against the
+them. \textbf{Hedge rank} is Hedge's position among the series compared: the four methods and
+the bookmakers of the panel that clear its coverage threshold, seven on the full panel and five on
+each of the other two. \textbf{log-loss} is Hedge's calibrated log-loss, \textbf{Second} the series
+ranked second, with its log-loss, and \textbf{Paired} summarises Hedge's paired tests against the
 bookmakers.}
 \label{tab:nopinnacle}
 \end{table}
@@ -2216,27 +2256,23 @@ bookmakers.}
 
 On the \textbf{full} panel the result holds (Figure~\ref{fig:nopinn}). The comparison is scored on
 the 31,814 matches that all eleven series quoted, since the two closing bookmakers only start
-around 2019/20. The three learning algorithms sit above every bookmaker. OGD significantly beats
-the five opening prices, with margins from $-0.00347$ (VC\_BV) to $-0.00408$ (BW) and
-$p<0.001$ throughout, beats the closing BWC as well ($-0.00035$, $p=0.037$), and ties with the
-closing B365C ($+0.00010$, $p=0.598$). The plain average, by contrast, falls below both closing
+around 2019/20. The three learning algorithms sit above every bookmaker, with Hedge first. Hedge
+significantly beats the five opening prices, with margins from $-0.00376$ (VC\_BV) to $-0.00437$
+(BW) and $p<0.001$ throughout, beats the closing BWC as well ($-0.00064$, $p=0.001$), and ties
+with the closing B365C ($-0.00019$, $p=0.308$). The plain average, by contrast, falls below both closing
 prices: without Pinnacle, what keeps the mixture level with the best closing bookmaker is the
 learned weighting, not the averaging.
 
-On the two \textbf{homogeneous} panels the result changes. On closing, OGD beats three (WHC
-$-0.00088$, IWC $-0.00078$, BWC $-0.00050$) and ties with B365C ($p=0.482$) and VC\_BVC
-($p=0.304$); it does rank first, but with the plain average second at a distance of $0.00002$,
-i.e.\ practically indistinguishable. On opening it again beats three, ties with B365 ($p=0.201$),
-but \textbf{significantly loses to VC\_BV} ($+0.00030$, $p=0.005$): the only case in the whole
-thesis where a \emph{bookmaker} other than Pinnacle significantly beats us, and there the plain
-average moves ahead of OGD. The statement is deliberately restricted to bookmakers: in the
-deployment test (\S\ref{sec:res-deploy}) Betfair Exchange also significantly beats us, but that
-is not a bookmaker but an exchange.
+On the two \textbf{homogeneous} panels Hedge again ranks first and loses to no bookmaker. On
+closing it beats three (WHC $-0.00105$, IWC $-0.00095$, BWC $-0.00067$) and ties with B365C
+($p=0.104$) and VC\_BVC ($p=0.898$). On opening it beats four (IW, WH, BW and B365, $p\leq0.020$)
+and ties with VC\_BV ($p=0.092$). Its distance from the plain average, however, shrinks to
+$0.00005$ on closing and $0.00006$ on opening, and OGD on the opening panel falls behind the
+average ($1.00001$ against $0.99992$).
 
-The pattern is stable enough not to be attributed to chance, and it repeats the finding of
-\S\ref{sec:res-panels}: once Pinnacle leaves, the remaining members of the same phase resemble one
-another so closely that no quality difference is left to learn. The configuration that is
-selected is therefore the best partly \emph{because} it contains the market's best odds-setter.
+The pattern repeats the finding of \S\ref{sec:res-panels}: once Pinnacle leaves, the remaining
+members of the same phase resemble one another closely, and little quality difference is left to
+learn. Hedge still extracts it, but the margin is a fraction of what the full panel offers.
 
 \section{Robustness over time}
 
@@ -2256,13 +2292,13 @@ becomes correspondingly more demanding (Table~\ref{tab:recent}).
 \textbf{\#} & \textbf{Series} & \textbf{phase} & \textbf{log-loss} \\
 \midrule
 1 & PSC & closing & 0.99439 \\
-2 & \textbf{OGD} & --- & \textbf{0.99496} \\
-3 & VC\_BVC & closing & 0.99498 \\
-4 & BWC & closing & 0.99502 \\
-5 & WHC & closing & 0.99502 \\
-6 & B365C & closing & 0.99543 \\
-7 & Uniform & --- & 0.99592 \\
-8 & Hedge & --- & 0.99601 \\
+2 & \textbf{Hedge} & --- & \textbf{0.99491} \\
+3 & OGD & --- & 0.99496 \\
+4 & VC\_BVC & closing & 0.99498 \\
+5 & BWC & closing & 0.99502 \\
+6 & WHC & closing & 0.99502 \\
+7 & B365C & closing & 0.99543 \\
+8 & Uniform & --- & 0.99592 \\
 9 & FTRL & --- & 0.99604 \\
 10--14 & WH, PS, VC\_BV, BW, B365 & opening & 0.99771 and below \\
 \bottomrule
@@ -2280,12 +2316,14 @@ for a bookmaker and --- for the methods; the last row collects the five opening 
   \label{fig:recent}
 \end{figure}
 
-OGD sits at \#2 (Figure~\ref{fig:recent}), ahead of every closing bookmaker other than
-Pinnacle, and the gap to PSC shrinks
-to $+0.00036$ ($p=0.021$) from the decade's $+0.00043$. Two findings, however, \emph{reverse} and
-are reported explicitly: Hedge and FTRL lose to the plain average on the \emph{full} panel here,
-where over the decade they beat it ($+0.00008$ and $+0.00011$, $p=0.016$ and $p=0.003$), and tie
-with it on both restricted panels; and log-loss and Brier cease to agree on the ordering.
+Hedge sits at \#2 and OGD at \#3 (Figure~\ref{fig:recent}), tied with each other ($p=0.231$) and
+both ahead of every closing bookmaker other than Pinnacle; Hedge significantly beats B365C
+($-0.00063$, $p<0.001$). Three findings, however, \emph{reverse} and are reported explicitly. PSC
+is significantly ahead of Hedge in this window ($+0.00037$, $p=0.008$), where over the decade the
+two tie; OGD's gap shrinks to $+0.00036$ ($p=0.021$) from the decade's $+0.00043$. FTRL loses to
+the plain average on the \emph{full} panel here ($+0.00011$, $p=0.003$), where over the decade it
+beats it, while Hedge beats the average on every panel of the window except closing-only with
+Shin, where it ties. And log-loss and Brier cease to agree on the ordering.
 
 \subsection{Deployment test}
 \label{sec:res-deploy}
@@ -2301,12 +2339,12 @@ rounds of 2025--26, of which 7,861 are common. Table~\ref{tab:deploy-table} give
 \textbf{\#} & \textbf{Series} & \textbf{phase} & \textbf{log-loss} \\
 \midrule
 1 & BFEC (Betfair Exchange) & closing & 1.00108 \\
-2 & \textbf{OGD closing-only, online} & --- & \textbf{1.00186} \\
-3 & OGD full panel, online & --- & 1.00198 \\
-4 & BWC & closing & 1.00216 \\
-5 & OGD closing-only, frozen & --- & 1.00220 \\
+2 & \textbf{Hedge closing-only, online} & --- & \textbf{1.00178} \\
+3 & Hedge full panel, online & --- & 1.00194 \\
+4 & Hedge closing-only, frozen & --- & 1.00197 \\
+5 & BWC & closing & 1.00217 \\
 6 & B365C & closing & 1.00231 \\
-7 & OGD full panel, frozen & --- & 1.00251 \\
+7 & Hedge full panel, frozen & --- & 1.00249 \\
 8--10 & B365, BFE, BW & opening & 1.00427 -- 1.00479 \\
 \bottomrule
 \end{tabular}
@@ -2326,21 +2364,22 @@ its weights are locked at the cut; the last row collects the three opening price
 
 \begin{itemize}
   \item \textbf{Every opening price is significantly beaten}, in every variant: $-0.0018$ to
-        $-0.0029$, all $p\leq0.011$.
+        $-0.0030$, all $p\leq0.006$.
   \item \textbf{The closing prices of the bookmakers are not beaten, and they do not beat us.}
-        Against B365C and BWC every variant ties ($p$ from $0.263$ to $0.892$).
-  \item \textbf{Betfair Exchange significantly beats every variant}: $+0.00078$ ($p=0.026$) and
-        $+0.00112$ ($p=0.003$) for the closing-only panel online and frozen, $+0.00089$
-        ($p=0.013$) and $+0.00143$ ($p=0.002$) for the full panel.
-  \item The online variant consistently beats the frozen one ($1.00186$ against $1.00220$), so
-        the precise statement is not ``trained up to 2024'' but ``runs continuously''.
+        Against B365C and BWC every variant ties ($p$ from $0.211$ to $0.730$).
+  \item \textbf{Betfair Exchange significantly beats every variant}: $+0.00070$ ($p=0.019$) and
+        $+0.00089$ ($p=0.009$) for the closing-only panel online and frozen, $+0.00086$
+        ($p=0.010$) and $+0.00141$ ($p=0.002$) for the full panel.
+  \item The online variant consistently beats the frozen one ($1.00178$ against $1.00197$ on the
+        closing-only panel, $1.00194$ against $1.00249$ on the full one), so the precise statement
+        is not ``trained up to 2024'' but ``runs continuously''.
 \end{itemize}
 
 \paragraph{Pinnacle in this window.} Its coverage drops to 59\% after 2025 and it stops quoting on
 14/01/2026, so it does not pass the threshold, and forcing it into the common table would cut
 the common matches by more than half (from 7,861 to 3,828). It is therefore compared one to
-one, over its own rounds: we significantly beat PS ($-0.0022$ to $-0.0023$, $p$ from $0.005$ to
-$0.019$, over 6,857 matches), and we tie with PSC ($p$ from $0.405$ to $0.834$, over 6,892
+one, over its own rounds: we significantly beat PS ($-0.0023$ to $-0.0024$, $p$ from $0.009$ to
+$0.011$, over 6,857 matches), and we tie with PSC ($p$ from $0.140$ to $0.199$, over 6,892
 matches).
 
 The best forecaster in this window is not a bookmaker but \textbf{Betfair
@@ -2388,23 +2427,20 @@ of the dataset's series, \textbf{PSC} Pinnacle's closing price, and \textbf{Best
 the best of the remaining closing prices, with its log-loss. The step multipliers selected on
 each dataset's 75\% prefix are, for B, B$'$ and C respectively, $\times 100$, $\times 100$,
 $\times 30$ for Hedge, $\times 30$, $\times 3$, $\times 100$ for OGD and $\times 1000$,
-$\times 100$, $\times 30$ for FTRL, against $\times 0.25$, $\times 100$ and $\times 0.05$ on the
+$\times 100$, $\times 30$ for FTRL, against $\times 250$, $\times 100$ and $\times 0.05$ on the
 full panel (Table~\ref{tab:steps}). Table~\ref{app:common} gives every series.}
 \label{tab:common}
 \end{table}
 
-\paragraph{Without partial coverage the step changes completely.} Hedge and FTRL, which on the
-full panel select a step four and twenty times smaller than the textbook one
-(\S\ref{sec:res-steps}), here select steps between 30 and 1000 times larger than it. When every
-expert is always present and one is clearly the best, the optimal behaviour is to move the
-weight onto it quickly. When experts come and go, as on the full panel, the same behaviour is
-punished and a longer memory pays. The optimal step is therefore a property of the panel's
-structure, not of the algorithm.
+\paragraph{Without partial coverage FTRL's step changes direction.} FTRL, which on the full
+panel selects a step twenty times smaller than the textbook one (\S\ref{sec:res-steps}), here
+selects one between 30 and 1000 times larger. Hedge selects a large step in both settings. The
+optimal step is therefore a property of the panel's structure, and not only of the algorithm.
 
 \paragraph{With Pinnacle, the algorithms reach it (dataset B).} All three algorithms tie with
 PSC: FTRL by $+0.00002$ ($p=0.691$), OGD by $+0.00017$ ($p=0.134$) and Hedge by $+0.00023$
-($p=0.099$). OGD significantly beats the second best closing price (VC\_BVC, $-0.00039$,
-$p=0.003$), and all three significantly beat the plain average. On the full panel over the
+($p=0.099$). Hedge significantly beats the second best closing price (VC\_BVC, $-0.00033$,
+$p<0.001$), and all three significantly beat the plain average. On the full panel over the
 decade PSC stays significantly ahead (\S\ref{sec:res-ranking}); on the common matches of
 2019--2024 the gap disappears, as it narrows in the recent window (\S\ref{sec:res-recent}).
 
@@ -2417,24 +2453,25 @@ mixture level with the closing prices is the learning and not the averaging.
 
 \paragraph{Pinnacle and Betfair Exchange cannot be told apart (dataset C).} When both quote, PSC
 has the lower log-loss ($0.99775$ against $0.99820$ for BFEC), but the difference is not
-significant ($p=0.122$), and the algorithms tie with both. The advantage of Betfair Exchange in
+significant ($p=0.122$), and the algorithms tie with both (Hedge against PSC $p=0.057$, against
+BFEC $p=0.617$). The advantage of Betfair Exchange in
 the deployment test (\S\ref{sec:res-deploy}) therefore does not show that it forecasts better
 than Pinnacle: it coincides with the period in which Pinnacle stopped quoting.
 
 \paragraph{Value betting.} Repeating the simulation of \S\ref{sec:res-value} on dataset B, with the
-same quarter Kelly against the real odds and a mixture of the target's phase without the target,
-gives significant profits against four closing prices (WHC $32.9\times$, IWC $3.66\times$, BWC
-$2.38\times$, VC\_BVC $2.01\times$) and no significant loss. Without Pinnacle in the mixture
-(dataset B$'$) two remain, WHC ($23.3\times$, $p<0.001$) and IWC ($4.30\times$, $p=0.009$): the
-profits against BWC and VC\_BVC came from Pinnacle being inside the mixture. The profit against
+same quarter Kelly against the real odds and a Hedge mixture of the target's phase without the
+target, gives significant profits against three closing prices (WHC $22.4\times$, IWC
+$5.84\times$, BWC $2.12\times$) and no significant loss. Without Pinnacle in the mixture (dataset
+B$'$) two remain, WHC ($18.4\times$, $p=0.001$) and IWC ($4.48\times$, $p=0.009$): the profit
+against BWC came from Pinnacle being inside the mixture. The profit against
 WHC is the only one that survives every version of the analysis. Table~\ref{app:common-vb}
 gives every target.
 
 \paragraph{Caveats.} The datasets cover a shorter period than the decade, five seasons for B and
 B$'$ and a single one for C, and they keep only the matches that every chosen series quoted; the
 series themselves were chosen by their coverage over the whole period. Twelve targets were
-tested in the value betting, so the marginal profits ($p$ between $0.011$ and $0.033$) should be
-read with care.
+tested in the value betting, so the marginal profit against BWC ($p=0.047$) should be read with
+care.
 
 \section{Value betting and the learned stake size}
 \label{sec:res-value}
@@ -2451,13 +2488,13 @@ of the \emph{bets}, jointly for all targets, and the remaining tail stays outsid
 Neither of the two preceding stages is re-tuned here.
 
 The selection gives $\lambda_0 = 0.5$ and $\lambda_{\max} = 1$ for Online Newton Step and
-$\lambda_0 = 0.25$, $\lambda_{\max} = 1$ for OGD. On the tail of the bets both are slightly
-negative, $-0.000030$ and $-0.000034$ in log growth rate per bet: 19,490 of the 45,801 closing
-bets are placed against PSC, the opponent no staking rule makes profitable (Table~\ref{tab:vb-sig}),
-so the pooled tail says little about the targets where an edge exists. One point is worth noting that contradicts every other tuning in
-the thesis: \textbf{Online Newton Step selects a rate multiplier equal to $1$}, that is the
-constant the theory supplies needs no correction at all, whereas OGD needs $\times 10$ and in one
-setting the grid runs off the edge without stabilising. Where the structure of the loss is
+$\lambda_0 = 1$, $\lambda_{\max} = 1$ for OGD. On the tail of the bets Online Newton Step is
+positive, $+0.000081$ in log growth rate per bet, and OGD negative, $-0.000091$; 21,585 of the
+49,725 closing bets are placed against PSC, the opponent no staking rule makes profitable
+(Table~\ref{tab:vb-sig}), so the pooled tail says little about the targets where an edge exists.
+One point is worth noting: \textbf{Online Newton Step selects a rate multiplier equal to $1$},
+that is the constant the theory supplies needs no correction at all, whereas OGD needs
+$\times 333$, found only after the grid was extended twice. Where the structure of the loss is
 exploited correctly, the a-priori bound turns out to be correctly calibrated as well.
 Table~\ref{tab:oco-kelly} gives the closing targets and Figure~\ref{fig:ocokelly} the
 bankroll paths behind them.
@@ -2470,11 +2507,11 @@ bankroll paths behind them.
 \textbf{Against} & \textbf{Bets} & \textbf{Kelly $\tfrac14$} & \textbf{OCO $\lambda$} &
 \textbf{Full Kelly} & \textbf{mean $\lambda$} \\
 \midrule
-WHC     &  7,249 & $84.2\times$  & $\mathbf{6{,}492\times}$ & $29{,}332\times$ & 0.79 \\
-BWC     &  6,886 & $2.54\times$  & $\mathbf{4.25\times}$    & $6.81\times$     & 0.62 \\
-VC\_BVC &  4,547 & $1.33\times$  & $1.14\times$             & $0.98\times$     & 0.57 \\
-B365C   &  7,629 & $0.87\times$  & $0.54\times$             & $0.13\times$     & 0.38 \\
-PSC     & 19,490 & $0.55\times$  & $0.25\times$             & $0.0039\times$   & 0.37 \\
+WHC     &  7,406 & $52.7\times$  & $\mathbf{1{,}351\times}$ & $4{,}710\times$  & 0.73 \\
+BWC     &  7,585 & $2.04\times$  & $\mathbf{2.35\times}$    & $2.30\times$     & 0.47 \\
+VC\_BVC &  5,187 & $1.59\times$  & $\mathbf{1.72\times}$    & $1.75\times$     & 0.48 \\
+B365C   &  7,962 & $1.15\times$  & $0.77\times$             & $0.34\times$     & 0.42 \\
+PSC     & 21,585 & $0.51\times$  & $0.22\times$             & $0.00066\times$  & 0.30 \\
 \bottomrule
 \end{tabular}
 \caption{Final bankroll starting from $1$ against each closing target, calibrated
@@ -2502,30 +2539,31 @@ size. The last column is the mean multiplier learned by Online Newton Step.}
 
 \paragraph{The result has two parts that do not say the same thing.} On the closing targets, in
 the per-bet paired test the learned multiplier \textbf{ties} with the fixed $\tfrac14$: over
-twenty cells (two normalisations $\times$ two stages $\times$ five targets) there are 18 ties, one
-win and one loss. In final bankroll it is ahead on two of the five targets, and on WHC by seventy-seven
-times. The two reconcile numerically: the per-bet difference is $+0.00060$, minute, but it
-compounds over $7{,}249$ bets, while the uncertainty remains wide enough that the test does not
-certify it ($p=0.100$). It is the same pattern as the ``sharp'' anchor-bookmaker result:
+twenty cells (two normalisations $\times$ two stages $\times$ five targets) there are 18 ties and
+two losses, both against PSC after calibration, and no win. In final bankroll it is ahead on three
+of the five targets, and on WHC by a factor of twenty-six. The two reconcile numerically: the
+per-bet difference on WHC is $+0.00044$, minute, but it compounds over $7{,}406$ bets, while the
+uncertainty remains wide enough that the test does not certify it ($p=0.156$). It is the same pattern as the ``sharp'' anchor-bookmaker result:
 systematic superiority in the point estimate, without statistical certification.
 
 \paragraph{What the multiplier learns.} Against the closing targets it sits almost everywhere
-above $\tfrac14$, and its value tracks how profitable the target is: $0.37$ against the
-loss-making PSC, $0.79$ against the profitable WHC. It therefore raises the risk where there is an edge and pulls it back where there
+above $\tfrac14$, and its value tracks how profitable the target is: $0.30$ against the
+loss-making PSC, $0.73$ against the profitable WHC. It therefore raises the risk where there is an edge and pulls it back where there
 is none, behaviour no constant can express, and which emerges without its being given any
 information about who the opponent is.
 
 \paragraph{The formulation was the problem, not the idea.} The same question had been posed
 earlier with the learner learning the \emph{fraction} of capital directly. That version lost
-systematically: 9 losses out of 20 cells, no wins. The cause is exactly the one
+systematically: 14 losses out of 20 cells, no wins. The cause is exactly the one
 \S\ref{sec:oco-kelly-theory} predicts; the comparator ``best constant stake'' does not contain
 the closed form, and the learner throws away the $\hat{p}_t$ that the two preceding stages have
 just produced. Changing only what is learned, with the same data and the same test, the result
 goes from systematic loss to a tie with a point-estimate advantage.
 
-\paragraph{A side finding: $\tfrac14$ is excessively conservative.} \emph{Full} Kelly ties in 16 of
-the 20 cells, wins in 2 and loses in only 2. Its risk is concentrated almost entirely on PSC,
-where it wipes out the bankroll ($0.0039$). On the profitable targets, that is, the fixed
+\paragraph{A side finding: $\tfrac14$ is excessively conservative.} \emph{Full} Kelly ties in 17 of
+the 20 cells and loses in 3, with no win. Its risk is concentrated almost entirely on PSC, where it
+wipes out the bankroll ($0.00066$), while against WHC it reaches $4{,}710\times$ against the
+quarter's $52.7\times$. On the profitable targets, that is, the fixed
 $\tfrac14$ leaves a substantial part of the growth unused. The learned multiplier is the middle
 road: it keeps most of the upside and avoids the catastrophe.
 
@@ -2542,19 +2580,19 @@ with one another.
 \toprule
 \textbf{Against} & \textbf{Phase} & \textbf{Bets} & \textbf{Bankroll} & \textbf{$p$} & \\
 \midrule
-WHC     & closing & 6,569  & $39.44\times$ & $0.001$  & profit \\
-IW      & opening & 7,439  & $7.88\times$  & $0.008$  & profit \\
+WHC     & closing & 6,456  & $85.59\times$ & $<0.001$ & profit \\
+IW      & opening & 7,496  & $23.88\times$ & $<0.001$ & profit \\
 \midrule
-BWC     & closing & 6,574  & $1.60\times$  & $0.347$ & --- \\
-WH      & opening & 5,906  & $1.40\times$  & $0.514$ & --- \\
-BW      & opening & 7,751  & $1.26\times$  & $0.586$ & --- \\
-VC\_BVC & closing & 4,620  & $0.70\times$  & $0.333$ & --- \\
-VC\_BV  & opening & 8,067  & $0.62\times$  & $0.295$ & --- \\
-B365C   & closing & 7,948  & $0.51\times$  & $0.217$ & --- \\
-B365    & opening & 10,754 & $0.47\times$  & $0.128$ & --- \\
+BWC     & closing & 5,447  & $2.68\times$  & $0.065$ & --- \\
+BW      & opening & 9,114  & $2.01\times$  & $0.161$ & --- \\
+VC\_BVC & closing & 4,084  & $1.92\times$  & $0.142$ & --- \\
+WH      & opening & 7,628  & $1.60\times$  & $0.448$ & --- \\
+B365C   & closing & 5,812  & $1.53\times$  & $0.311$ & --- \\
+B365    & opening & 13,179 & $0.83\times$  & $0.693$ & --- \\
+VC\_BV  & opening & 7,581  & $0.73\times$  & $0.440$ & --- \\
 \midrule
-PS      & opening & 26,623 & $0.25\times$  & $0.050$ & loss \\
-PSC     & closing & 39,993 & $0.0002\times$ & $<0.001$ & loss \\
+PS      & opening & 26,181 & $0.21\times$  & $0.040$ & loss \\
+PSC     & closing & 37,782 & $0.0008\times$ & $0.001$ & loss \\
 \bottomrule
 \end{tabular}
 \caption{Value betting with the fixed $\tfrac14$ of the Kelly fraction against eleven targets.
@@ -2568,10 +2606,12 @@ magnitude.}
 
 Over eleven bookmakers there are \emph{two} significant profits (both against ``soft'',
 recreational-facing houses) and two significant losses, both against Pinnacle: clearly against
-PSC, the best forecaster in the panel, and only just against PS ($p=0.050$). Pinnacle is exactly
-the opponent an inferior model ought to lose to. The test
-thus works in both directions. Phase matching is essential: with the full panel instead of the
-closing-only one, the result gets worse on \emph{every} closing target.
+PSC, the best forecaster in the panel, and only just against PS ($p=0.040$). Pinnacle is exactly
+the opponent an inferior model ought to lose to. The test thus works in both directions. With
+Hedge the panel matters less than it did with OGD: against the closing targets the full panel
+minus the target does better than the closing-only one on four of the five (WHC $85.6\times$
+against $52.7\times$) and worse only on PSC, consistent with Hedge ignoring the opening prices
+(\S\ref{sec:res-panels}).
 
 \paragraph{The extension to opening targets.} The learned multiplier is applied to all six opening
 targets as well, with the corresponding opening-only panel. The causality requirement is stricter
@@ -2590,12 +2630,12 @@ bets it is supposed to be independent of.
 \textbf{Against} & \textbf{Bets} & \textbf{Kelly $\tfrac14$} & \textbf{OCO $\lambda$} &
 \textbf{Full Kelly} & \textbf{mean $\lambda$} \\
 \midrule
-IW      &  7,439 & $7.88\times$  & $\mathbf{56.7\times}$ & $109.0\times$  & 0.75 \\
-WH      &  5,906 & $1.40\times$  & $1.26\times$          & $0.85\times$   & 0.24 \\
-BW      &  7,751 & $1.26\times$  & $1.23\times$          & $0.90\times$   & 0.22 \\
-VC\_BV  &  8,067 & $0.62\times$  & $0.69\times$          & $0.04\times$   & 0.13 \\
-B365    & 10,754 & $0.47\times$  & $0.66\times$          & $0.013\times$  & 0.13 \\
-PS      & 26,623 & $0.25\times$  & $\mathbf{0.68\times}$ & $0.0002\times$ & 0.05 \\
+IW      &  7,496 & $23.9\times$  & $\mathbf{28{,}051\times}$ & $12{,}546\times$ & 1.11 \\
+BW      &  9,114 & $2.01\times$  & $\mathbf{7.87\times}$     & $4.17\times$     & 0.71 \\
+WH      &  7,628 & $1.60\times$  & $1.43\times$              & $0.78\times$     & 0.29 \\
+B365    & 13,179 & $0.83\times$  & $0.59\times$              & $0.070\times$    & 0.29 \\
+VC\_BV  &  7,581 & $0.73\times$  & $0.62\times$              & $0.10\times$     & 0.28 \\
+PS      & 26,181 & $0.21\times$  & $\mathbf{0.63\times}$     & $0.00006\times$  & 0.08 \\
 \bottomrule
 \end{tabular}
 \caption{Opening targets: final bankroll starting from $1$, calibrated probabilities,
@@ -2605,21 +2645,24 @@ proportional normalisation, with the columns as in Table~\ref{tab:oco-kelly}. Th
 \end{table}
 
 The finding is that the learned multiplier pays off \emph{more} on opening prices than on closing
-ones: 8 wins and 1 loss over 48 paired tests, against 3 wins and 3 losses on the closing side.
-Significant wins arise against PS ($p<0.001$), IW ($p=0.027$) and VC\_BV ($p=0.016$), while the
-single loss is minute ($-0.000026$ per bet against BW).
+ones: 11 wins and 1 loss over 48 paired tests, against no win and 3 losses over 40 on the closing
+side. The significant wins arise against IW (both variants, $p\leq0.023$) and PS (OGD,
+$p\leq0.031$), and the single loss is against VC\_BV ($-0.00012$ per bet, $p=0.016$, Online
+Newton Step with Shin).
 
 More interesting than the result is the \emph{mechanism}, which becomes visible here. The mean
 $\lambda$ ranks the targets almost perfectly by how beatable they are, without the algorithm being
 given any information about who the opponent is: against IW, the only profitable opening target,
-it raises $\lambda$ to $0.75$, that is nearly full Kelly; against PS, the hardest, it lowers it to
-$0.05$ and essentially stops betting, thereby more than doubling the surviving capital, from
-$0.25\times$ to $0.68\times$. The opening $\lambda$ values ($0.05$--$0.75$) are systematically
-lower than the closing ones ($0.17$--$0.79$): the opening market is harder and the algorithm
-discovers this by itself.
+it raises $\lambda$ to $1.11$, beyond full Kelly, which the opening bound $\lambda_{\max}=1.5$
+permits; against PS, the hardest, it lowers it to $0.08$ and essentially stops betting, thereby
+tripling the surviving capital, from $0.21\times$ to $0.63\times$. The opening $\lambda$ values
+span $0.08$--$1.11$, a wider range than the closing ones ($0.30$--$0.73$): the opening targets
+differ more, and the algorithm finds by itself both the one that is clearly beatable and the one
+that is not.
 
 The same appears from the opposite side. \emph{Full} Kelly, which tied on the closing targets
-(2 wins, 2 losses), collapses on the opening ones: \textbf{10 significant losses against 2 wins}.
+apart from three losses, does worse on the opening ones: \textbf{7 significant losses against 4
+wins}.
 The opening side genuinely does need shrinkage, and the question is not whether to impose it but
 how much, which is precisely the question a fixed coefficient of $\tfrac14$ cannot answer and a
 learned one can.
@@ -2640,7 +2683,8 @@ The question of \S\ref{sec:bandit-theory} is what remains when the algorithm see
 number per round, the loss of its own prediction. The two gradient estimators, one-point and
 two-point, are implemented, with $\xi$ and the step selected on the same chronological train
 prefix as every other hyperparameter, and with ten different random seeds, since the algorithm is
-stochastic.
+stochastic. The experiment is run on OGD, the one of the three algorithms whose update is a
+gradient step, since that step is what the bandit estimators replace.
 
 Two correctness checks come first. With full information and a linearised loss the code
 reproduces the implemented OGD \emph{exactly}, and the two-point estimator is identified with the
@@ -2760,7 +2804,7 @@ hidden Markov model; each regime steps in proportion to its responsibility. $K=1
 the plain Sleeping-Experts OGD of \S\ref{sec:sleeping} exactly.
 
 The motivation is measured and not hypothetical: \S\ref{sec:res-panels} and the information
-arrival analysis show that the closing advantage varies 26-fold depending on how much the line
+arrival analysis show that the closing advantage varies 42-fold depending on how much the line
 moved. There is therefore a genuine latent state in the data. The regime is deliberately left
 \emph{latent}, so that it can be checked afterwards whether the chain discovers it on its own.
 
@@ -2817,12 +2861,13 @@ only 2,231--3,800 matches, far too few for the online algorithm to converge on i
 specialists end up trusting largely the \emph{same} experts as the unified model, i.e.\ they do not
 discover anything local.
 
-\paragraph{Fixed-Share does not help.} Every $\alpha > 0$ worsens the log-loss (Table~\ref{app:fs}: $0.99839$ at
-$\alpha=0$ against $0.99884$ and above); the $\alpha=0$ case reproduces plain Hedge exactly, which
+\paragraph{Fixed-Share does not help.} Every $\alpha > 0$ worsens the log-loss (Table~\ref{app:fs}: $0.99690$ at
+$\alpha=0$ against $0.99871$ and above); the $\alpha=0$ case reproduces plain Hedge exactly, which
 is what makes this a statement about Fixed-Share and not about the particular implementation of
-it. Sweeping $\alpha$ \emph{jointly} with the step shows why:
-$\alpha$ only ever helped when the step was too large. Both control the same quantity (how fast
-the algorithm forgets), and the step is the more efficient of the two instruments.
+it. Sweeping $\alpha$ \emph{jointly} with the step, over six steps from $\times 10$ to
+$\times 30000$, selects $\alpha=0$ at every one of them: the leak helps at no step. Both control
+the same quantity (how fast the algorithm forgets), and the step is the more efficient of the two
+instruments.
 
 \paragraph{A per-expert step clock significantly worsens things.} Replacing the global $t$ with
 the number of rounds in which each expert was awake (which is literally the quantity the
@@ -2850,16 +2895,17 @@ redundant.
 \S\ref{sec:mcmc-theory} is theoretically more attractive, since the shrinkage emerges from the
 uncertainty instead of being imposed. Paired with the fixed $\tfrac14$ over the same bets, for
 four targets and two stake levels, it gives \textbf{6 ties and 2 significant losses} (PSC at both
-levels, $p<0.001$ and $p=0.007$), with \emph{no} significant win. The selected concentration
-parameter $\kappa$ is moreover unstable across targets with no evident pattern, an indication that
-the selection is fitting noise. The most likely explanation is that the Dirichlet model does not
+levels, $p=0.003$ and $p=0.037$), with \emph{no} significant win. The selected concentration
+parameter is moreover $\kappa=200$, the top of the grid, for every target. As $\kappa$ grows the
+posterior concentrates and the method returns to the plug-in closed form, so a selection pressing
+against that edge says that the data want none of the shrinkage the posterior produces. The most likely explanation is that the Dirichlet model does not
 correctly describe the mechanism generating bookmakers' disagreements: their disagreements are not
 independent noise around a common truth but systematic pricing differences, so the posterior is
 the wrong distribution and the shrinkage it produces does not correspond to the real uncertainty.
 
 \paragraph{Draws are practically unpredictable as a primary prediction.} Although they constitute
-$\sim$26\% of the matches, the best algorithm selects them as the most likely outcome in $0.4\%$
-of cases (Table~\ref{app:cls} gives the performance of every series by outcome class). This is a
+$\sim$26\% of the matches, the best algorithm (Hedge) selects them as the most likely outcome in
+$0.6\%$ of cases (Table~\ref{app:cls} gives the performance of every series by outcome class). This is a
 known phenomenon of football prediction, confirmed here quantitatively.
 
 \section{Discussion}
@@ -2874,16 +2920,18 @@ online mixture of published odds, with no data beyond the prices themselves, con
 significantly beats both the uniform average and the overwhelming majority of individual
 companies. That this is achieved with no statistical assumption about the distribution of the
 data, and with predictions that are by construction out of sample, is the main methodological
-gain of the online approach over a classical batch one. The limitation emerged from the
+gain of the online approach over a classical batch one. A limitation emerged from the
 experiment of \S\ref{sec:res-bandit}: with an explicit zero-step control it turns out that $42\%$
-of the margin over the uniform average is produced by the repeated projection onto the simplex,
-that is by the geometry of the reduction and not by learning. The weighting does add something
-real, but less than one would conclude by comparing it directly against the average.
+of OGD's margin over the uniform average is produced by the repeated projection onto the simplex,
+that is by the geometry of the reduction and not by learning. Hedge has no such geometry: at a
+zero step it remains exactly the uniform average, so the whole of its margin ($0.00196$) is
+learning.
 
 At the level of \textbf{comparison with the market}, the answer is more guarded. Over the full
-decade and on the full panel the sharpest bookmaker remains significantly ahead. In the
-configuration finally selected the difference ceases to be significant, and in the deployment
-test the mixture beats every opening price and ties with the bookmakers' closing prices. The real
+decade and on the full panel Hedge ties with the sharpest bookmaker, while OGD remains
+significantly behind it; in the last five seasons PSC is significantly ahead of both. In the
+deployment test the mixture beats every opening price and ties with the bookmakers' closing
+prices. The real
 limit is not a bookmaker: Betfair Exchange, which is an exchange and therefore a market price
 without an operator's margin, significantly beats us. The honest statement is that we
 \emph{reach} the leading edge of the bookmaker market, not that we exceed it, and that the market
@@ -2898,38 +2946,32 @@ multiplier multiplies the final bankroll where an edge exists and shrinks itself
 does, without ever creating an edge. The choice of opponent remains far more important than the
 choice of stake.
 
-\subsection{When learning pays off: heterogeneity as a precondition}
+\subsection{When learning pays off: heterogeneity}
 \label{sec:disc-hetero}
 
-The recurring pattern throughout the thesis is that learned weighting pays off when, and only
-when, the experts differ substantially in quality. The finding appears independently at three
-points:
+The recurring pattern throughout the thesis is that learned weighting pays off mostly when the
+experts differ substantially in quality. The finding appears independently at three points:
 
 \begin{itemize}
   \item On the full panel, which contains 13 good closing and 13 systematically worse opening
-        experts, all three algorithms significantly beat the plain average.
-  \item On the homogeneous panels the advantage disappears: on closing only, Hedge and FTRL
-        \emph{lose} to the average in 4 tests out of 4, and on opening only all three algorithms
-        tie with it.
-  \item Removing Pinnacle from the \emph{opening} panel, even OGD falls behind the average
-        ($1.00001$ against $0.99992$) and significantly loses to VC\_BV.
+        experts, all three algorithms significantly beat the plain average, Hedge by $0.0020$.
+  \item On the homogeneous panels the advantage shrinks by a factor of three to five: on closing
+        only Hedge wins by $0.0004$ and OGD by $0.0003$ while FTRL \emph{loses} to the average,
+        and on opening only Hedge wins by $0.0006$ while OGD and FTRL tie with it.
+  \item Removing Pinnacle, Hedge stays ahead of the average by only $0.00005$ on the closing
+        panel and $0.00006$ on the opening one, where OGD even falls behind it ($1.00001$ against
+        $0.99992$).
 \end{itemize}
 
-The fourth case (the closing panel without Pinnacle) does \textbf{not} support the pattern any
-more, and is reported for precisely that reason. There OGD ranks first ($0.99917$) with the
-average second ($0.99919$). The difference is $0.00002$, practically zero, so the correct
-reading is not ``weighting wins here'' but ``the two are indistinguishable'', which still
-agrees with the general conclusion, since in a homogeneous panel weighting has nothing to
-learn.
-
-The interpretation is that the gain comes primarily not from the algorithm but from the structure
-of the panel. When a real quality difference exists, the weighting finds and exploits it. When it
-does not, the adaptation buys nothing and can cost: the algorithm pays estimation noise with no
-corresponding benefit, and the average (which estimates nothing) proves at least as robust.
+The interpretation is that the size of the gain comes primarily not from the algorithm but from
+the structure of the panel. When a real quality difference exists, the weighting finds and
+exploits it. When it does not, there is much less to find; Hedge still extracts a small margin,
+while FTRL pays estimation noise with no corresponding benefit and the average (which estimates
+nothing) proves more robust.
 
 This conclusion has direct practical value for anyone who would apply the framework in another
-field. The criterion for a good set of experts is not their number, nor how much their numbers
-differ, but whether they are \emph{produced by different processes}.
+field. What decides how much a learned weighting can add is not the number of experts, nor how
+much their numbers differ, but whether they are \emph{produced by different processes}.
 
 \subsection{The character of the method}
 
@@ -2943,20 +2985,19 @@ weights at any moment are not the answer but the current state of an unresolved 
 This property was also confirmed empirically, where we did not expect it. We examined whether the
 mixture eventually ``settles'' somewhere and quietens down, given that the step decays as
 $1/\sqrt{t}$. It does not. The step does fall by a factor of 277 from the first round to the last,
-but the mean movement of the weight vector per round is $0.0353$, $0.0226$, $0.0227$, $0.0307$
+but the mean movement of OGD's weight vector per round is $0.0353$, $0.0226$, $0.0227$, $0.0307$
 over the four quarters: the last moves \emph{more} than the second and the third, at a point where
 the step is two hundred and seventy times smaller. The reason is that the movement is dominated by
 the projection onto the simplex every time the awake set changes, not by the step: the same
 phenomenon that \S\ref{sec:res-bandit} isolates quantitatively, showing that the projection on
-its own, with no learning at all, produces $42\%$ of the mixture's margin over the uniform
-average.
+its own, with no learning at all, produces $42\%$ of OGD's margin over the uniform average.
 
-Relatedly, the theoretically superior alternative (the Aggregating Algorithm, which exploits
-the exp-concavity of the log-loss and achieves regret $\leq \ln N$ with a constant $\eta=1$)
-performs in practice \emph{worse than the uniform average}. The explanation is precisely that
-its bound concerns a \emph{static} comparator, while the panel is not static: Pinnacle's
-coverage collapses towards the end of the period, and an algorithm that concentrates quickly on
-a few experts is punished exactly by an expert that disappears.
+The theoretically strongest alternative (the Aggregating Algorithm, which exploits the
+exp-concavity of the log-loss and achieves regret $\leq \ln N$ with a constant $\eta=1$) is
+borne out in practice as well: it is the constant step Hedge selects on the prefix, and it beats
+the decaying one. The first implementation seemed to refute it, performing worse than the
+uniform average; its own bound showed that the implementation was at fault
+(\S\ref{sec:res-steps}).
 
 % =====================================================================
 \chapter{Conclusions and future work}
@@ -2981,30 +3022,29 @@ The main conclusions of the present work are the following.
         published odds significantly beats the uniform average and the overwhelming majority of
         individual companies, with no assumption about the distribution of the data.
 
-  \item \textbf{The mixture reaches but does not exceed the market's leading edge.} In the
-        configuration selected, the difference from the sharpest bookmaker ceases to be
-        statistically significant. In the deployment test it significantly beats every opening
+  \item \textbf{The mixture reaches but does not exceed the market's leading edge.} Hedge ties with
+        the sharpest bookmaker over the whole decade, on the full panel and with no special
+        configuration. In the deployment test it significantly beats every opening
         price and ties with the bookmakers' closing prices. The limit is set by Betfair Exchange,
         which is not a bookmaker but an exchange, that is a market price without an operator's
         margin: that one significantly beats us. On matches that every series quoted, with no
         partial coverage, the algorithms tie with Pinnacle, and Pinnacle and Betfair Exchange
         cannot be told apart (\S\ref{sec:res-common}).
 
-  \item \textbf{A substantial part of the apparent superiority is not learning.} Under the
-        Sleeping Experts reduction the weight vector moves even with a zero step, because the
+  \item \textbf{A substantial part of OGD's apparent superiority is not learning.} Under the
+        Sleeping Experts reduction OGD's weight vector moves even with a zero step, because the
         projection is redone onto a simplex of different dimension every time the awake set
-        changes. With an explicit zero-step control, $42\%$ of the margin over the uniform average
-        is attributed to this geometry and not to the algorithm. Every future comparison against
-        the uniform average ought to carry the same control.
+        changes. With an explicit zero-step control, $42\%$ of OGD's margin over the uniform
+        average is attributed to this geometry and not to the algorithm. Hedge has no such
+        geometry, and the whole of its margin is learning. Every future comparison against the
+        uniform average ought to carry the same control.
 
-  \item \textbf{Panel heterogeneity is a precondition, not a detail.} Learned weighting pays off
-        only when the experts differ substantially; on a homogeneous set the plain average is at
-        least as robust. The finding is independently confirmed at three points, while at a fourth
-        (the closing panel without Pinnacle) the two end up indistinguishable
-        (\S\ref{sec:disc-hetero}).
+  \item \textbf{Panel heterogeneity is where learning pays.} The gain of a learned weighting is
+        three to five times larger when the experts differ substantially; on a homogeneous set it
+        shrinks, and for FTRL it turns into a loss (\S\ref{sec:disc-hetero}).
 
   \item \textbf{Worst-case theoretical steps are not optimal in practice}, and they in fact miss in
-        opposite directions per algorithm. They protect against an adversary that betting odds are
+        opposite directions per algorithm: too small for Hedge and OGD, too large for FTRL. They protect against an adversary that betting odds are
         not. The only exception is the third OCO stage, where the algorithm that exploits the
         structure of the loss accepts the theoretical constant uncorrected.
 
@@ -3017,7 +3057,7 @@ The main conclusions of the present work are the following.
         not contain the closed form and because it throws away the probability the two preceding
         stages have just produced. Learning the \emph{multiplier} on top of the closed form ties
         with the fixed coefficient on the closing targets and significantly beats it on the opening
-        ones, by 8 wins to 1 loss, learning to stake more against some opponents and less
+        ones, by 11 wins to 1 loss, learning to stake more against some opponents and less
         against others without ever being told who the opponent is. It is also the only place in the thesis where
         theory's a-priori constant came out right without correction, precisely because the
         algorithm that uses it exploits the structure of the loss.
@@ -3030,6 +3070,12 @@ The main conclusions of the present work are the following.
         caveat for a time; read off the chronological prefix, which is what the protocol specifies,
         all three are already at their optimum. Selecting on the tail is selecting on the test set,
         and here the two criteria disagree.
+
+  \item \textbf{The theory's bounds are also a check on the implementation.} The bound of the
+        Aggregating Algorithm was violated fifty-fold, and the violation revealed that the first
+        implementation of Hedge did not rescale the awake experts back to their mass. Fixed,
+        Hedge became the best of the three algorithms and the only one to tie with Pinnacle over
+        the decade.
 \end{enumerate}
 
 \section{The odds as a social relation}
@@ -3110,11 +3156,8 @@ concentrates where access is controlled, and it is withdrawn when exercised.
 \paragraph{No teleology, and the path is not a straight line.} Every regret bound in the thesis
 assumes the opposite: comparison against the best \textbf{fixed} weight vector, which is the same
 presupposition as de-vigging, a determinate property where there is a relation in motion. The
-refutation is measured. The Aggregating Algorithm, holding the strongest bound in the thesis and
-one independent of the horizon, performs worse than the uniform average, because Pinnacle's
-coverage collapses and whoever concentrates quickly is punished by an expert that disappears; the
-schedule designed for convergence loses significantly to the non-decaying one for FTRL
-($p<0.001$); and the weights move more in the final quarter than in the middle ones, at a point
+refutation is measured. The schedule designed for convergence loses significantly to the
+non-decaying one for FTRL and for Hedge (both $p<0.001$); and the weights move more in the final quarter than in the middle ones, at a point
 where the step is orders of magnitude smaller. Nor does the thesis's own knowledge advance
 linearly: nine ideas were tried and rejected, findings reverse when the window changes, and a
 caveat about the step multipliers proved unfounded as soon as the selection criterion was
@@ -3129,7 +3172,7 @@ to be measuring.
 That is what is at stake practically. A strictly positivist protocol would have delivered three 
 wrong conclusions: that the entire margin over the uniform average is a product of learning, when $42\%$ of it is not
 (\S\ref{sec:res-bandit}); that variety among the experts suffices, when on a homogeneous panel
-the learned weighting gains nothing and on the closing panel loses in 4 tests out of 4
+the gain of the learned weighting shrinks three- to five-fold and for FTRL turns into a loss
 (\S\ref{sec:disc-hetero}); and that the market's
 hierarchy is a matter of technical capability, when it is a matter of margin, of access, and of
 who is permitted to win. All three were avoided by the same move: refusing to identify what is
@@ -3188,8 +3231,8 @@ change. A two-outcome sport, where the structure of the problem simplifies, is o
 interest.
 
 \paragraph{Bayesian Model Averaging as a baseline.} A full BMA baseline would give an empirical
-point of comparison against the online algorithms, and would further illuminate the failure of the
-Aggregating Algorithm.
+point of comparison against the online algorithms, side by side with the Aggregating Algorithm,
+its online Bayesian counterpart.
 
 \appendix
 \input{appendix_tables_en}
