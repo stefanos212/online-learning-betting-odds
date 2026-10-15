@@ -21,7 +21,7 @@ Two different quantities, which need two different treatments:
   NOT pairable, because two series call draws on DIFFERENT matches -- there
   is no common denominator to pair on. Same obstacle as comparing two
   betting strategies that place different bets (see
-  value_betting_ogd_vs_ftrl.py). So precision gets a per-series bootstrap
+  value_betting_hedge_vs_ogd.py). So precision gets a per-series bootstrap
   confidence interval instead, and the comparison that IS meaningful is
   against the class base rate: when a series does make this call, is it
   better than the unconditional frequency of that outcome? That is the
@@ -144,8 +144,8 @@ def main():
     print(f"Tier-A entities: {list(entries)}\n")
 
     # ---- 1. recall: paired tests ----
-    pairs = [("OGD", "Hedge"), ("OGD", "FTRL"), ("OGD", "Uniform average"),
-             ("Hedge", "FTRL")] + [("OGD", b) for b in books]
+    pairs = [("Hedge", "OGD"), ("Hedge", "FTRL"), ("Hedge", "Uniform average"),
+             ("OGD", "FTRL")] + [("Hedge", b) for b in books]
 
     rec_rows = []
     for cls, label in CLASS_NAMES.items():

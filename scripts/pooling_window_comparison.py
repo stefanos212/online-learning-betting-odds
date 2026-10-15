@@ -86,13 +86,14 @@ def run_window(P, awake, y, seasons, panel, season_set):
     comparisons = []
     if "PSC" in raw_ll_full:
         comparisons += [
-            ("OGD vs PSC (raw)", raw_ll_full["OGD"], raw_ll_full["PSC"]),
+            ("Hedge vs PSC (raw)", raw_ll_full["Hedge"], raw_ll_full["PSC"]),
+            ("Hedge vs PSC (calibrated)", cal_ll_full["Hedge"], cal_ll_full["PSC"]),
             ("OGD vs PSC (calibrated)", cal_ll_full["OGD"], cal_ll_full["PSC"]),
         ]
     comparisons += [
-        ("OGD vs Hedge (raw)", raw_ll_full["OGD"], raw_ll_full["Hedge"]),
-        ("OGD vs Uniform average (raw)", raw_ll_full["OGD"], raw_ll_full["Uniform average"]),
+        ("Hedge vs OGD (raw)", raw_ll_full["Hedge"], raw_ll_full["OGD"]),
         ("Hedge vs Uniform average (raw)", raw_ll_full["Hedge"], raw_ll_full["Uniform average"]),
+        ("OGD vs Uniform average (raw)", raw_ll_full["OGD"], raw_ll_full["Uniform average"]),
     ]
     sig_rows = []
     for label, a, b in comparisons:

@@ -2,7 +2,7 @@
 STACKING THE WINS: WHAT IS THE BEST CONFIGURATION WE CAN ACTUALLY BUILD?
 
 Four things have been measured separately in this project and never combined:
-the corrected OGD step (applied), the closing-only panel beating the full one
+the corrected step of the main mixture, Hedge (applied), the closing-only panel beating the full one
 (significant, 4/4 algorithms, both normalizations), Shin de-vig beating basic
 on raw log-loss, and calibration. The main pipeline still runs on the FULL
 panel with BASIC normalization, i.e. it leaves two of the four on the table.
@@ -18,7 +18,7 @@ CONFIGURATIONS
   A               closing-only panel, Shin de-vig         (both)
   B               A minus single-season bookmakers        (both, plus a quality filter)
 
-All use OGD with the tuned step, and each is reported raw and causally
+All use the main mixture (Hedge, sleeping_experts.MAIN_ALGORITHM) with the tuned step, and each is reported raw and causally
 calibrated.
 
 TWO THINGS THAT MAKE THIS AN HONEST COMPARISON, both of which this project
@@ -53,7 +53,7 @@ import matplotlib.pyplot as plt
 
 from sleeping_experts import (
     DATA_DIR, OUT_DIR, EPS, COLORS,
-    per_round_expert_loss, run_ogd_sleeping,
+    per_round_expert_loss, run_main_sleeping,
     load_universe_from, split_by_market_phase,
 )
 from calibration_analysis import _style_axes
@@ -76,14 +76,14 @@ def single_season(panel, awake, seasons):
 
 
 def fit_config(P, awake, y, indices):
-    """OGD (tuned step) on a column subset, then causal calibration. Returns
+    """The main mixture (Hedge, tuned step) on a column subset, then causal calibration. Returns
     per-round raw and calibrated log-loss at FULL length, NaN where the subset
     has nobody awake."""
     T = P.shape[0]
     P_s, aw_s = P[:, indices, :], awake[:, indices]
     alive = aw_s.any(axis=1)
 
-    W = run_ogd_sleeping(per_round_expert_loss(P_s, y), aw_s, len(indices))
+    W = run_main_sleeping(per_round_expert_loss(P_s, y), aw_s, len(indices))
     phat = np.einsum("tn,tnk->tk", W, P_s)
 
     raw = np.full(T, np.nan)
@@ -116,7 +116,7 @@ def plot_configs(table, out_path):
         ax.axvline(psc.iloc[0], color="#898781", linestyle="--", linewidth=1.4,
                     zorder=1, label="PSC (held-out)")
     for yp, (_, r) in zip(ypos, cal.iterrows()):
-        color = "#898781" if r["config"] == "PSC alone" else COLORS["OGD"]
+        color = "#898781" if r["config"] == "PSC alone" else COLORS["Hedge"]
         ax.scatter([r["val_log_loss"]], [yp], s=80, color=color, zorder=3,
                     edgecolor="#fcfcfb", linewidth=1.1)
     ax.set_yticks(ypos)

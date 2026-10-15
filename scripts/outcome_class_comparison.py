@@ -31,7 +31,7 @@ Three views:
      anywhere else and is the more natural reading of "better at the ace".
   B. ALGORITHM vs ALGORITHM within each class -- does one of the three OCO
      algorithms own a particular outcome?
-  C. OGD vs every Tier-A bookmaker within each class.
+  C. Hedge (the main mixture) vs every Tier-A bookmaker within each class.
 
 SIGN: diff = loss(first) - loss(second), so NEGATIVE means the first-named
 series is better (the log-loss convention -- see CLAUDE.md).
@@ -175,9 +175,9 @@ def main():
         print()
 
     # ---- B + C: paired tests, per class and pooled ----
-    pairs = [("OGD", "Hedge"), ("OGD", "FTRL"), ("OGD", "Uniform average"),
-             ("Hedge", "FTRL")]
-    pairs += [("OGD", b) for b, (_, _, kind) in entries.items() if kind == "bookmaker"]
+    pairs = [("Hedge", "OGD"), ("Hedge", "FTRL"), ("Hedge", "Uniform average"),
+             ("OGD", "FTRL")]
+    pairs += [("Hedge", b) for b, (_, _, kind) in entries.items() if kind == "bookmaker"]
 
     sig_rows = []
     for a, b in pairs:
@@ -209,7 +209,7 @@ def main():
               .to_string(index=False, float_format=lambda v: f"{v:.5f}"))
         print()
 
-    print(f"\n=== C. OGD vs each Tier-A bookmaker, per class ===\n")
+    print(f"\n=== C. Hedge vs each Tier-A bookmaker, per class ===\n")
     for cls_label in ["ALL"] + list(CLASS_NAMES.values()):
         sub = sig[(sig["outcome"] == cls_label) & (sig["series_b"].isin(
             [b for b, (_, _, k) in entries.items() if k == "bookmaker"]))]

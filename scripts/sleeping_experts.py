@@ -16,7 +16,11 @@ reduction (Freund, Schapire, Singer & Warmuth, 1997; see also Blum & Mansour,
     match) are used to form the prediction, renormalized to a distribution
     over A(t) alone;
   - only awake experts' state is updated after round t; asleep experts are
-    frozen exactly as they were;
+    left exactly as they were. For Hedge this is the specialists update
+    proper: after the multiplicative step the awake group is rescaled back
+    to the total mass it had, which is what the per-expert guarantee below
+    rests on (see hedge_specialists_step -- an earlier version skipped the
+    rescaling and lost the guarantee);
   - a round where NOBODY is awake is skipped entirely (its W row stays all
     zeros and no state moves). load_full_universe() guarantees >=1 quote per
     round on the full panel, and the subset builders elsewhere filter to
@@ -72,18 +76,29 @@ OUTCOME_INDEX = {"H": 0, "D": 1, "A": 2}
 # per-expert AdaGrad is worse than no scaling at all.
 OGD_STEP_MULTIPLIER = 100.0
 
-# Hedge and FTRL want the step scaled DOWN, not up. The original sweep reported
-# both as already optimal at 1.0, but its grid STARTED at 1.0 -- so that was a
+# Hedge's multiplier was re-selected when run_hedge_sleeping moved to the
+# specialists update (see hedge_specialists_step). The old value, x0.25, was
+# tuned for the earlier version without the awake-mass rescaling, and its
+# "Hedge wants a SMALLER step" was a property of that version: with the
+# rescaling, a small step leaves Hedge within 0.00002 of the uniform average.
+# Same protocol as everywhere else, raw log-loss on the chronological 75% prefix:
+#   train 0.998849 (x0.25) -> 0.997945 (x10) -> 0.996717 (x100)
+#         -> 0.9966819 (x250) -> 0.9966820 (x750) -> 0.996689 (x10000)
+# The train curve is flat to 1e-6 from x200 to x1000, so the pick inside that
+# plateau is noise; x250 is the train minimum and is shipped as such. The tail
+# leans towards the large end of the plateau (0.997557 at x250, 0.997328 at
+# x1000), but the tail is never used to choose.
+HEDGE_STEP_MULTIPLIER = 250.0
+
+# FTRL wants the step scaled DOWN, not up. The original sweep reported it as
+# already optimal at 1.0, but its grid STARTED at 1.0 -- so that was a
 # boundary, not an optimum, and nobody had looked to its left. Re-running the
-# search downwards finds a genuine interior minimum for each, selected on the
-# same chronological train prefix used everywhere else:
-#   Hedge  train 0.998691 (x0.001) -> 0.998118 (x0.25) -> 0.998128 (x1)
+# search downwards finds a genuine interior minimum, selected on the same
+# chronological train prefix used everywhere else:
 #   FTRL   train 0.998661 (x0.001) -> 0.998117 (x0.05) -> 0.998160 (x1)
-# Held-out gain over the old x1: +0.00013 for Hedge, +0.00018 for FTRL. The
-# direction is the mirror image of OGD's and for the same structural reason --
-# Hedge's eta sits in an exponent over a single round's loss, so shrinking it
-# lengthens the memory, while OGD's multiplies one gradient step.
-HEDGE_STEP_MULTIPLIER = 0.25
+# Held-out gain over the old x1: +0.00018. FTRL's eta multiplies the whole
+# accumulated loss, so shrinking it lengthens the memory, while OGD's multiplies
+# one gradient step.
 FTRL_STEP_MULTIPLIER = 0.05
 
 COLORS = {
@@ -261,23 +276,46 @@ def per_round_expert_loss(P, y):
 
 # ------------------------------------------------- sleeping-experts algos --
 
+def hedge_specialists_step(logw_a, v, eta, loss_a):
+    """One specialists update of the awake log-weights (Freund, Schapire,
+    Singer & Warmuth 1997): the usual multiplicative step e^(-eta * loss),
+    then the awake group is rescaled so that its TOTAL mass is what it was
+    before the step. Sleepers are untouched. `v` is the awake weights
+    normalised to sum to 1 (the prediction copy), so the restoring factor is
+    1 / sum(v * e^(-eta * loss)).
+
+    The rescaling is the whole point. Without it the awake group loses mass to
+    the sleepers every round, an expert returning after a long absence comes
+    back over-weighted, and the per-expert guarantee is lost: at eta = 1 the
+    unrescaled version trails PSC by a total of 165 nats on PSC's own rounds
+    against a bound of ln 26 = 3.26, the rescaled one by 1.8. With every expert
+    awake the factor is common to all of them and cancels in the prediction,
+    so this reduces exactly to plain Hedge."""
+    step = -eta * loss_a
+    s = step.max()
+    return logw_a + step - (s + np.log(np.dot(v, np.exp(step - s))))
+
+
 def run_hedge_sleeping(loss, awake, N):
-    """Sleeping-experts Hedge (see module docstring). NOTE: `w` is the raw,
-    persistent per-expert state and is NEVER globally renormalized to sum to
-    1 -- only the awake-restricted copy `v` is normalized, and only for the
-    purpose of making a prediction. This detail matters if you extend this
-    function: see fixed_share.py's comment about a bug this caused there."""
-    w = np.full(N, 1.0 / N)               # persistent weight, frozen while asleep
+    """Sleeping-experts Hedge with the specialists update (see
+    hedge_specialists_step and the module docstring). Carried in LOG weight
+    space so that a large eta cannot underflow the weights. Only the
+    awake-restricted copy `v` is normalised, for the prediction; the
+    persistent state is never renormalised as a whole -- the specialists
+    rescaling touches the awake group only."""
+    logw = np.full(N, -np.log(N))          # persistent log-weight, untouched while asleep
     T = loss.shape[0]
     W = np.zeros((T, N))
     for t in range(T):
         a = awake[t]
         if not a.any():
             continue                      # nobody quoting: nothing to predict, nothing to learn
-        v = w[a] / w[a].sum()             # renormalize over the awake subset only
+        la = logw[a]
+        v = np.exp(la - la.max())         # renormalize over the awake subset only
+        v /= v.sum()
         W[t, a] = v
         eta = HEDGE_STEP_MULTIPLIER * np.sqrt(np.log(N) / (t + 1)) / M
-        w[a] = w[a] * np.exp(-eta * loss[t, a])
+        logw[a] = hedge_specialists_step(la, v, eta, loss[t, a])
     return W
 
 
@@ -327,6 +365,21 @@ def run_ftrl_sleeping(loss, awake, N):
         W[t, a] = v
         cum_loss[a] += loss[t, a]
     return W
+
+
+# The algorithm that every single-mixture experiment uses: the one that is
+# ranked against the bookmakers, bets, is deployed, and is tested on the
+# restricted panels and windows. Hedge since the specialists fix made it the
+# best of the three (it ties PSC over the decade and beats OGD); it was OGD
+# before that. Studies that are ABOUT one algorithm keep their own:
+# bandit_oco.py and markov_ogd.py work on OGD's projection, and
+# regime_switching.py runs copies of OGD.
+MAIN_ALGORITHM = "Hedge"
+
+
+def run_main_sleeping(loss, awake, N):
+    """The mixture of MAIN_ALGORITHM (see the comment above)."""
+    return run_hedge_sleeping(loss, awake, N)
 
 
 # --------------------------------------------------------- weight readout --

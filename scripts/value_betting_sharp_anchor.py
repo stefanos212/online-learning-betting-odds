@@ -22,8 +22,8 @@ FOUR FORECASTERS, identical bets otherwise (quarter-Kelly, highest
 positive-EV outcome, same rounds):
   1. PSC raw            -- the sharp price, de-vigged, used as-is
   2. PSC calibrated     -- same, after the project's causal temperature scaling
-  3. OGD raw            -- the mixture, target excluded (canonical design)
-  4. OGD calibrated     -- the headline configuration of the whole project
+  3. Hedge raw          -- the main mixture, target excluded (canonical design)
+  4. Hedge calibrated   -- the headline configuration of the whole project
 
 NOTE the mixture already CONTAINS PSC: for a closing target the panel is the
 full 26 minus the target, PSC included. So this is not "sharp vs learned" in
@@ -32,9 +32,9 @@ question is whether blending PSC with 24 lesser experts helps or dilutes.
 
 Every comparison is restricted to rounds where PSC, the target and the odds
 are ALL available, so all four forecasters bet on the same opportunity set.
-PSC vs OGD is then paired per active round on log-growth (they place
+PSC vs Hedge is then paired per active round on log-growth (they place
 different bets, so per-bet pairing is not available -- same device as
-value_betting_ogd_vs_ftrl.py).
+value_betting_hedge_vs_ogd.py).
 
 SIGN: the paired table bootstraps log-GROWTH, so POSITIVE mean_diff means
 the first-named forecaster is BETTER (see CLAUDE.md's sign gotcha).
@@ -53,7 +53,7 @@ from matplotlib.lines import Line2D
 
 from sleeping_experts import (
     DATA_DIR, OUT_DIR, COLORS,
-    per_round_expert_loss, run_ogd_sleeping,
+    per_round_expert_loss, run_main_sleeping,
     load_match_order, load_universe_from, split_by_market_phase,
 )
 from final_ranking import calibrate_full_history, COVERAGE_THRESHOLD
@@ -70,7 +70,7 @@ from betting import (
 ANCHORS = [("PSC", "closing"), ("VC_BV", "opening")]
 MIN_TARGET_COVERAGE = 15.0   # lower than value_betting's 50% so IWC/BFEC qualify
 FORECASTER_COLORS = {"anchor raw": "#c3c2b7", "anchor calibrated": "#52514e",
-                     "OGD raw": "#f0a883", "OGD calibrated": COLORS["OGD"]}
+                     "Hedge raw": "#8fb8ea", "Hedge calibrated": COLORS["Hedge"]}
 
 
 def phase_targets(panel, awake, seasons, anchor, phase):
@@ -96,7 +96,7 @@ def plot_anchor(table, out_path):
     Dashed line at breakeven."""
     cal = table[~table["thin"]] if "thin" in table else table
     cal = cal.assign(label=cal["bookmaker"] + "  [" + cal["anchor"] + "]")
-    order = (cal[cal["forecaster"] == "OGD calibrated"]
+    order = (cal[cal["forecaster"] == "Hedge calibrated"]
              .sort_values("mean_log_growth_per_bet")["label"].tolist())
     fig, ax = plt.subplots(figsize=(9.5, 0.6 * len(order) + 2.4), facecolor="#fcfcfb")
     ax.set_facecolor("#fcfcfb")
@@ -179,7 +179,7 @@ def main():
             # fitted on ALL rounds and then bet only on `common`
             keep_cols = [k for k in panel_idx if k != t_col]
             P_sub, awake_sub = P[:, keep_cols, :], awake[:, keep_cols]
-            W = run_ogd_sleeping(per_round_expert_loss(P_sub, y), awake_sub, len(keep_cols))
+            W = run_main_sleeping(per_round_expert_loss(P_sub, y), awake_sub, len(keep_cols))
             ogd_full = np.einsum("tn,tnk->tk", W, P_sub)
             _, ogd_cal_full, _, _ = calibrate_full_history(
                 ogd_full, y, np.ones(len(y), dtype=bool))
@@ -187,7 +187,7 @@ def main():
 
             growth_by = {}
             for fname, p_hat in [("anchor raw", anc_raw), ("anchor calibrated", anc_cal),
-                                  ("OGD raw", ogd_raw), ("OGD calibrated", ogd_cal)]:
+                                  ("Hedge raw", ogd_raw), ("Hedge calibrated", ogd_cal)]:
                 growth, bet_placed = simulate_kelly_betting(p_hat, odds_c, y_c, all_true)
                 row, _ = score_bet(growth, bet_placed, all_true,
                                     {"anchor": anchor, "phase": phase, "bookmaker": name,
@@ -200,10 +200,10 @@ def main():
                       f"edge={row['mean_log_growth_per_bet']:+.5f}  p={row['p_value']}")
 
             # paired, per active round (the four bet different rounds)
-            for a, b in [("anchor calibrated", "OGD calibrated"),
-                          ("anchor raw", "OGD raw"),
+            for a, b in [("anchor calibrated", "Hedge calibrated"),
+                          ("anchor raw", "Hedge raw"),
                           ("anchor calibrated", "anchor raw"),
-                          ("OGD calibrated", "OGD raw")]:
+                          ("Hedge calibrated", "Hedge raw")]:
                 diff = growth_by[a] - growth_by[b]
                 res = moving_block_bootstrap_test(diff)
                 verdict = ("tie (not significant)" if not res["significant_95"]
@@ -233,11 +233,11 @@ def main():
 
     print(f"\n=== Paired, per active round — saved to {sig_path} ===")
     print("    (POSITIVE mean_diff = the FIRST-named forecaster has the higher growth)\n")
-    head = sig[sig["comparison"] == "anchor calibrated vs OGD calibrated"]
+    head = sig[sig["comparison"] == "anchor calibrated vs Hedge calibrated"]
     for anchor, phase in ANCHORS:
         sub = head[head["anchor"] == anchor]
         k = int((sub["mean_diff"] > 0).sum())
-        print(f"-- {anchor} calibrated vs OGD calibrated ({phase}) --")
+        print(f"-- {anchor} calibrated vs Hedge calibrated ({phase}) --")
         print(sub[["bookmaker", "n_rounds", "mean_diff", "ci_low", "ci_high",
                     "p_value", "verdict"]]
               .to_string(index=False, float_format=lambda v: f"{v:.6f}"))

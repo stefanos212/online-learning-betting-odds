@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 
 from sleeping_experts import (
-    DATA_DIR, OUT_DIR, per_round_expert_loss, run_ogd_sleeping,
+    DATA_DIR, OUT_DIR, per_round_expert_loss, run_main_sleeping,
 )
 from final_ranking import calibrate_full_history
 from significance_test import moving_block_bootstrap_test
@@ -104,7 +104,7 @@ def simulate_kelly_betting(p_hat, odds, y, mask, kelly_mult=KELLY_MULT):
 
 def fit_leave_out(panel, P, awake, y, indices, target_book, match_ids, exclude_target=True,
                    apply_reduction=True):
-    """THE fitting routine behind every betting experiment: OGD fitted on
+    """THE fitting routine behind every betting experiment: the main mixture (Hedge) fitted on
     `indices` (a column-index subset -- the full panel, or just open_idx, or
     just close_idx), optionally excluding `target_book` from within them,
     then causally calibrated the same way as final_ranking.py.
@@ -124,7 +124,7 @@ def fit_leave_out(panel, P, awake, y, indices, target_book, match_ids, exclude_t
     rounds must be further restricted to those where >=1 of the kept
     columns is awake AND target_book itself has usable odds. But for the
     FULL-panel-minus-target ("mixed-trained") case the original code never
-    applied this reduction at all -- it dropped one column and ran OGD
+    applied this reduction at all -- it dropped one column and ran the mixture
     across every round unrestricted. Passing apply_reduction=False
     reproduces that exactly; every caller using the full panel
     (list(range(N))) must pass it.
@@ -150,8 +150,8 @@ def fit_leave_out(panel, P, awake, y, indices, target_book, match_ids, exclude_t
         odds, book_mask = odds_full, book_mask_full
 
     loss_sub = per_round_expert_loss(P_sub, y_sub)
-    W_ogd = run_ogd_sleeping(loss_sub, awake_sub, N_sub)
-    phat_raw = np.einsum("tn,tnk->tk", W_ogd, P_sub)
+    W = run_main_sleeping(loss_sub, awake_sub, N_sub)   # Hedge: sleeping_experts.MAIN_ALGORITHM
+    phat_raw = np.einsum("tn,tnk->tk", W, P_sub)
 
     all_true = np.ones(len(y_sub), dtype=bool)
     _, phat_cal, _, best_c = calibrate_full_history(phat_raw, y_sub, all_true)

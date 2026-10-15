@@ -40,7 +40,7 @@ from sleeping_experts import (
     HEDGE_STEP_MULTIPLIER,
     OUT_DIR, EPS, M,
     load_full_universe, per_round_expert_loss, run_hedge_sleeping, evaluate,
-    last_awake_weight,
+    last_awake_weight, hedge_specialists_step,
 )
 
 ALPHA_GRID = [0.0, 0.005, 0.01, 0.02, 0.05]  # 0.0 = plain Hedge, included as a sanity-check baseline
@@ -56,20 +56,25 @@ def run_hedge_fixed_share(loss, awake, N, alpha):
     prediction copy `v` itself, which would silently change the dynamics even
     at alpha=0 (an earlier, buggy version of this function did exactly that;
     keeping this note since it's the kind of mistake that's easy to repeat)."""
-    w = np.full(N, 1.0 / N)
+    logw = np.full(N, -np.log(N))
     T = loss.shape[0]
     W = np.zeros((T, N))
     for t in range(T):
         a = awake[t]
-        v = w[a] / w[a].sum()             # renormalize over the awake subset, for prediction ONLY
+        la = logw[a]
+        v = np.exp(la - la.max())         # renormalize over the awake subset, for prediction ONLY
+        v /= v.sum()
         W[t, a] = v
         eta = HEDGE_STEP_MULTIPLIER * np.sqrt(np.log(N) / (t + 1)) / M
-        w_new = w[a] * np.exp(-eta * loss[t, a])   # exactly sleeping_experts.run_hedge_sleeping's update
+        new = hedge_specialists_step(la, v, eta, loss[t, a])   # exactly run_hedge_sleeping's update
         if alpha > 0:
-            k = a.sum()
-            total = w_new.sum()
-            w_new = (1 - alpha) * w_new + alpha * (total / k)   # leak toward uniform, same total mass
-        w[a] = w_new
+            # leak toward uniform within the awake group, same total mass; done in
+            # linear space relative to the group's largest weight, then back to log
+            s = new.max()
+            w_new = np.exp(new - s)
+            w_new = (1 - alpha) * w_new + alpha * (w_new.sum() / a.sum())
+            new = s + np.log(w_new)
+        logw[a] = new
     return W
 
 

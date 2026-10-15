@@ -44,7 +44,7 @@ from matplotlib.lines import Line2D
 
 from sleeping_experts import (
     DATA_DIR, OUT_DIR, COLORS,
-    per_round_expert_loss, run_ogd_sleeping,
+    per_round_expert_loss, run_main_sleeping,
     load_match_order, load_universe_from, split_by_market_phase,
 )
 from final_ranking import calibrate_full_history
@@ -79,7 +79,7 @@ def fit_including_target(panel, P, awake, y, indices, target_book, match_ids,
         odds, book_mask = odds_full, book_mask_full
 
     loss_sub = per_round_expert_loss(P_sub, y_sub)
-    W = run_ogd_sleeping(loss_sub, awake_sub, N_sub)
+    W = run_main_sleeping(loss_sub, awake_sub, N_sub)
     phat_raw = np.einsum("tn,tnk->tk", W, P_sub)
 
     all_true = np.ones(len(y_sub), dtype=bool)

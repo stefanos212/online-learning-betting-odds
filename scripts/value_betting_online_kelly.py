@@ -38,7 +38,7 @@ producing usable, positive-EV signals), not from round 0 of the whole
 76,584-match history, most of which never triggers a bet.
 
 Runs the SAME "closing-on-closing" comparison as
-value_betting_closing_trained.py (OGD mixture trained on ONLY the other
+value_betting_closing_trained.py (main mixture trained on ONLY the other
 closing-side bookmakers, bet against each closing-side target -- causally
 valid, no look-ahead risk), for both de-vig normalizations (Basic, Shin),
 comparing this online-learned stake against the classical fixed-formula
@@ -58,7 +58,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from sleeping_experts import OUT_DIR, DATA_DIR, per_round_expert_loss, run_ogd_sleeping, load_match_order, load_universe_from, split_by_market_phase
+from sleeping_experts import OUT_DIR, DATA_DIR, per_round_expert_loss, run_main_sleeping, load_match_order, load_universe_from, split_by_market_phase
 from final_ranking import calibrate_full_history
 from significance_test import moving_block_bootstrap_test
 from betting import (
@@ -109,7 +109,7 @@ def simulate_online_kelly(p_hat, odds, y, mask, F_MAX=F_MAX):
 
 
 def fit_closing_on_closing(panel, P, awake, y, book, close_idx, match_ids):
-    """Same OGD fit as value_betting_closing_trained.run_closing_on_closing
+    """Same mixture fit as value_betting_closing_trained.run_closing_on_closing
     (closing-only training panel, target excluded), but returns the raw
     ingredients (phat_raw, phat_cal, odds, mask, y_sub) instead of already
     running the classical Kelly simulation, so both the classical and the
@@ -128,8 +128,8 @@ def fit_closing_on_closing(panel, P, awake, y, book, close_idx, match_ids):
     odds, book_mask = odds_full[keep], np.ones(keep.sum(), dtype=bool)
 
     loss_sub = per_round_expert_loss(P_sub, y_sub)
-    W_ogd = run_ogd_sleeping(loss_sub, awake_sub, N_sub)
-    phat_raw = np.einsum("tn,tnk->tk", W_ogd, P_sub)
+    W = run_main_sleeping(loss_sub, awake_sub, N_sub)   # Hedge: sleeping_experts.MAIN_ALGORITHM
+    phat_raw = np.einsum("tn,tnk->tk", W, P_sub)
 
     all_true = np.ones(len(y_sub), dtype=bool)
     _, phat_cal, _, _ = calibrate_full_history(phat_raw, y_sub, all_true)

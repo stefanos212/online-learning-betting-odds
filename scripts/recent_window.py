@@ -56,7 +56,7 @@ import matplotlib.pyplot as plt
 from sleeping_experts import (
     DATA_DIR, OUT_DIR, EPS,
     per_round_expert_loss, evaluate,
-    run_hedge_sleeping, run_ogd_sleeping, run_ftrl_sleeping,
+    run_hedge_sleeping, run_ogd_sleeping, run_ftrl_sleeping, MAIN_ALGORITHM,
     load_universe_from, split_by_market_phase,
 )
 from calibration_analysis import _style_axes
@@ -66,7 +66,7 @@ from significance_test import moving_block_bootstrap_test, paired_diff, full_len
 RECENT_SEASONS = 5
 TRAIN_FRACTION = 0.75
 COVERAGE_FLOOR = 60.0
-CHALLENGER = "OGD"
+CHALLENGER = MAIN_ALGORITHM   # Hedge, the best algorithm
 DROPPED = ["PS", "PSC"]
 
 ALGOS = ("Hedge", "OGD", "FTRL", "Uniform average")
@@ -189,11 +189,12 @@ def section_significance(panel, P, awake, y):
         raw, cal = per_round_series(P[:, k, :], y, awake[:, k], T)
         ser[book] = {"raw": raw, "calibrated": cal}
 
-    pairs = [("OGD", "PSC", "raw"), ("OGD", "PSC", "calibrated"),
-             ("OGD", "B365C", "raw"),
-             ("OGD", "Hedge", "raw"), ("OGD", "FTRL", "raw"),
-             ("OGD", "Uniform average", "raw"),
-             ("Hedge", "Uniform average", "raw"), ("FTRL", "Uniform average", "raw")]
+    pairs = [("Hedge", "PSC", "raw"), ("Hedge", "PSC", "calibrated"),
+             ("OGD", "PSC", "raw"), ("OGD", "PSC", "calibrated"),
+             ("Hedge", "B365C", "raw"),
+             ("Hedge", "OGD", "raw"), ("Hedge", "FTRL", "raw"),
+             ("Hedge", "Uniform average", "raw"), ("OGD", "Uniform average", "raw"),
+             ("FTRL", "Uniform average", "raw")]
     rows = []
     for a, b, stage in pairs:
         common, _, _, _ = common_split([ser[a], ser[b]], T)
@@ -290,7 +291,7 @@ def section_configs(universes):
     }
     ser = {}
     for name, (Pu, idx) in configs.items():
-        probs, mask = fit_algorithms(Pu, awake, y, idx)["OGD"]
+        probs, mask = fit_algorithms(Pu, awake, y, idx)[CHALLENGER]
         raw, cal = per_round_series(probs, y, mask, T)
         ser[name] = {"raw": raw, "calibrated": cal}
         print(f"  {name:32s} {len(idx):2d} experts, {int(mask.sum())} γύροι")

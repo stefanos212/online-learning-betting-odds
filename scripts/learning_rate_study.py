@@ -44,12 +44,17 @@ A LESSON THIS FILE TAUGHT ITSELF: its first version's grid for Hedge/FTRL
 started at x1 and only went up, and reported both as "already optimal at
 x1" -- but x1 was the grid's LOWER BOUNDARY, not an interior optimum, and
 nobody had looked to its left. HEDGE_FTRL_MULTIPLIERS below now extends down
-to x0.001 and finds genuine interior minima at x0.25 (Hedge) and x0.05
-(FTRL), now shipped as HEDGE_STEP_MULTIPLIER / FTRL_STEP_MULTIPLIER in
-sleeping_experts.py. Whenever a sweep's answer sits on a grid endpoint,
-extend the grid before believing it -- OGD's own x100 optimum is safely
-interior to RATE_MULTIPLIERS below, which is why it was caught immediately
-and Hedge/FTRL's was not.
+to x0.001 and finds a genuine interior minimum at x0.05 for FTRL, shipped as
+FTRL_STEP_MULTIPLIER in sleeping_experts.py. Whenever a sweep's answer sits on
+a grid endpoint, extend the grid before believing it -- OGD's own x100 optimum
+is safely interior to RATE_MULTIPLIERS below, which is why it was caught
+immediately and FTRL's was not.
+
+HEDGE HAS ITS OWN GRID SINCE THE SPECIALISTS FIX. Hedge's x0.25 was the
+optimum of the earlier run_hedge_sleeping, which skipped the awake-mass
+rescaling of the specialists update. With the rescaling the optimum moves to
+the other end entirely (x250, a plateau from x200 to x1000 on train), so
+HEDGE_MULTIPLIERS spans x0.25 to x100000 to keep it interior.
 
 Produces:
   - results/learning_rate_study.csv
@@ -66,6 +71,7 @@ from sleeping_experts import (
     FTRL_STEP_MULTIPLIER,
     load_full_universe, per_round_expert_loss, project_to_simplex,
     run_hedge_sleeping, run_ogd_sleeping, run_ftrl_sleeping, evaluate,
+    hedge_specialists_step,
 )
 
 TRAIN_FRACTION = 0.75
@@ -74,9 +80,14 @@ RATE_MULTIPLIERS = [1.0, 2.0, 5.0, 10.0, 25.0, 50.0, 75.0, 90.0, 100.0, 110.0,
 HEDGE_FTRL_MULTIPLIERS = [0.001, 0.005, 0.01, 0.02, 0.05, 0.1, 0.25, 0.5,
                           0.75, 1.0, 1.5, 2.0, 5.0, 10.0, 25.0, 50.0, 100.0,
                           200.0, 500.0, 1000.0]                   # Hedge/FTRL grid
-"""Deliberately extended well below x1: that is where HEDGE_STEP_MULTIPLIER
-(0.25) and FTRL_STEP_MULTIPLIER (0.05) turned out to live -- see the module
-docstring."""
+"""Deliberately extended well below x1: that is where FTRL_STEP_MULTIPLIER
+(0.05) turned out to live -- see the module docstring."""
+HEDGE_MULTIPLIERS = [0.25, 1.0, 10.0, 50.0, 100.0, 150.0, 200.0, 250.0, 300.0,
+                     400.0, 500.0, 750.0, 1000.0, 2000.0, 5000.0, 10000.0,
+                     30000.0, 100000.0]                             # Hedge grid
+"""Hedge's own grid since the specialists fix: its train optimum is x250, on a
+plateau from x200 to x1000, so the grid is dense there and runs far past it on
+both sides."""
 CONSTANT_ETAS = [1e-5, 3e-5, 1e-4, 3e-4, 1e-3, 3e-3, 0.01, 0.03,
                  0.1, 0.3, 0.5, 1.0, 2.0]  # 1.0 = Bayesian mixture / Aggregating Algorithm
 """The first version of this grid started at 0.1 and the constant schedule was
@@ -140,7 +151,7 @@ def hedge_scaled(loss, awake, N, mult=1.0, const_eta=None):
         v /= v.sum()
         W[t, a] = v
         eta = const_eta if const_eta is not None else mult * np.sqrt(np.log(N) / (t + 1)) / M
-        logw[a] = la - eta * loss[t, a]
+        logw[a] = hedge_specialists_step(la, v, eta, loss[t, a])   # same update as shipped
     return W
 
 
@@ -342,7 +353,7 @@ def main():
     rows = []
 
     print("-- Hedge, learning-rate multiplier --")
-    for m in HEDGE_FTRL_MULTIPLIERS:
+    for m in HEDGE_MULTIPLIERS:
         full, val = score(hedge_scaled(loss, awake, N, mult=m), P, y, val_mask)
         rows.append({"family": "Hedge x mult", "setting": m,
                       "full_log_loss": full, "val_log_loss": val})

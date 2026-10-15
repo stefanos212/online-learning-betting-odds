@@ -24,7 +24,7 @@ block bootstrap, over the whole dataset and over its 25% tail. All series are
 scored on the same matches, so their log-losses compare directly.
 
 Value betting repeats value_betting.py's design on B and B': quarter Kelly
-against the target's real odds, OGD mixture of the target's phase with the
+against the target's real odds, Hedge mixture of the target's phase with the
 target removed (an opening target sees no closing price at all).
 
 Produces:
@@ -38,7 +38,7 @@ import numpy as np
 import pandas as pd
 
 import learning_rate_study as lr
-from sleeping_experts import OUT_DIR, EPS, load_full_universe, load_match_order, per_round_expert_loss
+from sleeping_experts import OUT_DIR, EPS, load_full_universe, load_match_order, per_round_expert_loss, MAIN_ALGORITHM
 from final_ranking import calibrate_full_history
 from significance_test import moving_block_bootstrap_test
 from betting import load_decimal_odds, simulate_kelly_betting, score_bet
@@ -61,13 +61,13 @@ GRIDS = {
 
 # (first, second) pairs tested per dataset; negative mean diff = first better
 TESTS = {
-    "B": [("OGD", "PSC"), ("FTRL", "PSC"), ("Hedge", "PSC"), ("OGD", "VC_BVC"),
-          ("OGD", "Uniform average"), ("FTRL", "Uniform average"), ("Hedge", "Uniform average")],
-    "B'": [("OGD", "VC_BVC"), ("FTRL", "VC_BVC"), ("Hedge", "VC_BVC"), ("OGD", "B365C"),
-           ("OGD", "Uniform average"), ("FTRL", "Uniform average"), ("Hedge", "Uniform average"),
+    "B": [("Hedge", "PSC"), ("OGD", "PSC"), ("FTRL", "PSC"), ("Hedge", "VC_BVC"),
+          ("Hedge", "Uniform average"), ("OGD", "Uniform average"), ("FTRL", "Uniform average")],
+    "B'": [("Hedge", "VC_BVC"), ("OGD", "VC_BVC"), ("FTRL", "VC_BVC"), ("Hedge", "B365C"),
+           ("Hedge", "Uniform average"), ("OGD", "Uniform average"), ("FTRL", "Uniform average"),
            ("Uniform average", "VC_BVC")],
-    "C": [("PSC", "BFEC"), ("OGD", "PSC"), ("FTRL", "PSC"), ("OGD", "BFEC"), ("FTRL", "BFEC"),
-          ("OGD", "Uniform average")],
+    "C": [("PSC", "BFEC"), ("Hedge", "PSC"), ("OGD", "PSC"), ("FTRL", "PSC"), ("Hedge", "BFEC"),
+          ("OGD", "BFEC"), ("FTRL", "BFEC"), ("Hedge", "Uniform average")],
 }
 
 
@@ -144,12 +144,12 @@ def paired(name, d, losses):
 
 
 def value_betting(name, d, opening, closing, match_ids):
-    """Quarter Kelly against each target's real odds, OGD mixture of the
+    """Quarter Kelly against each target's real odds, Hedge mixture of the
     target's own phase with the target removed."""
     out = []
     for target in opening + closing:
         peers = [b for b in (opening if target in opening else closing) if b != target]
-        p, step = d.mixture(peers, "OGD")
+        p, step = d.mixture(peers, MAIN_ALGORITHM)
         odds = load_decimal_odds(target, match_ids[d.rows])
         mask = np.isfinite(odds).all(axis=1)
         growth, bet = simulate_kelly_betting(d.calibrated(p), odds, d.y, mask)

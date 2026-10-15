@@ -45,7 +45,7 @@ import matplotlib.pyplot as plt
 
 from sleeping_experts import (
     DATA_DIR, OUT_DIR, EPS, M,
-    per_round_expert_loss, project_to_simplex, OGD_STEP_MULTIPLIER,
+    per_round_expert_loss, HEDGE_STEP_MULTIPLIER, hedge_specialists_step, run_hedge_sleeping,
     load_universe_from, split_by_market_phase,
 )
 from calibration_analysis import _style_axes
@@ -69,24 +69,28 @@ instead would force the shared round count from 8.1k down to 2.9k and leave
 nothing significant anywhere, which is why it is an aside and not a row."""
 
 
-def ogd_weights(P_s, aw_s, y, freeze_at=None):
-    """run_ogd_sleeping's recursion, with an optional freeze point. After
-    `freeze_at` the weights are still projected onto each round's awake subset
-    (needed to predict) but never stepped (no learning)."""
-    D, N = np.sqrt(2.0), P_s.shape[1]
+def hedge_weights(P_s, aw_s, y, freeze_at=None):
+    """run_hedge_sleeping's recursion (the main mixture, specialists update),
+    with an optional freeze point. After `freeze_at` the weights are still
+    renormalised over each round's awake subset (needed to predict) but never
+    updated (no learning). With freeze_at=None it reproduces
+    run_hedge_sleeping exactly (asserted in main())."""
+    N = P_s.shape[1]
     loss = per_round_expert_loss(P_s, y)
-    w = np.full(N, 1.0 / N)
+    logw = np.full(N, -np.log(N))
     W = np.zeros((len(y), N))
     for t in range(len(y)):
         a = aw_s[t]
         if not a.any():
             continue
-        v = project_to_simplex(w[a])
+        la = logw[a]
+        v = np.exp(la - la.max())
+        v /= v.sum()
         W[t, a] = v
         if freeze_at is not None and t >= freeze_at:
             continue
-        w[a] = v
-        w[a] = w[a] - (OGD_STEP_MULTIPLIER * D / (M * np.sqrt(t + 1))) * loss[t, a]
+        eta = HEDGE_STEP_MULTIPLIER * np.sqrt(np.log(N) / (t + 1)) / M
+        logw[a] = hedge_specialists_step(la, v, eta, loss[t, a])
     return W
 
 
@@ -153,9 +157,12 @@ def main():
         P_s, aw_s = P[:, idx, :], awake[:, idx]
         alive = aw_s.any(axis=1)
         for mode, fr, live in (("online", None, True), ("παγωμένο", cut_idx, False)):
-            W = ogd_weights(P_s, aw_s, y, freeze_at=fr)
+            W = hedge_weights(P_s, aw_s, y, freeze_at=fr)
+            if fr is None:
+                assert np.allclose(W, run_hedge_sleeping(per_round_expert_loss(P_s, y),
+                                                         aw_s, len(idx))),                     "hedge_weights(freeze_at=None) must reproduce run_hedge_sleeping"
             phat = np.einsum("tn,tnk->tk", W, P_s)
-            series[f"OGD {pname}, {mode}"] = {
+            series[f"Hedge {pname}, {mode}"] = {
                 "loss": calibrated_loss(phat, y, alive, train, T, live),
                 "type": "αλγόριθμος"}
 

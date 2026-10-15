@@ -102,7 +102,7 @@ def paired_diff(a, b):
 
 def main():
     """Builds raw + calibrated per-round log-loss series for the 4 algorithms
-    and 2 reference bookmakers, runs the 12-comparison battery defined below
+    and 2 reference bookmakers, runs the 16-comparison battery defined below
     (each a call to moving_block_bootstrap_test on a paired_diff), prints and
     saves results/significance_test_table.csv. moving_block_bootstrap_test()
     itself is reused directly by value_betting.py and contextual_experts.py."""
@@ -131,13 +131,17 @@ def main():
         print(f"  calibrated {book} done")
 
     comparisons = [
+        ("Hedge vs PSC (raw)", raw_ll["Hedge"], raw_ll["PSC"]),
+        ("Hedge vs PSC (calibrated)", cal_ll["Hedge"], cal_ll["PSC"]),
         ("OGD vs PSC (raw)", raw_ll["OGD"], raw_ll["PSC"]),
         ("OGD vs PSC (calibrated)", cal_ll["OGD"], cal_ll["PSC"]),
+        ("Hedge vs B365C (raw)", raw_ll["Hedge"], raw_ll["B365C"]),
         ("OGD vs B365C (raw)", raw_ll["OGD"], raw_ll["B365C"]),
-        ("OGD vs Hedge (raw)", raw_ll["OGD"], raw_ll["Hedge"]),
+        ("Hedge vs OGD (raw)", raw_ll["Hedge"], raw_ll["OGD"]),
+        ("Hedge vs FTRL (raw)", raw_ll["Hedge"], raw_ll["FTRL"]),
         ("OGD vs FTRL (raw)", raw_ll["OGD"], raw_ll["FTRL"]),
-        ("OGD vs Uniform average (raw)", raw_ll["OGD"], raw_ll["Uniform average"]),
         ("Hedge vs Uniform average (raw)", raw_ll["Hedge"], raw_ll["Uniform average"]),
+        ("OGD vs Uniform average (raw)", raw_ll["OGD"], raw_ll["Uniform average"]),
         ("FTRL vs Uniform average (raw)", raw_ll["FTRL"], raw_ll["Uniform average"]),
         ("Hedge: raw vs calibrated", raw_ll["Hedge"], cal_ll["Hedge"]),
         ("OGD: raw vs calibrated", raw_ll["OGD"], cal_ll["OGD"]),

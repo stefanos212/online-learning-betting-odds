@@ -20,8 +20,8 @@ depends on no other script's results.
 
 Comparisons are ranked on raw and calibrated log-loss, plus a paired
 moving block bootstrap of the best algorithm against each bookmaker, on the
-rounds where both are defined. SIGN: diff = loss(OGD) - loss(bookmaker), so
-NEGATIVE means OGD is better (the log-loss convention, see CLAUDE.md).
+rounds where both are defined. SIGN: diff = loss(Hedge) - loss(bookmaker), so
+NEGATIVE means Hedge is better (the log-loss convention, see CLAUDE.md).
 
 Produces:
   - results/no_pinnacle_ranking.csv
@@ -37,13 +37,13 @@ import matplotlib.pyplot as plt
 from sleeping_experts import (
     OUT_DIR, EPS, COLORS,
     load_full_universe, per_round_expert_loss,
-    run_hedge_sleeping, run_ogd_sleeping, run_ftrl_sleeping, evaluate,
+    run_hedge_sleeping, run_ogd_sleeping, run_ftrl_sleeping, evaluate, MAIN_ALGORITHM,
 )
 from final_ranking import calibrate_full_history, COVERAGE_THRESHOLD, RANK_COLORS
 from significance_test import moving_block_bootstrap_test, paired_diff, full_length_raw_logloss
 
 DROPPED = ["PS", "PSC"]          # both Pinnacle columns
-CHALLENGER = "OGD"               # best algorithm, the one the tests are run for
+CHALLENGER = MAIN_ALGORITHM      # best algorithm (Hedge), the one the tests are run for
 TRAIN_FRACTION = 0.75            # chronological split, same protocol as elsewhere
 
 # Run on two panels. The closing-only one is there because

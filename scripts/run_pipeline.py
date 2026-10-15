@@ -12,9 +12,9 @@ The cost of a process launch is irrelevant next to what they compute.
 Three steps read another step's CSV rather than only the processed data, so
 order is load-bearing for them:
   - market_devig_comparisons and value_betting read results_table.csv
-  - value_betting_ogd_vs_ftrl and value_betting_circular read
+  - value_betting_hedge_vs_ogd and value_betting_circular read
     value_betting_all_bookmakers_table.csv (the first of the two asserts its own
-    OGD half reproduces it, so a stale file turns into a confusing failure)
+    Hedge half reproduces it, so a stale file turns into a confusing failure)
 
 data_processer only needs re-running when the raw downloads change, so it is
 opt-in via --with-data. make_appendix_tables is not a dependency of anything but
@@ -49,7 +49,7 @@ STEPS = [
 
     ("value_betting",               "Kelly simulations; writes the bookmaker sweep"),
     ("value_betting_online_kelly",  "the earlier stake learner, kept for contrast"),
-    ("value_betting_ogd_vs_ftrl",   "asserts it reproduces the OGD half"),
+    ("value_betting_hedge_vs_ogd",  "asserts it reproduces the Hedge half"),
     ("value_betting_circular",      "leakage control"),
     ("value_betting_sharp_anchor",  "anchor-bookmaker variant"),
     ("value_betting_by_band",       "profit by probability band"),

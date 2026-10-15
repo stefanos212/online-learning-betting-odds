@@ -35,7 +35,7 @@ microstructure -- informed vs uninformed traders, spread as protection
 (Kyle 1985; Glosten & Milgrom 1985; Shin 1992 for the betting-market case)
 -- not "insider detection".
 
-Only OGD and the uniform average are fitted here (not Hedge/FTRL): the
+Only the main mixture (Hedge) and the uniform average are fitted here (not OGD/FTRL): the
 question is about the market, not about which algorithm wins, and halving
 the fits keeps this cheap.
 
@@ -52,7 +52,7 @@ import matplotlib.pyplot as plt
 
 from sleeping_experts import (
     DATA_DIR, OUT_DIR, EPS, COLORS,
-    load_full_universe, per_round_expert_loss, run_ogd_sleeping,
+    load_full_universe, per_round_expert_loss, run_main_sleeping,
     load_match_order, split_by_market_phase,
 )
 from calibration_analysis import _style_axes
@@ -118,11 +118,11 @@ def plot_strata(table, out_path):
         ax.plot(x, sub["ll_full"], marker="o", markersize=5, linewidth=1.9,
                  color=COLORS["benchmark"], label="full panel")
         ax.plot(x, sub["ll_closing"], marker="o", markersize=5, linewidth=1.9,
-                 color=COLORS["OGD"], label="closing-only mixture")
+                 color=COLORS["Hedge"], label="closing-only mixture")
         ax.set_xticks(x)
         ax.set_xticklabels([f"Q{i+1}" for i in x], fontsize=9)
         ax.set_xlabel(f"quintile of {stratifier} (Q1 = lowest)", color="#52514e")
-        ax.set_ylabel("OGD log-loss", color="#52514e")
+        ax.set_ylabel("Hedge log-loss", color="#52514e")
         ax.set_title(f"Stratified by {stratifier}", color="#0b0b0b", fontsize=12, pad=10)
         _style_axes(ax)
         leg = ax.legend(frameon=False, fontsize=8.5)
@@ -148,19 +148,19 @@ def main():
           f"(mean {np.nanmean(mov):.4f}, 90th pct {np.nanpercentile(mov, 90):.4f})")
     print(f"z anomaly defined for {int((~np.isnan(z_anom)).sum())} of {T} rounds\n")
 
-    # OGD on each of the three panels, per-round log-loss scattered to full length
+    # the main mixture on each of the three panels, per-round log-loss scattered to full length
     open_idx, close_idx = split_by_market_phase(panel)
     ll = {}
     for market, indices in [("opening", open_idx), ("closing", close_idx),
                              ("full", list(range(N)))]:
         P_s, aw_s, y_s, keep = build_subset(P, awake, y, indices)
-        W = run_ogd_sleeping(per_round_expert_loss(P_s, y_s), aw_s, len(indices))
+        W = run_main_sleeping(per_round_expert_loss(P_s, y_s), aw_s, len(indices))
         phat = np.einsum("tn,tnk->tk", W, P_s)
         v = -np.log(np.clip(phat[np.arange(len(y_s)), y_s], EPS, 1.0))
         full = np.full(T, np.nan)
         full[keep] = v
         ll[market] = full
-        print(f"  fitted OGD on {market:8s} panel ({len(indices)} experts, {int(keep.sum())} rounds)")
+        print(f"  fitted Hedge on {market:8s} panel ({len(indices)} experts, {int(keep.sum())} rounds)")
 
     rows, sig_rows = [], []
     for stratifier, values in [("line movement", mov), ("Shin z anomaly", z_anom)]:

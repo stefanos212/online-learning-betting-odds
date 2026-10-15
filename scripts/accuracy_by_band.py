@@ -31,13 +31,13 @@ with coverage >= 70%), same cut as final_ranking.py:
   C. IS ANY OF IT REAL? Views A and B are descriptive -- with 10 bands the
      per-band samples get small and differences between series start to look
      impressive by chance. So for each confidence band we also run the
-     project's standard paired test: OGD vs each Tier-A bookmaker, per-round
-     log-loss, restricted to the rounds where OGD's top pick falls in that
+     project's standard paired test: Hedge (the main mixture) vs each Tier-A bookmaker, per-round
+     log-loss, restricted to the rounds where Hedge's top pick falls in that
      band (both series defined on those rounds, so the pairing is exact).
      Moving block bootstrap, same engine as everywhere else.
 
-SIGN (view C): diff = loss(OGD) - loss(bookmaker), so NEGATIVE mean_diff
-means OGD is better -- the log-loss convention, not the growth convention
+SIGN (view C): diff = loss(Hedge) - loss(bookmaker), so NEGATIVE mean_diff
+means Hedge is better -- the log-loss convention, not the growth convention
 (see CLAUDE.md).
 
 Produces:
@@ -239,12 +239,12 @@ def main():
         print()
 
     # ---- C: is any apparent per-band advantage statistically real? ----
-    print("\n=== C. OGD vs each Tier-A bookmaker, WITHIN each confidence band ===")
-    print("    (rounds where OGD's top pick falls in that band; negative mean_diff = OGD better)\n")
-    ogd_probs = entries["OGD"][0]
-    ogd_pmax = ogd_probs.max(axis=1)
-    band_idx = np.clip(np.digitize(ogd_pmax, CONF_EDGES[1:-1], right=False), 0, len(CONF_EDGES) - 2)
-    ogd_ll = full_length_raw_logloss(ogd_probs, y, T)
+    print("\n=== C. Hedge vs each Tier-A bookmaker, WITHIN each confidence band ===")
+    print("    (rounds where Hedge's top pick falls in that band; negative mean_diff = Hedge better)\n")
+    main_probs = entries["Hedge"][0]
+    main_pmax = main_probs.max(axis=1)
+    band_idx = np.clip(np.digitize(main_pmax, CONF_EDGES[1:-1], right=False), 0, len(CONF_EDGES) - 2)
+    main_ll = full_length_raw_logloss(main_probs, y, T)
 
     sig_rows = []
     for b, band in enumerate(band_labels(CONF_EDGES)):
@@ -255,14 +255,14 @@ def main():
             if kind != "bookmaker":
                 continue
             book_ll = full_length_raw_logloss(probs, y, T, mask=mask)
-            a = np.where(in_band, ogd_ll, np.nan)
+            a = np.where(in_band, main_ll, np.nan)
             b_ll = np.where(in_band, book_ll, np.nan)
             d, n = paired_diff(a, b_ll)
             if n < MIN_BAND_N:
                 continue
             res = moving_block_bootstrap_test(d)
             verdict = ("tie (not significant)" if not res["significant_95"]
-                       else ("OGD better" if res["mean_diff"] < 0 else f"{name} better"))
+                       else ("Hedge better" if res["mean_diff"] < 0 else f"{name} better"))
             sig_rows.append({"band": band, "bookmaker": name, "n": n,
                               "verdict": verdict, **res})
 
@@ -279,8 +279,8 @@ def main():
         print()
     print(f"Saved: {sig_path}")
 
-    wins = sig_table[sig_table["verdict"] == "OGD better"]
-    print(f"\nOGD significantly better in {len(wins)} of {len(sig_table)} band x bookmaker cells.")
+    wins = sig_table[sig_table["verdict"] == "Hedge better"]
+    print(f"\nHedge significantly better in {len(wins)} of {len(sig_table)} band x bookmaker cells.")
     if not wins.empty:
         print(wins[["band", "bookmaker", "mean_diff", "p_value"]]
               .to_string(index=False, float_format=lambda v: f"{v:.5f}"))

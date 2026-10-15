@@ -12,18 +12,18 @@ discussion: "eventually learning which experts are better for different
 types of bets, e.g. different leagues". We have not tested that claim
 anywhere else in the codebase until this file.
 
-Method: instead of ONE OGD instance sharing weights across all 10 leagues
+Method: instead of ONE Hedge instance sharing weights across all 10 leagues
 pooled together (what sleeping_experts.py / final_ranking.py do), run TEN
-INDEPENDENT OGD instances, one per league, each starting from uniform
+INDEPENDENT Hedge instances, one per league, each starting from uniform
 weights and only ever seeing that league's own chronological match sequence.
 Compare each specialist's log-loss on its league's matches against the
-GLOBAL (pooled) OGD's log-loss on those SAME matches -- a fair, apples-to-
+GLOBAL (pooled) Hedge's log-loss on those SAME matches -- a fair, apples-to-
 apples comparison since both are scored on identical rounds, just trained
 differently (shared vs. per-league weights).
 
 Produces:
   - results/contextual_experts_table.csv   (per league: n_matches, global
-                                             OGD log-loss vs. specialist
+                                             Hedge log-loss vs. specialist
                                              log-loss, which wins, top-3
                                              bookmakers the specialist
                                              ended up trusting most)
@@ -39,7 +39,7 @@ from sleeping_experts import (
     EXCLUDED_BOOKMAKERS,
     DATA_DIR, OUT_DIR, EPS, COLORS,
     load_full_universe, load_match_order, per_round_expert_loss,
-    run_ogd_sleeping, evaluate, last_awake_weight,
+    run_main_sleeping, evaluate, last_awake_weight,
 )
 from significance_test import moving_block_bootstrap_test
 
@@ -48,7 +48,7 @@ from significance_test import moving_block_bootstrap_test
 # specialists across wildly different tiers (a top flight vs. a 4th division)
 # mixes leagues with very different predictability/favorite-longshot profiles
 # to begin with, which would muddy the "does per-league specialization help"
-# question this file exists to answer, and (2) 22 independent OGD refits is a
+# question this file exists to answer, and (2) 22 independent Hedge refits is a
 # lot of extra compute for a comparison this file already found (on the
 # original 10 divisions) doesn't help -- no reason to expect that changes by
 # adding lower divisions or non-domestic-rival leagues.
@@ -72,13 +72,13 @@ def load_league_labels(match_ids):
 
 
 def run_league_specialist(P, awake, y, league_idx):
-    """Fit an independent OGD instance using ONLY this league's rounds, in
+    """Fit an independent Hedge instance using ONLY this league's rounds, in
     their own chronological order (a slice of the globally-sorted tensor is
     still chronologically sorted, so no re-sorting needed)."""
     P_l, awake_l, y_l = P[league_idx], awake[league_idx], y[league_idx]
     loss_l = per_round_expert_loss(P_l, y_l)
     N = P.shape[1]
-    W_l = run_ogd_sleeping(loss_l, awake_l, N)
+    W_l = run_main_sleeping(loss_l, awake_l, N)
     phat_l = np.einsum("tn,tnk->tk", W_l, P_l)
     return phat_l, W_l
 
@@ -90,9 +90,9 @@ def plot_league_comparison(table, out_path):
     order = table.sort_values("specialist_log_loss")
     ypos = np.arange(len(order))[::-1]
     ax.scatter(order["global_log_loss"], ypos, color=COLORS["benchmark"], s=70,
-                label="Global (pooled) OGD", zorder=3)
-    ax.scatter(order["specialist_log_loss"], ypos, color=COLORS["OGD"], s=70,
-                label="Per-league specialist OGD", zorder=3)
+                label="Global (pooled) Hedge", zorder=3)
+    ax.scatter(order["specialist_log_loss"], ypos, color=COLORS["Hedge"], s=70,
+                label="Per-league specialist Hedge", zorder=3)
     for yp, (_, row) in zip(ypos, order.iterrows()):
         ax.plot([row["global_log_loss"], row["specialist_log_loss"]], [yp, yp],
                  color="#c3c2b7", linewidth=1.2, zorder=2)
@@ -100,7 +100,7 @@ def plot_league_comparison(table, out_path):
     ax.set_yticks(ypos)
     ax.set_yticklabels(order["league"], fontsize=9, color="#0b0b0b")
     ax.set_xlabel("Log-loss on that league's matches", color="#52514e")
-    ax.set_title("Global vs. per-league specialist OGD", color="#0b0b0b", fontsize=12, pad=12)
+    ax.set_title("Global vs. per-league specialist Hedge", color="#0b0b0b", fontsize=12, pad=12)
     ax.grid(True, axis="x", color="#e1e0d9", linewidth=0.8)
     ax.set_axisbelow(True)
     for spine in ["top", "right", "left"]:
@@ -123,10 +123,10 @@ def main():
     league_labels = load_league_labels(match_ids)
     assert len(league_labels) == T
 
-    # global (pooled) OGD, exactly as in sleeping_experts.py/final_ranking.py --
+    # global (pooled) Hedge, exactly as in sleeping_experts.py/final_ranking.py --
     # trained ONCE sharing weights across all leagues, evaluated per-league below
     loss_global = per_round_expert_loss(P, y)
-    W_global = run_ogd_sleeping(loss_global, awake, N)
+    W_global = run_main_sleeping(loss_global, awake, N)
     phat_global = np.einsum("tn,tnk->tk", W_global, P)
     global_logloss_per_round = -np.log(np.clip(phat_global[np.arange(T), y], EPS, 1.0))
 

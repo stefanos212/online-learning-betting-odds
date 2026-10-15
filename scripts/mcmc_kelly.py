@@ -386,14 +386,14 @@ def main():
 
 
 def fit_with_weights(panel, P, awake, y, indices, book, match_ids):
-    """Leave-one-out OGD fit that also returns the per-round weights.
+    """Leave-one-out fit of the main mixture (Hedge) that also returns the per-round weights.
 
     Reproduces value_betting.fit_leave_out's round reduction exactly (keep the
     rounds where at least one remaining expert is awake AND the target quoted
     usable odds), so every returned array is aligned to the same rounds.
     """
     from betting import load_decimal_odds
-    from sleeping_experts import per_round_expert_loss, run_ogd_sleeping
+    from sleeping_experts import per_round_expert_loss, run_main_sleeping
     from final_ranking import calibrate_full_history
 
     col = panel.index(book)
@@ -406,7 +406,7 @@ def fit_with_weights(panel, P, awake, y, indices, book, match_ids):
     P_sub, aw_sub, y_sub = Pk[keep], awk[keep], y[keep]
     odds = odds_full[keep]
 
-    W = run_ogd_sleeping(per_round_expert_loss(P_sub, y_sub), aw_sub, len(keep_cols))
+    W = run_main_sleeping(per_round_expert_loss(P_sub, y_sub), aw_sub, len(keep_cols))
     phat = np.einsum("tn,tnk->tk", W, P_sub)
     all_true = np.ones(len(y_sub), dtype=bool)
     _, phat_cal, _, _ = calibrate_full_history(phat, y_sub, all_true)

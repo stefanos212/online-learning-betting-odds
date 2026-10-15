@@ -1,25 +1,25 @@
 market,algorithm,metric,comparison,lower_is_better,verdict,n,normalization,block_length,mean_diff,ci_low,ci_high,p_value,significant_95
-opening,Hedge,log_loss,Hedge vs Uniform average,True,tie (not significant),76557,Shin,42,1.978904608989345e-05,-1.4209140876158433e-05,5.0909672739934306e-05,0.264,False
-opening,Hedge,brier,Hedge vs Uniform average,True,tie (not significant),76557,Shin,42,1.3337705437181915e-05,-7.332966077969932e-06,3.197181924803648e-05,0.223,False
-opening,Hedge,accuracy,Hedge vs Uniform average,False,tie (not significant),76557,Shin,42,-5.22486513316875e-05,-0.00024818109382551565,0.00014368379116214063,0.632,False
+opening,Hedge,log_loss,Hedge vs Uniform average,True,Hedge wins,76557,Shin,42,-0.0003041179998162812,-0.00043935687491765033,-0.00016659602813721478,0.0,True
+opening,Hedge,brier,Hedge vs Uniform average,True,Hedge wins,76557,Shin,42,-0.00019399129396127662,-0.0002744901252324835,-0.00011335833880167062,0.0,True
+opening,Hedge,accuracy,Hedge vs Uniform average,False,tie (not significant),76557,Shin,42,0.000313491907990125,-0.00027463197356218183,0.0008882270726386875,0.29,False
 opening,OGD,log_loss,OGD vs Uniform average,True,tie (not significant),76557,Shin,42,4.647753220686873e-05,-2.3148354659465908e-05,0.00012141976313100877,0.187,False
 opening,OGD,brier,OGD vs Uniform average,True,tie (not significant),76557,Shin,42,1.5685567061472004e-05,-2.6412485214932178e-05,6.096635954764202e-05,0.435,False
 opening,OGD,accuracy,OGD vs Uniform average,False,tie (not significant),76557,Shin,42,-5.22486513316875e-05,-0.0004183157647243225,0.00033961623365596876,0.833,False
 opening,FTRL,log_loss,FTRL vs Uniform average,True,tie (not significant),76557,Shin,42,1.799533888952155e-05,-1.5454572455667933e-05,4.798649831781335e-05,0.283,False
 opening,FTRL,brier,FTRL vs Uniform average,True,tie (not significant),76557,Shin,42,1.2469218605085104e-05,-7.420026002138599e-06,3.0649965984514e-05,0.235,False
 opening,FTRL,accuracy,FTRL vs Uniform average,False,tie (not significant),76557,Shin,42,-9.143513983045313e-05,-0.0002876941363951037,0.000104497302663375,0.425,False
-closing,Hedge,log_loss,Hedge vs Uniform average,True,Uniform average wins,76521,Shin,42,0.00011206893009338832,6.922099650675242e-05,0.0001575791820301274,0.0,True
-closing,Hedge,brier,Hedge vs Uniform average,True,Uniform average wins,76521,Shin,42,7.633981961052514e-05,4.9263850451950297e-05,0.00010472412760865957,0.0,True
-closing,Hedge,accuracy,Hedge vs Uniform average,False,tie (not significant),76521,Shin,42,-0.0001437513885077299,-0.00045739078161550426,0.00016988800460004442,0.379,False
+closing,Hedge,log_loss,Hedge vs Uniform average,True,Hedge wins,76521,Shin,42,-0.00019894192243822021,-0.00029609741005772025,-0.00010385203843977141,0.0,True
+closing,Hedge,brier,Hedge vs Uniform average,True,Hedge wins,76521,Shin,42,-0.00011558964340643312,-0.00017619840805122247,-5.589966711816991e-05,0.0,True
+closing,Hedge,accuracy,Hedge vs Uniform average,False,tie (not significant),76521,Shin,42,-3.9204924138471795e-05,-0.000496595705753976,0.0004051175494308752,0.866,False
 closing,OGD,log_loss,OGD vs Uniform average,True,OGD wins,76521,Shin,42,-0.00013033584198292994,-0.00022322497858185688,-3.4134116028005924e-05,0.006,True
 closing,OGD,brier,OGD vs Uniform average,True,OGD wins,76521,Shin,42,-7.041043060548505e-05,-0.00013072278053110058,-1.121697229595014e-05,0.018,True
 closing,OGD,accuracy,OGD vs Uniform average,False,tie (not significant),76521,Shin,42,-0.00015681969655388718,-0.0006011421701232341,0.0002875027770154598,0.513,False
 closing,FTRL,log_loss,FTRL vs Uniform average,True,Uniform average wins,76521,Shin,42,0.00010800600463646363,6.595495224208623e-05,0.00015277066288783557,0.0,True
 closing,FTRL,brier,FTRL vs Uniform average,True,Uniform average wins,76521,Shin,42,7.357556064204849e-05,4.6850739044601775e-05,0.00010119505957857961,0.0,True
 closing,FTRL,accuracy,FTRL vs Uniform average,False,tie (not significant),76521,Shin,42,-0.00016988800460004442,-0.0004838541054089721,0.00013100978816272477,0.297,False
-full,Hedge,log_loss,Hedge vs Uniform average,True,Hedge wins,76584,Shin,42,-0.0004519474479850896,-0.0006389325118580472,-0.0002587508500641302,0.0,True
-full,Hedge,brier,Hedge vs Uniform average,True,Hedge wins,76584,Shin,42,-0.0003037688490534294,-0.00043207902164509737,-0.00017560407984123664,0.0,True
-full,Hedge,accuracy,Hedge vs Uniform average,False,tie (not significant),76584,Shin,42,0.0005223023085762039,-0.00018280580800167137,0.001214352867439674,0.161,False
+full,Hedge,log_loss,Hedge vs Uniform average,True,Hedge wins,76584,Shin,42,-0.0015961136571047527,-0.001957866400683808,-0.0012355962857108422,0.0,True
+full,Hedge,brier,Hedge vs Uniform average,True,Hedge wins,76584,Shin,42,-0.0010392378869732543,-0.0012735078045899657,-0.0007949719296580015,0.0,True
+full,Hedge,accuracy,Hedge vs Uniform average,False,tie (not significant),76584,Shin,42,0.0011490650788676486,-1.3057557714405098e-05,0.0022592839235349403,0.054,False
 full,OGD,log_loss,OGD vs Uniform average,True,OGD wins,76584,Shin,42,-0.001139312693812205,-0.0013882170615553116,-0.0009020694209733464,0.0,True
 full,OGD,brier,OGD vs Uniform average,True,OGD wins,76584,Shin,42,-0.000744083485672563,-0.00091213013129801,-0.0005823601910803974,0.0,True
 full,OGD,accuracy,OGD vs Uniform average,False,tie (not significant),76584,Shin,42,0.0007442807897210905,-0.00018280580800167137,0.0016583098297294474,0.119,False

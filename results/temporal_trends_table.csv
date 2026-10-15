@@ -1,24 +1,24 @@
 series,type,season,metric,value,kind
-Hedge,algorithm,1617,log_loss,0.9947671172675379,per-series
-Hedge,algorithm,1617,ece,0.017871674719474675,per-series
-Hedge,algorithm,1718,log_loss,0.9933697420994179,per-series
-Hedge,algorithm,1718,ece,0.010076848937110328,per-series
-Hedge,algorithm,1819,log_loss,0.9991046082986564,per-series
-Hedge,algorithm,1819,ece,0.008554866153345683,per-series
-Hedge,algorithm,1920,log_loss,1.0104557752699619,per-series
-Hedge,algorithm,1920,ece,0.006202941073572117,per-series
-Hedge,algorithm,2021,log_loss,1.0066503765900523,per-series
-Hedge,algorithm,2021,ece,0.008456279430314463,per-series
-Hedge,algorithm,2122,log_loss,0.9959870604763558,per-series
-Hedge,algorithm,2122,ece,0.01010534085253282,per-series
-Hedge,algorithm,2223,log_loss,0.9939613873475645,per-series
-Hedge,algorithm,2223,ece,0.015825890180316184,per-series
-Hedge,algorithm,2324,log_loss,0.9923425017311079,per-series
-Hedge,algorithm,2324,ece,0.0074090457738103625,per-series
-Hedge,algorithm,2425,log_loss,0.9980554998951757,per-series
-Hedge,algorithm,2425,ece,0.006022678807805575,per-series
-Hedge,algorithm,2526,log_loss,1.0008770411349053,per-series
-Hedge,algorithm,2526,ece,0.009610413879782299,per-series
+Hedge,algorithm,1617,log_loss,0.9933179064135598,per-series
+Hedge,algorithm,1617,ece,0.014644135332677903,per-series
+Hedge,algorithm,1718,log_loss,0.9895015236121794,per-series
+Hedge,algorithm,1718,ece,0.006586419499805799,per-series
+Hedge,algorithm,1819,log_loss,0.9968464470056665,per-series
+Hedge,algorithm,1819,ece,0.006909609071738952,per-series
+Hedge,algorithm,1920,log_loss,1.0099055922004174,per-series
+Hedge,algorithm,1920,ece,0.005654411770993002,per-series
+Hedge,algorithm,2021,log_loss,1.0063237571184174,per-series
+Hedge,algorithm,2021,ece,0.007372398148485219,per-series
+Hedge,algorithm,2122,log_loss,0.9950454659579494,per-series
+Hedge,algorithm,2122,ece,0.007985225548525798,per-series
+Hedge,algorithm,2223,log_loss,0.992304781233109,per-series
+Hedge,algorithm,2223,ece,0.011299442646473961,per-series
+Hedge,algorithm,2324,log_loss,0.9910521856203318,per-series
+Hedge,algorithm,2324,ece,0.006024316909316032,per-series
+Hedge,algorithm,2425,log_loss,0.9968294820836137,per-series
+Hedge,algorithm,2425,ece,0.0048029677592081686,per-series
+Hedge,algorithm,2526,log_loss,0.9996366295861988,per-series
+Hedge,algorithm,2526,ece,0.007468980483109306,per-series
 OGD,algorithm,1617,log_loss,0.9936678491341023,per-series
 OGD,algorithm,1617,ece,0.016800511290781885,per-series
 OGD,algorithm,1718,log_loss,0.991254322170445,per-series
@@ -209,16 +209,16 @@ Bookmaker average,,2223,log_loss,0.9957177887433376,aggregate
 Bookmaker average,,2324,log_loss,0.9943614580361166,aggregate
 Bookmaker average,,2425,log_loss,0.9998093425014112,aggregate
 Bookmaker average,,2526,log_loss,1.0041390662266407,aggregate
-Algorithm average,,1617,log_loss,0.9944933096989552,aggregate
-Algorithm average,,1718,log_loss,0.992843710574364,aggregate
-Algorithm average,,1819,log_loss,0.9987234094616518,aggregate
-Algorithm average,,1920,log_loss,1.0106325493588333,aggregate
-Algorithm average,,2021,log_loss,1.0070042712889897,aggregate
-Algorithm average,,2122,log_loss,0.9962191060755119,aggregate
-Algorithm average,,2223,log_loss,0.9938175584452178,aggregate
-Algorithm average,,2324,log_loss,0.9923183041292185,aggregate
-Algorithm average,,2425,log_loss,0.9978187018883162,aggregate
-Algorithm average,,2526,log_loss,1.0005816937846128,aggregate
+Algorithm average,,1617,log_loss,0.9941310069854605,aggregate
+Algorithm average,,1718,log_loss,0.9918766559525544,aggregate
+Algorithm average,,1819,log_loss,0.9981588691384043,aggregate
+Algorithm average,,1920,log_loss,1.0104950035914473,aggregate
+Algorithm average,,2021,log_loss,1.0069226164210807,aggregate
+Algorithm average,,2122,log_loss,0.9959837074459104,aggregate
+Algorithm average,,2223,log_loss,0.9934034069166039,aggregate
+Algorithm average,,2324,log_loss,0.9919957251015245,aggregate
+Algorithm average,,2425,log_loss,0.9975121974354257,aggregate
+Algorithm average,,2526,log_loss,1.0002715908974362,aggregate
 Bookmaker average,,1617,ece,0.014673962476453766,aggregate
 Bookmaker average,,1718,ece,0.0076884760744452205,aggregate
 Bookmaker average,,1819,ece,0.006727237175740511,aggregate
@@ -229,16 +229,16 @@ Bookmaker average,,2223,ece,0.011797245528817389,aggregate
 Bookmaker average,,2324,ece,0.008398245705163274,aggregate
 Bookmaker average,,2425,ece,0.007128274840758507,aggregate
 Bookmaker average,,2526,ece,0.008438519536186948,aggregate
-Algorithm average,,1617,ece,0.0175949644553582,aggregate
-Algorithm average,,1718,ece,0.009917318646936107,aggregate
-Algorithm average,,1819,ece,0.008156908791003665,aggregate
-Algorithm average,,1920,ece,0.0052930749555614096,aggregate
-Algorithm average,,2021,ece,0.009005850746559846,aggregate
-Algorithm average,,2122,ece,0.009950406555717627,aggregate
-Algorithm average,,2223,ece,0.015000659260773945,aggregate
-Algorithm average,,2324,ece,0.00743374180648539,aggregate
-Algorithm average,,2425,ece,0.0060259956939351335,aggregate
-Algorithm average,,2526,ece,0.009213820581765278,aggregate
+Algorithm average,,1617,ece,0.016788079608659006,aggregate
+Algorithm average,,1718,ece,0.009044711287609974,aggregate
+Algorithm average,,1819,ece,0.007745594520601981,aggregate
+Algorithm average,,1920,ece,0.005155942629916631,aggregate
+Algorithm average,,2021,ece,0.008734880426102536,aggregate
+Algorithm average,,2122,ece,0.009420377729715872,aggregate
+Algorithm average,,2223,ece,0.01386904737731339,aggregate
+Algorithm average,,2324,ece,0.007087559590361807,aggregate
+Algorithm average,,2425,ece,0.005721067931785781,aggregate
+Algorithm average,,2526,ece,0.00867846223259703,aggregate
 Bookmaker average,,1617,overround_pct,4.419113658407021,aggregate
 Bookmaker average,,1718,overround_pct,4.389171178001944,aggregate
 Bookmaker average,,1819,overround_pct,4.722572613357305,aggregate

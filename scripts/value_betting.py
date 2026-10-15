@@ -49,11 +49,11 @@ The six experiments below (`run_*`), in the order `main()` runs them:
                                   economics for the two WORST algorithms
                                   (FTRL, Uniform average)? Only place in
                                   this file that uses an algorithm other
-                                  than OGD.
+                                  than the main one.
 
-Only OGD is used in experiments 1-5 (significance_test.py found it's the
-only one of the four mixture algorithms that significantly beats uniform
-averaging, so it's the only "candidate" worth putting money behind).
+Experiments 1-5 bet with the main mixture, sleeping_experts.MAIN_ALGORITHM
+(Hedge since the specialists fix made it the best of the three; it was OGD
+before), through betting.fit_leave_out.
 
 Produces (one CSV/PNG pair per experiment, see each run_* docstring):
   results/value_betting_table.csv, .png
@@ -271,7 +271,7 @@ def plot_edge_sweep(table, out_path):
 # =====================================================================
 
 def run_closing_trained_both_norms(match_ids):
-    """OGD trained on ONLY the other closing-side bookmakers, bet against
+    """The main mixture trained on ONLY the other closing-side bookmakers, bet against
     every closing-side target, for both Basic and Shin normalization.
     Causally valid, no look-ahead risk (see module docstring). Produces
     results/value_betting_closing_trained_table.csv, .png."""
@@ -312,7 +312,7 @@ def run_closing_trained_both_norms(match_ids):
     out_path = os.path.join(OUT_DIR, "value_betting_closing_trained_table.csv")
     table.to_csv(out_path, index=False)
     pd.set_option("display.width", 160)
-    print(f"\n=== Closing-on-closing Kelly (OGD) -- saved to {out_path} ===\n")
+    print(f"\n=== Closing-on-closing Kelly (Hedge) -- saved to {out_path} ===\n")
     print(table.to_string(index=False, float_format=lambda v: f"{v:.5f}"))
 
     plot_multi_target_bankrolls(
@@ -323,7 +323,7 @@ def run_closing_trained_both_norms(match_ids):
             ("Shin", "raw"): dict(color="#eb6834", linestyle="-", linewidth=1.4),
             ("Shin", "calibrated"): dict(color="#2a78d6", linestyle="-", linewidth=1.8),
         },
-        suptitle="Closing-on-closing Kelly: OGD trained on closing-only panel, bet vs. each closing bookmaker",
+        suptitle="Closing-on-closing Kelly: Hedge trained on closing-only panel, bet vs. each closing bookmaker",
         out_path=os.path.join(OUT_DIR, "value_betting_closing_trained.png"),
     )
     return table
@@ -518,7 +518,7 @@ def run_training_panel_sweep(match_ids):
 def run_shin_vs_basic(match_ids):
     """Does Shin normalization change the economics for FTRL and Uniform
     average (the two worst of the four mixture algorithms by calibrated
-    log-loss -- deliberately not OGD, which experiments 1-5 already cover)?
+    log-loss -- deliberately not the main mixture, which experiments 1-5 already cover)?
     The odds actually bet against are identical in both datasets (de-vig
     can't change payouts), so any profit difference comes purely from
     p_hat. Produces results/shin_vs_basic_value_betting_table.csv,

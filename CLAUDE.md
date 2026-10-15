@@ -49,10 +49,30 @@ prose.
   `main()` and produces no output; every other active script imports from it, directly or not.
   `sleeping_experts_experiment.py` is the script that actually runs those algorithms over the full panel
   and writes `results_table.csv` + `sleeping_experts_comparison.png`.
+- **Hedge is the SPECIALISTS update since 2026-10-15** (`hedge_specialists_step` in
+  `sleeping_experts.py`, shared by `run_hedge_sleeping`, `learning_rate_study.hedge_scaled` and
+  `fixed_share.run_hedge_fixed_share`): after the multiplicative step the awake group is rescaled back
+  to its previous total mass. The earlier version skipped that rescaling, which loses the per-expert
+  guarantee: at eta=1 it trailed PSC by 165 nats on PSC's rounds against a bound of ln 26 = 3.26 (the
+  fixed version: 1.8). Re-selected on the train prefix, `HEDGE_STEP_MULTIPLIER = 250` (plateau x200 to
+  x1000); Hedge then ties PSC over the decade (+0.00005, p=0.43) and beats OGD. OGD and FTRL are
+  untouched. Experiments: `experiments/specialists_hedge.py`, pre-fix snapshot kept outside the repo.
+  The bullets below about Hedge x0.25 are history.
+- **Hedge is also the MAIN algorithm** (`MAIN_ALGORITHM` / `run_main_sleeping` in
+  `sleeping_experts.py`): everything that used "the best algorithm" -- betting.fit_leave_out and so all
+  of value betting and the Kelly/ONS stage, deployment_test, best_configuration, information_arrival,
+  contextual_experts, mcmc_kelly, no_pinnacle_panel / recent_window (CHALLENGER), common_matches,
+  significance_test, outcome_class_*, accuracy_by_band, pooling_window_comparison -- uses Hedge; it was
+  OGD before. bandit_oco, markov_ogd and regime_switching stay on OGD on purpose (they study OGD's
+  projection / copies of OGD). `value_betting_ogd_vs_ftrl.py` became `value_betting_hedge_vs_ogd.py`
+  (asserts its Hedge half reproduces value_betting_all_bookmakers_table.csv). `docs/thesis_en_v2.tex`
+  was rewritten around Hedge on 2026-10-15, and so were the study guide and the 20-minute deck and
+  script. The 40-minute deck (build_deck.js) was NOT updated and still carries OGD-based and
+  pre-fix numbers.
 - **Three step multipliers in `sleeping_experts.py` are load-bearing**: `OGD_STEP_MULTIPLIER = 100`,
-  `HEDGE_STEP_MULTIPLIER = 0.25`, `FTRL_STEP_MULTIPLIER = 0.05`. All three are empirical, selected on a
-  chronological train prefix (same protocol as the calibration learning rate). Touching any of them
-  moves every number in `results/` and in the write-ups.
+  `HEDGE_STEP_MULTIPLIER = 250` (was 0.25 before the specialists fix), `FTRL_STEP_MULTIPLIER = 0.05`.
+  All three are empirical, selected on a chronological train prefix (same protocol as the calibration
+  learning rate). Touching any of them moves every number in `results/` and in the write-ups.
   **The lesson that produced two of them: a grid's endpoint is not an optimum.** `learning_rate_study.py`
   originally swept 1, 2, 5, ... 1000 and reported Hedge and FTRL as "already optimal at 1.0". They were
   at the grid's LOWER BOUNDARY and nobody had looked left. Searching downwards found genuine interior
@@ -128,7 +148,7 @@ prose.
   everything else always re-derives its own numbers):
   `download_data.ps1 -> data_processer.py -> sleeping_experts.py -> sleeping_experts_experiment.py ->
   calibration_analysis.py -> calibration_correction.py -> final_ranking.py -> {significance_test,
-  fixed_share, value_betting -> {value_betting_online_kelly, value_betting_ogd_vs_ftrl,
+  fixed_share, value_betting -> {value_betting_online_kelly, value_betting_hedge_vs_ogd,
   value_betting_circular, value_betting_sharp_anchor, value_betting_by_band},
   contextual_experts, outcome_class_accuracy -> {outcome_class_comparison,
   outcome_class_accuracy_test}, temporal_trends, pooling_window_comparison,
@@ -139,7 +159,7 @@ prose.
   `docs/WORK_PLAN.md` and `docs/CODE_OVERVIEW.md` for what each covers. Three of these read another
   script's CSV rather than only the processed data, so run order matters for them:
   `market_devig_comparisons.py` and `value_betting.py` read `results_table.csv`;
-  `value_betting_ogd_vs_ftrl.py` and `value_betting_circular.py` read
+  `value_betting_hedge_vs_ogd.py` and `value_betting_circular.py` read
   `value_betting_all_bookmakers_table.csv` (the first of the two ASSERTS its own OGD half reproduces it,
   so a stale file there turns into a confusing failure).
   `no_pinnacle_panel.py` is deliberately standalone -- it drops PS/PSC from the panel and refits, and
@@ -344,7 +364,8 @@ editing the shared file that half the scripts import -- `value_betting.py` and
   evaluates such a round would get a zero mixture probability: restrict betting/evaluation rounds
   yourself, as the value-betting files do.
 - **Never renormalize the PERSISTENT weight vector in a Hedge variant** -- only the awake-restricted
-  prediction copy may be normalized. `run_hedge_sleeping`'s docstring says this and `fixed_share.py`
+  prediction copy may be normalized. (Not to be confused with the specialists rescaling, which touches
+  the AWAKE group only and is required -- see the Hedge bullet near the top.) `run_hedge_sleeping`'s docstring says this and `fixed_share.py`
   documents an earlier occurrence, and it still got repeated in `learning_rate_study.py`: rescaling `w`
   after each update (there, to stop underflow at large eta) silently produces a DIFFERENT algorithm and
   a flattering set of conclusions. If you need a large eta, carry the weights in **log space** and apply

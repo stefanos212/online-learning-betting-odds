@@ -413,12 +413,12 @@ paired tests on which the conclusions of that section rest."""),
 Πίνακες~\ref{app:rwlive} και~\ref{app:rwlivesig} προσθέτουν μια σύγκριση που δεν εμφανίζεται
 στο κυρίως κείμενο: την αγορά που μπορεί πράγματι να χρησιμοποιήσει σήμερα ένας παίκτης, δηλαδή
 τις σειρές που δίνουν ακόμη αποδόσεις στο τελευταίο τέταρτο του συνόλου των δεδομένων. Εκεί το
-OGD κερδίζει σημαντικά κάθε τιμή ανοίγματος και ισοπαλεί με κάθε τιμή κλεισίματος. Οι
+Hedge κερδίζει σημαντικά κάθε τιμή ανοίγματος και ισοπαλεί με κάθε τιμή κλεισίματος. Οι
 Πίνακες~\ref{app:dep} και~\ref{app:depsig} συμπληρώνουν την \S\ref{sec:res-deploy}.""",
   r"""Tables~\ref{app:rw} and~\ref{app:rwsig} complete \S\ref{sec:res-recent}.
 Tables~\ref{app:rwlive} and~\ref{app:rwlivesig} add a comparison not shown in the main text:
 the market a bettor can actually use today, that is the series still quoting in the last
-quarter of the full history. There OGD significantly beats every opening price and ties with
+quarter of the full history. There Hedge significantly beats every opening price and ties with
 every closing one. Tables~\ref{app:dep} and~\ref{app:depsig} complete
 \S\ref{sec:res-deploy}."""),
  "common": (
@@ -570,11 +570,11 @@ positive one does. \textbf{Verdict} gives the outcome at the 95\% level."""),
     t = read("best_configuration.csv")
     if t is not None:
         add(longtable(t, T(
-            r"""Log-loss του OGD σε κάθε διαμόρφωση, στους ίδιους 71.818 αγώνες: \textbf{πλήρες}
+            r"""Log-loss του Hedge σε κάθε διαμόρφωση, στους ίδιους 71.818 αγώνες: \textbf{πλήρες}
 σε όλους, \textbf{train} στο χρονολογικό πρόθεμα 75\% και \textbf{ουρά} στο υπόλοιπο 25\%,
 μικρότερο καλύτερο· \textbf{Στάδιο} δείχνει αν οι πιθανότητες είναι raw ή βαθμονομημένες.
 \emph{Μόνο PSC} είναι ο bookmaker αναφοράς, βαθμολογημένος στους ίδιους αγώνες.""",
-            r"""Log-loss of OGD in each configuration, on the same 71,818 matches: \textbf{full}
+            r"""Log-loss of Hedge in each configuration, on the same 71,818 matches: \textbf{full}
 over all of them, \textbf{train} over their chronological 75\% prefix and \textbf{tail} over
 the remaining 25\%, lower better; \textbf{Stage} says whether the probabilities are raw or
 calibrated. \emph{PSC alone} is the benchmark bookmaker, scored on the same matches."""),
@@ -612,11 +612,11 @@ calibrated over all common matches, and calibrated over their chronological 75\%
     t = read("no_pinnacle_significance.csv")
     if t is not None:
         add(longtable(t, T(
-            r"""Το OGD έναντι κάθε bookmaker κάθε panel χωρίς την Pinnacle, ζευγαρωτά στους κοινούς
-αγώνες του panel, βαθμονομημένο log-loss. Αρνητική \textbf{Μ. διαφορά} σημαίνει ότι το OGD είναι
+            r"""Το Hedge έναντι κάθε bookmaker κάθε panel χωρίς την Pinnacle, ζευγαρωτά στους κοινούς
+αγώνες του panel, βαθμονομημένο log-loss. Αρνητική \textbf{Μ. διαφορά} σημαίνει ότι το Hedge είναι
 καλύτερο.""",
-            r"""OGD against each bookmaker of each panel without Pinnacle, paired over the
-panel's common matches, calibrated log-loss. A negative \textbf{Mean diff.} means that OGD is
+            r"""Hedge against each bookmaker of each panel without Pinnacle, paired over the
+panel's common matches, calibrated log-loss. A negative \textbf{Mean diff.} means that Hedge is
 better."""), "app:npsig",
             cols=["panel", "bookmaker", "n", "mean_diff", "ci_low", "ci_high", "p_value",
                   "verdict"]))
@@ -645,7 +645,7 @@ the series quoted."""), "app:rw",
             cols=["comparison", "n", "mean_diff", "ci_low", "ci_high", "p_value"]))
     t = read("recent_window_live_market.csv")
     if t is not None:
-        # one CSV, two tables: the ranking rows, then OGD's tests against the books
+        # one CSV, two tables: the ranking rows, then Hedge's tests against the books
         n_live = count(t.loc[t["bookmaker"].notna(), "n"].iloc[0])
         add(longtable(t[t["rank"].notna()], T(
             r"""Η αγορά του σήμερα: οι σειρές που περνούν το κατώφλι κάλυψης στο τελευταίο
@@ -659,10 +659,10 @@ causal run, and \textbf{Coverage} is computed on the last quarter alone.""").rep
             "app:rwlive",
             cols=["rank", "name", "phase", "coverage_tail_pct", "log_loss"]))
         add(longtable(t[t["bookmaker"].notna()], T(
-            r"""Το OGD έναντι κάθε bookmaker του Πίνακα~\ref{app:rwlive}, ζευγαρωτά στους ίδιους
-@N@ αγώνες· αρνητική \textbf{Μ. διαφορά} σημαίνει ότι το OGD είναι καλύτερο.""",
-            r"""OGD against each bookmaker of Table~\ref{app:rwlive}, paired over the same @N@
-matches; a negative \textbf{Mean diff.} means that OGD is better.""").replace("@N@", n_live),
+            r"""Το Hedge έναντι κάθε bookmaker του Πίνακα~\ref{app:rwlive}, ζευγαρωτά στους ίδιους
+@N@ αγώνες· αρνητική \textbf{Μ. διαφορά} σημαίνει ότι το Hedge είναι καλύτερο.""",
+            r"""Hedge against each bookmaker of Table~\ref{app:rwlive}, paired over the same @N@
+matches; a negative \textbf{Mean diff.} means that Hedge is better.""").replace("@N@", n_live),
             "app:rwlivesig",
             cols=["bookmaker", "phase", "n", "mean_diff", "ci_low", "ci_high", "p_value",
                   "verdict"]))
@@ -723,10 +723,10 @@ over its 25\% tail; a negative difference means that the first-named series is b
     if t is not None:
         add(longtable(t, T(
             r"""Value betting στα σύνολα B και B$'$ (χωρίς Pinnacle), με το σταθερό $\tfrac14$
-του κλάσματος Kelly απέναντι στις πραγματικές αποδόσεις και μείγμα OGD της φάσης του στόχου,
+του κλάσματος Kelly απέναντι στις πραγματικές αποδόσεις και μείγμα Hedge της φάσης του στόχου,
 χωρίς τον ίδιο τον στόχο· στήλες όπως στον Πίνακα~\ref{app:vbsweep}.""",
             r"""Value betting on datasets B and B$'$ (without Pinnacle), with the fixed $\tfrac14$
-of the Kelly fraction against the real odds and an OGD mixture of the target's phase without the
+of the Kelly fraction against the real odds and a Hedge mixture of the target's phase without the
 target itself; columns as in Table~\ref{app:vbsweep}."""), "app:common-vb",
             cols=["panel", "bookmaker", "phase", "n_bets", "final_bankroll",
                   "mean_log_growth_per_bet", "ci_low", "ci_high", "p_value"]))
@@ -788,23 +788,24 @@ plain Hedge."""), "app:fs",
             FORMAT[f"$\\alpha={float(a):g}$"] = "{:.3f}"
         add(longtable(t, T(
             r"""Βάρος Hedge των έντεκα σειρών που δίνουν αποδόσεις μόνο στις τελευταίες σεζόν,
-στον τελευταίο γύρο που ήταν ξύπνια η καθεμία, ανά $\alpha$. Χωρίς διαρροή ($\alpha=0$) κάθε
-σειρά κρατά 0,11 έως 0,17, περισσότερο από ίσο μερίδιο μεταξύ των experts που ήταν ξύπνιοι μαζί
-της· κάθε $\alpha>0$ τη φέρνει σχεδόν ακριβώς σε αυτό το ίσο μερίδιο.""",
+στον τελευταίο γύρο που ήταν ξύπνια η καθεμία, ανά $\alpha$. Χωρίς διαρροή ($\alpha=0$) οι
+τιμές ανοίγματος κρατούν σχεδόν μηδενικό βάρος (0,001 έως 0,012) και οι τιμές κλεισίματος 0,02
+έως 0,14· κάθε $\alpha>0$ φέρνει όλες κοντά σε ίσο μερίδιο μεταξύ των experts που ήταν ξύπνιοι
+μαζί τους (0,06 έως 0,11).""",
             r"""Hedge weight of the eleven series that quote only in the last seasons, read at
-each one's own last awake round, by $\alpha$. Without a leak ($\alpha=0$) each holds 0.11 to
-0.17, more than an equal share among the experts awake with it; any $\alpha>0$ brings it back
-to almost exactly that equal share."""), "app:fsw"))
+each one's own last awake round, by $\alpha$. Without a leak ($\alpha=0$) the opening
+series hold almost no weight (0.001 to 0.012) and the closing ones 0.02 to 0.14; any $\alpha>0$
+pulls all of them towards an equal share among the experts awake with them (0.06 to 0.11)."""), "app:fsw"))
     t = read("contextual_experts_table.csv")
     if t is not None:
         add(longtable(t, T(
-            r"""Ανά πρωτάθλημα ειδικοί: το OGD εκπαιδευμένο σε ένα μόνο πρωτάθλημα
-(\textbf{Ειδικός}) έναντι του ενιαίου OGD εκπαιδευμένου σε όλα (\textbf{Ενιαίο}), με log-loss
+            r"""Ανά πρωτάθλημα ειδικοί: το Hedge εκπαιδευμένο σε ένα μόνο πρωτάθλημα
+(\textbf{Ειδικός}) έναντι του ενιαίου Hedge εκπαιδευμένου σε όλα (\textbf{Ενιαίο}), με log-loss
 στους αγώνες του πρωταθλήματος, μικρότερο καλύτερο. \textbf{Νίκη ειδ.} δείχνει αν ο ειδικός
 είναι καλύτερος, και \textbf{Πιο έμπιστοι} οι τρεις σειρές με το μεγαλύτερο βάρος στον
 ειδικό.""",
-            r"""Per-league specialists: OGD trained on one league alone (\textbf{Specialist})
-against the single OGD trained on all of them (\textbf{Unified}), both scored by log-loss on that
+            r"""Per-league specialists: Hedge trained on one league alone (\textbf{Specialist})
+against the single Hedge trained on all of them (\textbf{Unified}), both scored by log-loss on that
 league's matches, lower better. \textbf{Spec. wins} says whether the specialist is better, and
 \textbf{Most trusted} lists the three series to which the specialist gave the largest
 weight."""), "app:ctx",
@@ -906,11 +907,11 @@ over the matches the series quoted."""), "app:pool",
     if t is not None:
         add(longtable(t, T(
             r"""Οι ζευγαρωτοί έλεγχοι πίσω από τον Πίνακα~\ref{tab:arrival} και το
-Σχήμα~\ref{fig:arrival}: σε κάθε πεμπτημόριο κάθε διαστρωμάτωσης, το OGD του closing-only panel
-έναντι του OGD του opening-only panel, raw log-loss. Αρνητική \textbf{Μ. διαφορά} σημαίνει ότι
+Σχήμα~\ref{fig:arrival}: σε κάθε πεμπτημόριο κάθε διαστρωμάτωσης, το Hedge του closing-only panel
+έναντι του Hedge του opening-only panel, raw log-loss. Αρνητική \textbf{Μ. διαφορά} σημαίνει ότι
 το closing panel είναι καλύτερο.""",
             r"""The paired tests behind Table~\ref{tab:arrival} and Figure~\ref{fig:arrival}: in
-each quintile of each stratification, OGD fitted on the closing-only panel against OGD fitted on
+each quintile of each stratification, Hedge fitted on the closing-only panel against Hedge fitted on
 the opening-only panel, raw log-loss. A negative \textbf{Mean diff.} means that the closing
 panel is better."""), "app:info",
             cols=["stratifier", "stratum", "n", "mean_diff", "ci_low", "ci_high", "p_value"]))
